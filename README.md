@@ -1,2 +1,3 @@
-# kaalgrontiid
-C++ parsers for geoformats
+## RadegastDB geostruct parsers
+
+RadegastDB geo formate parsers

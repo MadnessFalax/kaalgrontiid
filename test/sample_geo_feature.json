@@ -1,0 +1,15 @@
+
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          49.820923,
+          18.262524
+        ]
+      },
+      "properties": {
+        "type": "City",
+        "name": "Ostrava"
+      }
+    }
