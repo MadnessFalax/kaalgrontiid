@@ -1,3 +1,3 @@
-## RadegastDB geostruct parsers
+## Thesis
 
-RadegastDB geo formate parsers
+Thesis that is currently in progress.
