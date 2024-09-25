@@ -1,5 +1,6 @@
 #pragma once
 #include <cstdio>
+#include "is_pointer.h"
 
 /**
 * 
@@ -15,45 +16,43 @@
 
 
 #define START_SIZE 16
+#define MAX_INCREASE 1024
 
 template <class T>
 class pArray
 {
 protected:
-	T* data;
+	T* _data;
 	int _size;
-	int count;
-
+	int _count;
 
 public:
 
 	pArray() {
-		data = new T[START_SIZE];
+		_data = new T[START_SIZE];
 		_size = START_SIZE;
-		count = 0;
+		_count = 0;
 	}
 
-	// copy constr
 	pArray(pArray& other) {
 		this->_size = other._size;
-		this->count = other.count;
+		this->_count = other._count;
 
-		data = new T[this->_size];
+		_data = new T[this->_size];
 
 		for (int i = 0; i < this->_size; i++) {
-			this->data[i] = other.data[i];
+			this->_data[i] = other._data[i];
 		}
 	}
 
-	// move constr
 	pArray(pArray&& other) noexcept {
 		this->_size = other._size;
-		this->count = other.count;
+		this->_count = other._count;
 
-		data = new T[this->_size];
+		_data = new T[this->_size];
 
 		for (int i = 0; i < this->_size; i++) {
-			this->data[i] = other.data[i];
+			this->_data[i] = T(other._data[i]);
 		}
 
 		other.clear();
@@ -61,41 +60,39 @@ public:
 
 
 	~pArray() {
-		delete[] data;
-		data = nullptr;
+		delete[] _data;
+		_data = nullptr;
 	}
 
-	// move assignment (copy is forbiden for this array)
 	void operator= (pArray& other) {
 		if (this != &other) {
 			this->_size = other._size;
-			this->count = other.count;
+			this->_count = other._count;
 
-			delete[] data;
-			data = nullptr;
+			delete[] _data;
+			_data = nullptr;
 
-			data = new T[this->_size];
+			_data = new T[this->_size];
 
 			for (int i = 0; i < this->_size; i++) {
-				this->data[i] = other.data[i];
+				this->_data[i] = other._data[i];
 			}
 
 			other.clear();
 		}
 	}
 
-	// move assignment
 	void operator= (pArray&& other) noexcept {
 		this->_size = other._size;
-		this->count = other.count;
+		this->_count = other._count;
 
-		delete[] data;
-		data = nullptr;
+		delete[] _data;
+		_data = nullptr;
 
-		data = new T[this->_size];
+		_data = new T[this->_size];
 
 		for (int i = 0; i < this->_size; i++) {
-			this->data[i] = other.data[i];
+			this->_data[i] = other._data[i];
 		}
 
 		other.clear();
@@ -103,33 +100,33 @@ public:
 	}
 
 	T& operator[](int index) {
-		if (index >= count || index < 0) {
+		if (index >= _count || index < 0) {
 			// index out of bounds
 			throw;
 		}
 		else 
-			return data[index];	
+			return _data[index];
 	}
 
 	int size() {
-		return this->count;
+		return this->_count;
 	}
 
 	void push_back(T val) {
-		if (count + 1 >= _size) {
+		if (_count + 1 >= _size) {
 			increase_size();
 		}
 
-		data[count] = val;
-		count++;
+		_data[_count] = val;
+		_count++;
 	}
 
 	void clear() {
-		for (int i = 0; i < count; i++) {
+		for (int i = 0; i < _count; i++) {
 			// ???
-			data[i] = T{};
+			_data[i] = T{};
 		}
-		count = 0;
+		_count = 0;
 	}
 
 private:
@@ -138,14 +135,14 @@ private:
 		int new_size = (int)(_size * 2.5);
 		T* new_data = new T[new_size];
 
-		for (int i = 0; i < count; i++) {
-			new_data[i] = data[i];
+		for (int i = 0; i < _count; i++) {
+			new_data[i] = _data[i];
 		}
 
-		delete[] data;
-		data = nullptr;
+		delete[] _data;
+		_data = nullptr;
 
-		data = new_data;
+		_data = new_data;
 		_size = new_size;
 	}
 
@@ -168,11 +165,11 @@ public:
 	};
 
 	Iterator begin() {
-		return Iterator(&data[0]);
+		return Iterator(&_data[0]);
 	}
 
 	Iterator end() {
-		return Iterator(&data[count]);
+		return Iterator(&_data[_count]);
 	}
 };
 
