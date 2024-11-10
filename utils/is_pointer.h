@@ -6,7 +6,7 @@ struct _is_pointer {
 };
 
 template<typename T>
-struct _is_pointer {
+struct _is_pointer<T*> {
 	static constexpr bool value = true;
 };
 

@@ -1,8 +1,13 @@
-#include "parser/JSON/GeoJSONConverter.h"
+//#include "parser/JSON/GeoJSONConverter.h"
 #include "utils/pArray.h"
+#include "utils/is_pointer.h"
+
 
 int main() {
-	
+
+
+
+	/*
 	pArray<GJFeature*> a;
 	GeoJSONConverter* conv = new GeoJSONConverter("test/utf8_test.json");
 	conv->convert();
@@ -20,7 +25,7 @@ int main() {
 		x->dispose_deep();
 		delete x;
 		x = nullptr;
-	}
+	}*/
 
 	/*pArray<int> a = pArray<int>();
 
@@ -29,7 +34,7 @@ int main() {
 	}
 
 	int size = a.size();
-		
+	 
 	for (auto x : a) {
 		printf("%i\n", x);
 	}*/

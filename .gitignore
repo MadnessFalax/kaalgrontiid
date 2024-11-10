@@ -30,3 +30,9 @@
 *.exe
 *.out
 *.app
+
+# garbage I guess
+\.vs
+
+# build
+\x64

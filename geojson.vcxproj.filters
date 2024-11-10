@@ -39,6 +39,12 @@
     <ClInclude Include="utils\pPair.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="utils\is_pointer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\pUTF8String.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source.cpp">
@@ -63,5 +69,6 @@
     </None>
     <None Include="test\sample_geo.json" />
     <None Include="test\utf8_test.json" />
+    <None Include=".gitignore" />
   </ItemGroup>
 </Project>
