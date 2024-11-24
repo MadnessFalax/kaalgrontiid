@@ -121,7 +121,7 @@ namespace nspArray {
 			does not dispose elements! sets them to NULL / nullptr value instead
 		*/
 		constexpr void clear() {
-			if constexpr (is_pointer<value_type>()) {
+			if (is_pointer<value_type>()) {
 				for (size_t i = 0; i < _count; i++) {
 					_data[i] = nullptr;
 				}

@@ -4,202 +4,245 @@
 #include "cstdlib"
 #include "cstring"
 
+// REDO to hold null terminator
 
 namespace nspString {
 
-	constexpr size_t CAPACITY = 65535;
+	constexpr size_t CAPACITY = 65521;		// highest prime lower than ulong max value
 	constexpr size_t START_SIZE = 16;
 	constexpr size_t LOW_RESIZE = 10;		// higher = less chance that a reallocation will be needed after initial alloc, lower = less unused space after initial allocation
 	constexpr size_t INCR_FACTOR = 2;		// higher = reallocating less often, lower = less unused space after reallocation
 
+	// stores trailing null terminator
+	// operator+ is not implemented so that new heap objects arent constructed unintentionally
 	class pString
 	{
-		char* data;
-		int size;				// includes trailing '\0'
-		int count;
+		char* _data;			// holds trailing '\0'
+		size_t _size;			// total bytes allocated ('\0' included)
+		size_t _count;			// string char length ('\0' NOT included)
 
 	public:
 		pString() {
-			this->data = new char[START_SIZE];
-			this->size = START_SIZE;
-			this->count = 0;
+			this->_data = new char[START_SIZE];
+			this->_size = START_SIZE;
+			this->_count = 0;
 
-			memset(this->data, '\0', this->size);
+			memset(this->_data, '\0', this->_size);
 		}
 
 		pString(const pString& other) {
-			this->size = other.size;
-			this->count = other.count;
-			this->data = new char[this->size];
+			this->_size = other._size;
+			this->_count = other._count;
+			this->_data = new char[this->_size];
 
-			memset(this->data, '\0', this->size);
+			memset(this->_data, '\0', this->_size);
 
-			memcpy(this->data, other.data, this->count);
+			memcpy(this->_data, other._data, this->_count);
 		}
 
 		pString(pString&& other) noexcept {
-			this->size = other.size;
-			this->count = other.count;
-			this->data = other.data;
+			this->_size = other._size;
+			this->_count = other._count;
+			this->_data = other._data;
 
-			other.data = nullptr;
+			other._data = nullptr;
 		}
 
 		pString(const char* other) {
-			int tmp_count = strlen(other);
-			int tmp_size = tmp_count + START_SIZE;
-			count = tmp_count;
-			size = tmp_size;
-			data = new char[size];
+			if (other != nullptr) {
+				_count = strlen(other);
+			}
+			else {
+				_count = 0;
+			}
+			_size = _count + START_SIZE;
+			_data = new char[_size];
 
-			memset(this->data, '\0', this->size);
+			memset(this->_data, '\0', this->_size);
 
-			memcpy(this->data, other, this->count);
+			if (other != nullptr) {
+				memcpy(this->_data, other, this->_count);
+			}
 
 		}
 
 		~pString() {
-			delete[] data;
-			data = nullptr;
+			delete[] _data;
+			_data = nullptr;
 		}
 
-		void operator= (pString& other) {
+		void operator= (const pString& other) noexcept {
 			if (this != &other) {
-				int tmp_count = other.count;
+				size_t _count = other._count;
 
-				if (tmp_count > this->size - 1) {
-					int tmp_size = tmp_count + START_SIZE;
-					count = tmp_count;
-					size = tmp_size;
-					delete[] data;
-					data = new char[size];
+				if (_count > this->_size) {
+					_size = _count + START_SIZE;
+					delete[] _data;
+					_data = nullptr;
+					_data = new char[_size];
+					memset(this->_data, '\0', this->_size);
 				}
 
-				memset(this->data, '\0', this->size);
-
-				memcpy(this->data, other.data, tmp_count);
-
-				count = other.count;
+				memcpy(this->_data, other._data, _count);
 			}
 		}
 
-		// move resource from anonymous pString
 		void operator= (pString&& other) noexcept {
-			delete[] data;
+			delete[] _data;
 
-			count = other.count;
-			size = other.size;
-			data = other.data;
+			_count = other._count;
+			_size = other._size;
+			_data = other._data;
 
-			other.data = nullptr;
+			other._data = nullptr;
 		}
 
 		void operator= (const char* other) {
-			int tmp_len = strlen(other);
+			if (other != nullptr) {
+				if (other != this->_data) {
+					int _count = strlen(other);
 
-			if (tmp_len > this->size - 1) {
-				delete[] data;
-				data = nullptr;
+					if (_count + 1 > this->_size) {
+						delete[] _data;
+						_data = nullptr;
+						this->_size = _count + START_SIZE;
+						_data = new char[_size];
+						memset(this->_data, '\0', this->_size);
+					}
 
-				this->size = tmp_len + START_SIZE;
-				this->count = tmp_len;
-
-				data = new char[this->size];
+					memcpy(this->_data, other, _count);
+				}
 			}
-
-			memset(this->data, '\0', this->size);
-			memcpy(this->data, other, tmp_len);
 		}
 
 		void operator= (char other) {
-			memset(this->data, '\0', this->size);
-			this->data[0] = other;
+			memset(this->_data, '\0', this->_size);
+			_count = 1;
+			_data[0] = other;
 		}
 
-		void operator+= (pString& other) {
-			int tmp_count = other.count;
-			if (count + tmp_count >= size - 1) {
-				increase_size(tmp_count);
+		void operator+= (const pString& other) {
+			if (other._count > 0) {
+				if (this != &other) {
+					size_t tmp_count = other._count + _count;
+					if (tmp_count + 1 > _size) {
+						increase_size(other._count + 1);
+					}
+					memcpy(&(_data[_count]), other._data, tmp_count);
+					_count = tmp_count;
+				}
+				else {
+					size_t target_count = _count * 2;
+					if (target_count + 1 > _size) {
+						increase_size(_count + 1);
+					}
+					memmove(&(_data[_count]), _data, _count);
+					_count = target_count;
+				}
 			}
-
-			memcpy(&(data[count]), other.data, tmp_count);
-			count += tmp_count;
 		}
 
 		void operator+= (const char* other) {
-			int tmp_count = strlen(other);
-			if (count + tmp_count >= size - 1) {
-				increase_size(tmp_count);
-			}
+			if (other != nullptr) {
+				if (this->_data != other) {
+					size_t tmp_count = strlen(other);
+					if (_count + tmp_count + 1> _size) {
+						increase_size(tmp_count + 1);
+					}
 
-			memcpy(&(data[count]), other, tmp_count);
-			count += tmp_count;
+					memcpy(&(_data[_count]), other, tmp_count);
+					_count += tmp_count;
+				}
+				else {
+					size_t target_count = _count * 2;
+					if (target_count + 1 > _size) {
+						increase_size(_count + 1);
+					}
+					memmove(&(_data[_count]), _data, _count);
+					_count = target_count;
+				}
+			}
 		}
 
-		void operator+= (char other) {
-			if (count + 1 >= size - 1) {
-				increase_size(1);
+		void operator+= (const char other) {
+			if (other == '\0') {
+				return;
 			}
 
-			data[count] = other;
-			count++;
+			if (_count + 1 > _size) {
+				increase_size(2);
+			}
+
+			_data[_count] = other;
+			_count++;
 		}
 
-		bool operator== (const char* other) {
-			if (strcmp(this->data, other) == 0) {
+		bool operator== (const char* other) const {
+			if (other == nullptr) {
+				return false;
+			}
+			if (this->_data == other) {
+				return true;
+			}
+			if (strcmp(this->_data, other) == 0) {
 				return true;
 			}
 			return false;
 		}
 
-		bool operator== (pString& other) {
-			if (this == &other)
+		bool operator== (pString& other) const {
+			if (this == &other) {
 				return true;
-			if (strcmp(this->data, other.data) == 0) {
+			}
+			if (strcmp(this->_data, other._data) == 0) {
 				return true;
 			}
 			return false;
 		}
 
-		bool operator== (pString&& other) {
-			if (strcmp(this->data, other.data) == 0) {
+		bool operator== (pString&& other) const {
+			if (strcmp(this->_data, other._data) == 0) {
 				return true;
 			}
 			return false;
 		}
 
-		bool operator!= (pString& other) {
+		bool operator!= (pString& other) const {
 			return !(this->operator==(other));
 		}
 
 		bool operator< (const pString& other) const {
-			return strcmp(this->data, other.data) < 0;
+			return strcmp(this->_data, other._data) < 0;
 		}
 
-		char operator[](int index) {
-			if (index >= count + 1 || index < 0)
+		char& operator[](const size_t index) const {
+			if (index >= _count + 1 || index < 0)
 				// out of bounds
 				throw;
 			else
-				return data[index];
+				return _data[index];
 		}
 
-		int length() {
-			return this->count + 1;
+		size_t length() const {
+			return this->_count;
 		}
 
-		char* c_str() {
-			return this->data;
+		const char* c_str() const {
+			return this->_data;
 		}
 
 		void clear() {
-			this->count = 0;
+			for (size_t i = 0; i < _count; i++) {
+				_data[i] = '\0';
+			}
+			this->_count = 0;
 		}
 
-		virtual int get_hash() {
-			int hash_value = 0;
-			for (int i = 0; i < count; i++) {
-				hash_value = 37 * hash_value + data[i];
+		virtual unsigned short get_hash() {
+			unsigned long hash_value = 0;
+			for (size_t i = 0; i < _count; i++) {
+				hash_value = 37 * hash_value + _data[i];
+				hash_value %= ULONG_MAX;
 			}
 
 			unsigned short result = hash_value % CAPACITY;
@@ -211,31 +254,34 @@ namespace nspString {
 	private:
 
 		// prefered if we know new size
-		void increase_size(int incr) {
+		// increases size by incr
+		void increase_size(size_t incr) {
 			if (incr < LOW_RESIZE)
 				incr = LOW_RESIZE;
-			this->size += incr;
-			char* tmp_buf = new char[this->size];
+			this->_size += incr;
+			char* tmp_buf = new char[this->_size];
 
-			memset(tmp_buf, '\0', this->size);
-			memcpy(tmp_buf, this->data, this->count);
+			memset(tmp_buf, '\0', this->_size);
+			memcpy(tmp_buf, this->_data, this->_count);
 
-			delete[] this->data;
-			this->data = tmp_buf;
+			delete[] this->_data;
+			this->_data = nullptr;
+			this->_data = tmp_buf;
 		}
 
 		// suggested for usage in loop
 		int increase_size() {
-			this->size *= INCR_FACTOR;
-			char* tmp_buf = new char[this->size];
+			this->_size *= INCR_FACTOR;
+			char* tmp_buf = new char[this->_size];
 
-			memset(tmp_buf, '\0', this->size);
-			memcpy(tmp_buf, this->data, this->count);
+			memset(tmp_buf, '\0', this->_size);
+			memcpy(tmp_buf, this->_data, this->_count);
 
-			delete[] this->data;
-			this->data = tmp_buf;
+			delete[] this->_data;
+			this->_data = nullptr;
+			this->_data = tmp_buf;
 
-			return this->size;
+			return this->_size;
 		}
 
 	public:
@@ -256,11 +302,11 @@ namespace nspString {
 		};
 
 		Iterator begin() {
-			return Iterator(&data[0]);
+			return Iterator(&_data[0]);
 		}
 
 		Iterator end() {
-			return Iterator(&data[count]);
+			return Iterator(&_data[_count]);
 		}
 	};
 
