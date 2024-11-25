@@ -1,19 +1,18 @@
 #pragma once
 #include "pString.h"
-
+#include "is_pointer.h"
 /**
 * 
-*	Reconsider setting limits for buckets!
+*	Reconsider implementing ctor triplet
 * 
 */
 
 
 namespace nspMap {
 
-	constexpr size_t CAPACITY = 65535;
+	constexpr size_t CAPACITY = 65521;
 
 	template <class Tval>
-
 	class pNode {
 		bool last;
 
@@ -31,7 +30,7 @@ namespace nspMap {
 
 		pNode(nspString::pString first) {
 			this->first = first;
-			this->second = NULL;
+			second = value_type{};
 			next = nullptr;
 			last = true;
 		}
@@ -44,7 +43,7 @@ namespace nspMap {
 			this->next = nullptr;
 		}
 
-		void operator= (const_type other) {
+		void operator= (const_type other) noexcept {
 			second = other;
 		}
 
@@ -65,7 +64,7 @@ namespace nspMap {
 			}
 		}
 
-		const pNode* get_next() const noexcept {
+		pNode* get_next() const noexcept {
 			return next;
 		}
 
@@ -93,8 +92,7 @@ namespace nspMap {
 	private:
 		pNode<value_type>** table;
 		pNode<value_type>* first;
-		pNode<value_type>* first_branch_end;
-		bool table_moved;							// is this necesarry????????????
+		pNode<value_type>* first_branch_end;					// for new branch insertion
 
 	public:
 		pMap() {
@@ -102,8 +100,6 @@ namespace nspMap {
 			for (size_t i = 0; i < CAPACITY; i++) {
 				table[i] = nullptr;
 			}
-
-			table_moved = false;
 			first = nullptr;
 			first_branch_end = nullptr;
 		}
@@ -114,8 +110,6 @@ namespace nspMap {
 			for (size_t i = 0; i < CAPACITY; i++) {
 				table[i] = nullptr;
 			}
-
-			table_moved = false;
 			first = nullptr;
 			first_branch_end = nullptr;
 
@@ -131,16 +125,20 @@ namespace nspMap {
 			other.first = nullptr;
 			this->first_branch_end = other.first_branch_end;
 			other.first_branch_end = nullptr;
-			table_moved = false;						// ??
-			other.table_moved = true;					// ??
-
 		}
 
 		~pMap() {
-			if (!table_moved) {
-				clear();
+			if (first != nullptr) {
+				first->delete_list();
+			}
+			delete first;
+			first = nullptr;
+			first_branch_end = nullptr;
+			for (size_t i = 0; i < CAPACITY; i++) {
+				table[i] = nullptr;
 			}
 			delete[] table;
+			table = nullptr;
 		}
 
 		void operator=(const pMap& other) {
@@ -166,13 +164,10 @@ namespace nspMap {
 			other.first = nullptr;
 			this->first_branch_end = other.first_branch_end;
 			other.first_branch_end = nullptr;
-			other.table_moved = true;
 		}
 
-
-		// TODO: check this out
-		void set(nspString::pString key, value_type value) {
-			int hash = key.get_hash();
+		void set(nspString::pString key, const value_type value) {
+			unsigned short hash = key.get_hash();
 
 			pNode<value_type>* branch = table[hash];
 
@@ -193,27 +188,23 @@ namespace nspMap {
 				return;
 			}
 			else {
-
-				auto current = branch;
-
-				while (current->first != key && !current->is_last()) {
-					if (current->get_next() == nullptr) {
+				while (branch->first != key && !branch->is_last()) {
+					if (branch->get_next() == nullptr) {
 						break;
 					}
 
-					current = current->get_next();
+					branch = branch->get_next();
 				}
 
-				if (current->first == key) {
-					current->second = value;
+				if (branch->first == key) {
+					branch->second = value;
 				}
 				else {
-
-					auto tmp = new pNode<Tval>(key);
+					auto tmp = new pNode<value_type>(key);
 					tmp->second = value;
-					current->insert_next(tmp);
+					branch->insert_next(tmp);
 
-					if (current = first_branch_end) {
+					if (branch = first_branch_end) {
 						first_branch_end = tmp;
 					}
 				}
@@ -221,28 +212,26 @@ namespace nspMap {
 
 		}
 
-		Tval& get(pString key) {
-			int hash = key.get_hash();
+		reference get(nspString::pString key) const {
+			unsigned short hash = key.get_hash();
 
-			pNode<Tval>* branch = table[hash];
+			pNode<value_type>* branch = table[hash];
 
 			if (branch == nullptr) {
 				// Key not found
 				throw;
 			}
 
-			auto current = branch;
-
-			while (current->first != key && !current->is_last()) {
-				if (current->get_next() == nullptr) {
+			while (branch->first != key && !branch->is_last()) {
+				if (branch->get_next() == nullptr) {
 					break;
 				}
 
-				current = current->get_next();
+				branch = branch->get_next();
 			}
 
-			if (current->first == key) {
-				return current->second;
+			if (branch->first == key) {
+				return branch->second;
 			}
 			else {
 				// Key not found
@@ -250,34 +239,19 @@ namespace nspMap {
 			}
 		}
 
-		// IMPORTANT TO CHECK THIS OUT AGAIN!!!!!!!!!
-		void clear() {
-			if (first != nullptr) {
-				first->delete_list();
-				first_branch_end = nullptr;
-				delete first;
-				first = nullptr;
-			}
-			for (int i = 0; i < CAPACITY; i++) {
-				table[i] = nullptr;
-			}
-		}
-
-		bool contains_key(pString key) {
+		bool contains_key(nspString::pString key) const {
 			int hash = key.get_hash();
 
-			pNode<Tval>* branch = table[hash];
+			pNode<value_type>* branch = table[hash];
 
-			auto current = branch;
-
-			while (current->get_key() != key && !current->is_last()) {
-				current = current->get_next();
-				if (current == nullptr) {
+			while (branch->get_key() != key && !branch->is_last()) {
+				branch = branch->get_next();
+				if (branch == nullptr) {
 					return false;
 				}
 			}
 
-			if (current->get_key() == key) {
+			if (branch->get_key() == key) {
 				return true;
 			}
 			else
@@ -285,15 +259,15 @@ namespace nspMap {
 		}
 
 		struct Iterator {
-			pNode<Tval>* m_ptr;
+			pNode<value_type>* m_ptr;
 
 		public:
-			Iterator(pNode<Tval>* ptr) {
+			Iterator(pNode<value_type>* ptr) {
 				m_ptr = ptr;
 			}
 
-			pNode<Tval>& operator*() const { return *m_ptr; }
-			pNode<Tval>* operator->() { return m_ptr; }
+			pNode<value_type>& operator*() const { return *m_ptr; }
+			pNode<value_type>* operator->() { return m_ptr; }
 			Iterator& operator++() { m_ptr = m_ptr->get_next(); return *this; }
 			Iterator operator++(int) { Iterator tmp = *this; ++(*this); return tmp; }
 			friend bool operator== (const Iterator& a, const Iterator& b) { return a.m_ptr == b.m_ptr; };

@@ -1,7 +1,15 @@
 //#include "parser/JSON/GeoJSONConverter.h"
 #include "utils/pArray.h"
+#include "utils/pString.h"
 #include "utils/is_pointer.h"
+#include "utils/pMap.h"
 
+
+template <class T>
+using Array = nspArray::pArray<T>;
+using String = nspString::pString;
+template <class T>
+using Map = nspMap::pMap<T>;
 
 int main() {
 
@@ -57,6 +65,14 @@ int main() {
 		printf("%i\n", x.second);
 	}*/
 
+	auto m = new Map<int>();
+	m->set(String("a"), 1);
+
+	auto out = m->get(String("a"));
+
+	printf("%i\n", out);
+
+	delete m;
 
 	return 0;
 }

@@ -100,7 +100,7 @@ namespace nspString {
 		void operator= (const char* other) {
 			if (other != nullptr) {
 				if (other != this->_data) {
-					int _count = strlen(other);
+					size_t _count = strlen(other);
 
 					if (_count + 1 > this->_size) {
 						delete[] _data;
@@ -270,7 +270,7 @@ namespace nspString {
 		}
 
 		// suggested for usage in loop
-		int increase_size() {
+		size_t increase_size() {
 			this->_size *= INCR_FACTOR;
 			char* tmp_buf = new char[this->_size];
 

@@ -11,6 +11,6 @@ struct _is_pointer<T*> {
 };
 
 template<typename T>
-bool is_pointer() {
+constexpr bool is_pointer() {
 	return _is_pointer<T>::value;
 }
