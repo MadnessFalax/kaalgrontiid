@@ -9,8 +9,8 @@
 *	note: since this array's main purpose is to be used in parsers, 
 *	you should not modify current contents for other purposes, 
 *	yet adding new functionality or using this array structure 
-*	for other purposes is not prohibited, but might be overriden 
-*	for parser purposes
+*	for other purposes is not prohibited, but be cautious as the behaviour
+*	might be overriden for parser purposes
 * 
 */
 
