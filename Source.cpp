@@ -3,6 +3,7 @@
 #include "utils/pString.h"
 #include "utils/is_pointer.h"
 #include "utils/pMap.h"
+#include "utils/pUTF8String.h"
 
 
 template <class T>

@@ -41,6 +41,12 @@ namespace nspArray {
 			_count = 0;
 		}
 
+		pArray(size_t initial_size) {
+			_data = new T[initial_size];
+			_size = initial_size;
+			_count = 0;
+		}
+
 		pArray(const pArray& other) {
 			this->_size = other._size;
 			this->_count = other._count;

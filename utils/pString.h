@@ -63,7 +63,6 @@ namespace nspString {
 			if (other != nullptr) {
 				memcpy(this->_data, other, this->_count);
 			}
-
 		}
 
 		~pString() {
