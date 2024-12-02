@@ -98,7 +98,29 @@ namespace nspArray {
 			_data = other._data;
 
 			other.clear();
+		}
 
+		void operator+= (pArray& other) noexcept {
+			if (_size < _count + other._count) {
+				increase_size(other._count);
+			}
+
+			auto other_start_count = other._count;				// in case other is this
+			for (size_t i = 0; i < other_start_count; i++) {
+				_data[_count] = other._data[i];
+				_count++;
+			}
+		}
+
+		void operator+= (pArray&& other) noexcept {
+			if (_size < _count + other._count) {
+				increase_size(other._count);
+			}
+
+			for (size_t i = 0; i < other._count; i++) {
+				_data[_count] = other._data[i];
+				_count++;
+			}
 		}
 
 		reference operator[](const size_t index) {
@@ -144,7 +166,23 @@ namespace nspArray {
 	private:
 		// realocation
 		void increase_size() noexcept {
-			int new_size = (int)(_size * 2.5);
+			size_t new_size = (size_t)(_size * 2.5);
+			pointer new_data = new value_type[new_size];
+
+			for (size_t i = 0; i < _count; i++) {
+				new_data[i] = _data[i];
+			}
+
+			delete[] _data;
+			_data = nullptr;
+
+			_data = new_data;
+			_size = new_size;
+		}
+
+		// we know the extra size N needed
+		void increase_size(size_t n) noexcept {
+			size_t new_size = _size + n;
 			pointer new_data = new value_type[new_size];
 
 			for (size_t i = 0; i < _count; i++) {

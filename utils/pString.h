@@ -99,7 +99,7 @@ namespace nspString {
 		void operator= (const char* other) {
 			if (other != nullptr) {
 				if (other != this->_data) {
-					size_t _count = strlen(other);
+					_count = strlen(other);
 
 					if (_count + 1 > this->_size) {
 						delete[] _data;
@@ -114,7 +114,7 @@ namespace nspString {
 			}
 		}
 
-		void operator= (char other) {
+		void operator= (const char other) {
 			memset(this->_data, '\0', this->_size);
 			_count = 1;
 			_data[0] = other;
