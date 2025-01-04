@@ -4,18 +4,25 @@
 #include "utils/is_pointer.h"
 #include "utils/pMap.h"
 #include "utils/pUTF8String.h"
+#include "utils/pPair.h"
 
 
 template <class T>
 using Array = nspArray::pArray<T>;
 using String = nspString::pString;
-template <class T>
-using Map = nspMap::pMap<T>;
+//template <class T>
+//using Map = nspMap::pMap<T>;
 
 int main() {
 
+	auto a = new nspPair::pPair<int, int>();
 
+	a->second() = 1;
 
+	printf("%i\n", a->first());
+	printf("%i\n", a->second());
+
+	delete a;
 	/*
 	pArray<GJFeature*> a;
 	GeoJSONConverter* conv = new GeoJSONConverter("test/utf8_test.json");
@@ -66,14 +73,23 @@ int main() {
 		printf("%i\n", x.second);
 	}*/
 
-	auto m = new Map<int>();
-	m->set(String("a"), 1);
+	//auto m = new Map<int>();
+	//m->set(String("a"), 1);
+	//m->set(String("b"), 2);
+	//m->set(String("c"), 3);
 
-	auto out = m->get(String("a"));
+	//int out = int{};
+	//String out_s = String{};
 
-	printf("%i\n", out);
+	//for (auto x : *m) {
+	//	out_s = x.first;
+	//	printf("%s\n", out_s.c_str());
+	//	out = x.second;
+	//	printf("%i\n", out);
+	//}
 
-	delete m;
+
+	//delete m;
 
 	return 0;
 }

@@ -33,16 +33,16 @@
     <ClInclude Include="utils\pArray.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="utils\pMap.h">
+    <ClInclude Include="utils\is_pointer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\pUTF8String.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="utils\pPair.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="utils\is_pointer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="utils\pUTF8String.h">
+    <ClInclude Include="utils\pMap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

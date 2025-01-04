@@ -130,14 +130,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="utils\is_pointer.h" />
+    <ClInclude Include="utils\pMap.h" />
     <ClInclude Include="utils\pPair.h" />
+    <ClInclude Include="utils\is_pointer.h" />
     <ClInclude Include="utils\pArray.h" />
     <ClInclude Include="parser\JSON\GeoJSONType.h" />
     <ClInclude Include="parser\JSON\GeoJSONConverter.h" />
     <ClInclude Include="parser\JSON\JSONParser.h" />
     <ClInclude Include="parser\JSON\JSONType.h" />
-    <ClInclude Include="utils\pMap.h" />
     <ClInclude Include="utils\pString.h" />
     <ClInclude Include="utils\pUTF8String.h" />
   </ItemGroup>

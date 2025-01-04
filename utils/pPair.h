@@ -1,47 +1,67 @@
 #pragma once
 
-template<class Tx, class Ty>
-class pPair
-{
-public:
+namespace nspPair {
+	
+	template <class Tkey, class Tval>
+	class pPair
+	{
 
-	const Tx first;
-	const Ty second;
+		using key_type = Tkey;
+		using key_ptr = Tkey*;
+		using key_ref = Tkey&;
+		using value_type = Tval;
+		using value_ref = Tval&;
+		using value_ptr = Tval*;
 
-	pPair(Tx first, Ty second) {
-		this->first = first;
-		this->second = second;
-	}
+		key_ptr _first = nullptr;
+		value_ptr _second = nullptr;
 
-	pPair(pPair& other) {
-		this->first = other.first;
-		this->second = other.second;
-	}
+	public:
+		pPair() : _first(new key_type{}), _second(new value_type{}) {};
 
-	pPair(pPair&& other) {
-		this->first = other.first;
-		this->second = other.second;
-	}
+		pPair(key_ref key, value_ref value) : _first(new key_type(key)), _second(new value_type(value)) {};
+		
+		pPair(const pPair& other) : _first(new key_type(*other._first)), _second(new value_type(*other._second)) {};
+		
+		pPair(pPair&& other) noexcept : _first(other._first), _second(other._second) {
+			other._first = nullptr;
+			other._second = nullptr;
+		};
+		
+		~pPair() {
+			delete _first;
+			_first = nullptr;
+			delete _second;
+			_second = nullptr;
+		};
 
-	~pPair() {
+		pPair& operator=(const pPair& other) {
+			if (this != &other) {
+				delete _second;
+				_second = new value_type(*other._second);
+			}
 
-	}
+			return *this;
+		}
 
-	void operator==(pPair& other) {
-		if (this->first == other.first && this->second == other.second)
-			return true;
-		else
-			return false;
-	}
+		pPair& operator=(pPair&& other) noexcept {
+			if (this != &other) {
+				delete _second;
+				_second = other._second;
+				other._second = nullptr;
+			}
 
-	void operator=(pPair& other) {
-		this->first = other.first;
-		this->second = other.second;
-	}
+			return *this;
+		}
+		
+		const Tkey& first() const {
+			return *_first;
+		}
 
-	void operator=(pPair&& other) {
-		this->first = other.first;
-		this->second = other.second;
-	}
-};
+		value_ref second() {
+			return  *_second;
+		}
 
+	};
+
+}
