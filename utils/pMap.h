@@ -16,9 +16,9 @@ namespace nspMap {
 		using value_type = Tval;
 
 		struct Node {
-			Pair<key_type, value_type>* _pair;
+			Pair<key_type, value_type>* _pair = nullptr;
 			bool _last = true;
-			Node* _next;
+			Node* _next = nullptr;
 
 			const bool& is_last() const noexcept {
 				return _last;
@@ -51,11 +51,22 @@ namespace nspMap {
 			}
 		};
 
-		Node** _table;
-		Node* _first;						//	first element of first bucket
-		Node* _first_end;					//	last element of first bucket
+		Node** _table = nullptr;
+		Node* _first = nullptr;						//	first element of first bucket
+		Node* _first_end = nullptr;					//	last element of first bucket
 
 	public:
+		pMap() {
+			_table = new Node * [CAPACITY];
+			for (size_t i = 0; i < CAPACITY; i++) {
+				_table[i] = nullptr;
+			}
+		};
+
+		value_type& operator[](const key_type key) {
+
+		}
+
 
 	};
 
