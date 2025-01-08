@@ -45,6 +45,9 @@
     <ClInclude Include="utils\pMap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="utils\pHashable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source.cpp">

@@ -130,6 +130,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="utils\pHashable.h" />
     <ClInclude Include="utils\pMap.h" />
     <ClInclude Include="utils\pPair.h" />
     <ClInclude Include="utils\is_pointer.h" />
