@@ -9,7 +9,7 @@ namespace nspMap {
 	template <class Tkey, class Tval>
 	using Pair = nspPair::pPair<Tkey, Tval>;
 
-	template <class Tkey, class Tval, class Taddress>			// Taddress defines address space for buckets: unsigned char, unsigned short, unsigned int, unsigned long long for 1, 2, 3, 4 bytes respectivelly
+	template <class Tkey, class Tval, class Taddress = unsigned short>			// Taddress defines address space for buckets: unsigned char, unsigned short, unsigned int, unsigned long long for 1, 2, 3, 4 bytes respectivelly
 	class pMap
 	{
 		using key_type = Tkey;
@@ -55,7 +55,7 @@ namespace nspMap {
 		Node** _table = nullptr;
 		Node* _first = nullptr;						//	first element of first bucket
 		Node* _first_end = nullptr;					//	last element of first bucket
-		constexpr address_type _capacity = nspHashable::hash_max_val<address_type>();
+		address_type _capacity = nspHashable::hash_max_val<address_type>();
 
 	public:
 		pMap() {
@@ -73,6 +73,10 @@ namespace nspMap {
 
 		}
 
+		~pMap() {
+
+		}
+
 		pMap& operator=(const pMap& other) {
 
 		}
@@ -84,9 +88,12 @@ namespace nspMap {
 		value_type& operator[](const key_type key) {
 			address_type bucket_id = nspHashable::hash<address_type, key_type>(key);
 
+			//alt workflow for first node
+
 			// head
 			Node* cur = _table[bucket_id];
 			if (cur == nullptr) {
+				// create new node, create new pair for node, assign node to container
 				cur->_pair = new Pair<key_type, value_type>{key};
 				return cur->_pair->second();
 			}
@@ -99,14 +106,16 @@ namespace nspMap {
 			while (!cur->is_last()) {
 				cur = cur->get_next();
 				if (cur == nullptr) {
-					return false;
+					cur->_pair = new Pair<key_type, value_type>{ key };
+					return cur->_pair->second();
 				}
 				if (cur->_pair->first() == key) {
 					return cur->_pair->second();
 				}
 			}
 
-			return false;
+			cur->_pair = new Pair<key_type, value_type>{ key };
+			return cur->_pair->second();
 		}
 
 		bool empty() const noexcept {
