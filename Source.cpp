@@ -1,10 +1,9 @@
 //#include "parser/JSON/GeoJSONConverter.h"
-#include "utils/pArray.h"
-#include "utils/pString.h"
+#include "container/pArray.h"
+#include "container/pString.h"
 #include "utils/is_pointer.h"
-#include "utils/pMap.h"
-#include "utils/pUTF8String.h"
-#include "utils/pPair.h"
+#include "container/pMap.h"
+#include "container/pPair.h"
 
 
 template <class T>
