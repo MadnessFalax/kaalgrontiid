@@ -1,7 +1,13 @@
 #pragma once
 
+namespace nspMap {
+	template<class Tkey, class Tval, class Taddress>
+	class pMap;
+}
+
 namespace nspPair {
-	
+
+
 	template <class Tkey, class Tval>
 	class pPair
 	{
@@ -17,10 +23,21 @@ namespace nspPair {
 		value_ptr _second = nullptr;
 
 	public:
+		template <class Tkey_, class Tval_, class Taddress_>
+		friend class nspMap::pMap;
+
 		pPair() : _first(new key_type{}), _second(new value_type{}) {};
+
+		pPair(key_type key) : _first(new key_type{ key }), _second(new value_type{}) {};
+
+		pPair(key_ref key) : _first(new key_type{key}), _second(new value_type{}) {};
+
+		pPair(key_type&& key) : _first(new key_type{ key }), _second(new value_type{}) {};
 
 		pPair(key_ref key, value_ref value) : _first(new key_type(key)), _second(new value_type(value)) {};
 		
+		pPair(key_type&& key, value_type&& value) : _first(new key_type{ key }), _second(new value_type{ value }) {};
+
 		pPair(const pPair& other) : _first(new key_type(*other._first)), _second(new value_type(*other._second)) {};
 		
 		pPair(pPair&& other) noexcept : _first(other._first), _second(other._second) {

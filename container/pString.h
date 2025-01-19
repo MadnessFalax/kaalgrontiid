@@ -199,6 +199,16 @@ namespace nspString {
 			return false;
 		}
 
+		bool operator== (const pString& other) const {
+			if (this == &other) {
+				return true;
+			}
+			if (strcmp(this->_data, other._data) == 0) {
+				return true;
+			}
+			return false;
+		}
+
 		bool operator== (pString&& other) const {
 			if (strcmp(this->_data, other._data) == 0) {
 				return true;

@@ -21,12 +21,40 @@ namespace nspMap {
 			bool _last = true;
 			Node* _next = nullptr;
 
+			Node() {};
+
+			Node(Pair<key_type, value_type>* pair) : _pair(pair) {}
+
+			// dtor only destructs this node, delete chained by calling delete_bucket()
+			~Node() {
+				delete _pair;
+				_pair = nullptr;
+			};
+
 			const bool& is_last() const noexcept {
 				return _last;
 			}
 
 			Node* get_next() const noexcept {
 				return _next;
+			}
+
+			Node* get_bucket_last() const noexcept {
+				Node* tmp = this;
+				while (!tmp->is_last()) {
+					tmp = tmp->get_next();
+				}
+
+				return tmp;
+			}
+
+			Node* get_map_last() const noexcept {
+				Node* tmp = this;
+				while (tmp->_next != nullptr) {
+					tmp = tmp->get_next();
+				}
+
+				return tmp;
 			}
 
 			void insert_next(Node* other) noexcept {
@@ -44,11 +72,16 @@ namespace nspMap {
 			}
 
 			void delete_bucket() {
-				if (_next != nullptr) {
-					_next->delete_bucket();
+				if (_last) {
+					_next = nullptr;
 				}
-				delete _next;
-				_next = nullptr;
+				else {
+					_next->delete_bucket();
+					delete _next;
+					_next = nullptr;
+				}
+				delete _pair;
+				_pair = nullptr;
 			}
 		};
 
@@ -56,6 +89,9 @@ namespace nspMap {
 		Node* _first = nullptr;						//	first element of first bucket
 		Node* _first_end = nullptr;					//	last element of first bucket
 		address_type _capacity = nspHashable::hash_max_val<address_type>();
+
+		size_t _size_cache = 0;
+		bool _cache_valid = true;
 
 	public:
 		pMap() {
@@ -66,56 +102,140 @@ namespace nspMap {
 		};
 
 		pMap(pMap& other) {
-
+			_table = new Node * [_capacity];
+			for (auto cur : other) {
+				_table[cur->_first] = cur->_second;
+			}
 		}
 
 		pMap(pMap&& other) {
+			_table = other._table;
+			other._table = nullptr;
 
+			_first = other._first;
+			other._first = nullptr;
+
+			_first_end = other._first_end;
+			other._first_end = nullptr;
+
+			_size_cache = other._size_cache;
+			_cache_valid = other._cache_valid;
 		}
 
 		~pMap() {
+			// pMap owns both Nodes, Pairs are owned by Nodes
+			for (size_t i = 0; i < _capacity; i++) {
+				if (_table[i] != nullptr) {
+					_table[i]->delete_bucket();
+					delete _table[i];
+					_table[i] = nullptr;
+				}
+			}
+
+			delete[] _table;
+			_first = nullptr;
+			_first_end = nullptr;
 
 		}
 
 		pMap& operator=(const pMap& other) {
+			if (this != other) {
+				for (size_t i = 0; i < _capacity; i++) {
+					if (_table[i] != nullptr) {
+						_table[i]->delete_bucket();
+						delete _table[i];
+						_table[i] = nullptr;
+					}
+				}
 
+				delete[] _table;
+				_first = nullptr;
+				_first_end = nullptr;
+
+				_table = new Node * [_capacity];
+				for (auto cur : other) {
+					_table[cur->_first] = cur->_second;
+				}
+			}
+
+			return *this;
 		}
 
 		pMap& operator=(pMap&& other) {
+			if (this != &other) {
+				for (size_t i = 0; i < _capacity; i++) {
+					if (_table[i] != nullptr) {
+						_table[i]->delete_bucket();
+						delete _table[i];
+						_table[i] = nullptr;
+					}
+				}
 
+				delete[] _table;
+				_first = nullptr;
+				_first_end = nullptr;
+
+				_table = other._table;
+				other._table = nullptr;
+
+				_first = other._first;
+				other._first = nullptr;
+
+				_first_end = other._first_end;
+				other._first_end = nullptr;
+
+				_size_cache = other._size_cache;
+				_cache_valid = other._cache_valid;
+			}
+
+			return *this;
 		}
 			 
-		value_type& operator[](const key_type key) {
+		value_type& operator[](const key_type& key) {
 			address_type bucket_id = nspHashable::hash<address_type, key_type>(key);
-
-			//alt workflow for first node
 
 			// head
 			Node* cur = _table[bucket_id];
 			if (cur == nullptr) {
-				// create new node, create new pair for node, assign node to container
-				cur->_pair = new Pair<key_type, value_type>{key};
-				return cur->_pair->second();
+				// bucket empty -> become head of bucket
+				Pair<key_type, value_type>* pair = new Pair<key_type, value_type>{ key };
+				Node* node = new Node(pair);
+				_table[bucket_id] = node;
+
+				if (_first == nullptr) {
+					// map empty -> become first bucket
+					_first = _first_end = node;
+				}
+				else {
+					// map not empty -> assign after first bucket
+					node->_next = _first_end->_next;
+					_first_end->_next = node;
+				}
+
+				_cache_valid = false;
+				return *(node->_pair->_second);
 			}
 
-			if (cur->_pair->first() == key) {
-				return cur->_pair->second();
+			if (*(cur->_pair->_first) == key) {
+				return *(cur->_pair->_second);
 			}
 
 			// others
 			while (!cur->is_last()) {
 				cur = cur->get_next();
-				if (cur == nullptr) {
-					cur->_pair = new Pair<key_type, value_type>{ key };
-					return cur->_pair->second();
-				}
-				if (cur->_pair->first() == key) {
-					return cur->_pair->second();
+				if (*(cur->_pair->_first) == key) {
+					return *(cur->_pair->_second);
 				}
 			}
 
-			cur->_pair = new Pair<key_type, value_type>{ key };
-			return cur->_pair->second();
+			Pair<key_type, value_type>* pair = new Pair<key_type, value_type>(key);
+			Node* node = new Node(pair);
+			node->_next = cur->_next;
+			cur->_next = node;
+			cur->_last = false;
+			_cache_valid = false;
+
+			return *(node->_pair->_second);
 		}
 
 		bool empty() const noexcept {
@@ -123,10 +243,17 @@ namespace nspMap {
 		}
 
 		size_t size() const {						// mark noexcept after test
+			if (_cache_valid) {
+				return _size_cache;
+			}
+
 			size_t count = 0;
 			for (auto x : (*this)) {
 				count++;
 			}
+
+			_size_cache = count;
+			_cache_valid = true;
 			return count;
 		}
 
@@ -139,7 +266,7 @@ namespace nspMap {
 				return false;
 			}
 
-			if (cur->_pair->first() == key) {
+			if (cur->_pair->_first == key) {
 				return true;
 			}
 
@@ -149,7 +276,7 @@ namespace nspMap {
 				if (cur == nullptr) {
 					return false;
 				}
-				if (cur->_pair->first() == key) {
+				if (cur->_pair->_first == key) {
 					return true;
 				}
 			}

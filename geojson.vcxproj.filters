@@ -27,25 +27,22 @@
     <ClInclude Include="parser\JSON\GeoJSONType.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="utils\pString.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="utils\pArray.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="utils\is_pointer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="utils\pUTF8String.h">
+    <ClInclude Include="abstract\pHashable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="utils\pPair.h">
+    <ClInclude Include="container\pMap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="utils\pMap.h">
+    <ClInclude Include="container\pPair.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="utils\pHashable.h">
+    <ClInclude Include="container\pArray.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="container\pString.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

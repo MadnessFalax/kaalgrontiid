@@ -1,4 +1,8 @@
 //#include "parser/JSON/GeoJSONConverter.h"
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+
 #include "container/pArray.h"
 #include "container/pString.h"
 #include "utils/is_pointer.h"
@@ -9,19 +13,23 @@
 template <class T>
 using Array = nspArray::pArray<T>;
 using String = nspString::pString;
-//template <class T>
-//using Map = nspMap::pMap<T>;
+template <class T, class U>
+using Map = nspMap::pMap<T, U>;
 
 int main() {
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+	_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG);
+	
+	auto map = new Map<String, int>();
 
-	auto a = new nspPair::pPair<int, int>();
+	(*map)["aaa"] = 10;
 
-	a->second() = 1;
+	printf("%i\n", (*map)["aaa"]);
 
-	printf("%i\n", a->first());
-	printf("%i\n", a->second());
+	delete map;
 
-	delete a;
+	printf("ok");
+
 	/*
 	pArray<GJFeature*> a;
 	GeoJSONConverter* conv = new GeoJSONConverter("test/utf8_test.json");
@@ -89,6 +97,7 @@ int main() {
 
 
 	//delete m;
-
+	_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG);
+	_CrtDumpMemoryLeaks();
 	return 0;
 }

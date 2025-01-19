@@ -6,7 +6,7 @@ namespace nspHashable {
 
 	template<typename T>
 	struct _hash_max_val {
-		static constexpr T value = 1;				// use defined types or define your own
+		static constexpr T value = 1;				// use defined types or define your own here
 	};
 
 	template<>
