@@ -292,8 +292,8 @@ namespace nspMap {
 				_ptr = ptr;
 			}
 
-			Node& operator*() { return *(_ptr->_pair); }
-			Node* operator->() { return _ptr->_pair; }
+			Pair<key_type, value_type>& operator*() { return *(_ptr->_pair); }
+			Pair<key_type, value_type>* operator->() { return _ptr->_pair; }
 			Iterator& operator++() { _ptr = _ptr->get_next(); return *this; }
 			Iterator operator++(int) { Iterator tmp = *this; ++(*this); return tmp; }
 			friend bool operator== (const Iterator& a, const Iterator& b) { return a._ptr == b._ptr; };

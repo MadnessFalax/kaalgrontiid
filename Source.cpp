@@ -16,19 +16,31 @@ using String = nspString::pString;
 template <class T, class U>
 using Map = nspMap::pMap<T, U>;
 
+// used for out of scope stack disposal check so that _CrtDumpMemoryLeaks doesnt show false positive leaks on stack allocated memory
+void helper() {
+	
+	auto map = Map<String, int>();
+
+	map["aaa"] = 10;
+	map["bbb"] = 15;
+	map["ccc"] = 20;
+	map[String{}] = 25;
+
+	for (auto x : map) {
+		printf("%s: %i\n", x.first().c_str(), x.second());
+	};
+
+
+	printf("ok");
+
+	return;
+}
+
 int main() {
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 	_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG);
 	
-	auto map = new Map<String, int>();
-
-	(*map)["aaa"] = 10;
-
-	printf("%i\n", (*map)["aaa"]);
-
-	delete map;
-
-	printf("ok");
+	helper();
 
 	/*
 	pArray<GJFeature*> a;
