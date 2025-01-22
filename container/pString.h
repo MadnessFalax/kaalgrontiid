@@ -3,10 +3,13 @@
 #include "pArray.h"
 #include "cstdlib"
 #include "cstring"
+#include "../abstract/pHashable.h"
 
 // REDO to hold null terminator
 
 namespace nspString {
+
+	using Hashable = nspHashable::pHashable;
 
 	constexpr size_t CAPACITY = 65521;		// highest prime lower than ulong max value
 	constexpr size_t START_SIZE = 16;
@@ -15,7 +18,7 @@ namespace nspString {
 
 	// stores trailing null terminator
 	// operator+ is not implemented so that new heap objects arent constructed unintentionally
-	class pString
+	class pString : Hashable
 	{
 		char* _data = nullptr;			// holds trailing '\0'
 		size_t _size = START_SIZE;			// total bytes allocated ('\0' included)
@@ -243,16 +246,15 @@ namespace nspString {
 			this->_count = 0;
 		}
 
-		virtual unsigned short get_hash() {
-			unsigned long hash_value = 0;
-			for (size_t i = 0; i < _count; i++) {
-				hash_value = 37 * hash_value + _data[i];
-				hash_value %= ULONG_MAX;
+		unsigned long long hash() const override {
+			unsigned long long l_hash = 0xcbf29ce484222325;
+
+			for (size_t i = 0; i < length(); i++) {
+				l_hash ^= _data[i];
+				l_hash *= 0x100000001b3;
 			}
 
-			unsigned short result = hash_value % CAPACITY;
-
-			return result;
+			return l_hash;
 		}
 
 
