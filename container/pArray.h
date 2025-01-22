@@ -23,9 +23,9 @@ namespace nspArray {
 	class pArray
 	{
 	protected:
-		T* _data;
-		size_t _size;
-		size_t _count;
+		T* _data = nullptr;
+		size_t _size = START_SIZE;
+		size_t _count = 0;
 
 	public:
 		using value_type = T;
@@ -35,17 +35,9 @@ namespace nspArray {
 		using const_reference = const T&;
 
 
-		pArray() {
-			_data = new T[START_SIZE];
-			_size = START_SIZE;
-			_count = 0;
-		}
+		pArray() : _data(new T[START_SIZE]) {}
 
-		pArray(size_t initial_size) {
-			_data = new T[initial_size];
-			_size = initial_size;
-			_count = 0;
-		}
+		pArray(size_t initial_size) : _size(initial_size), _data(new T[initial_size]) {}
 
 		pArray(const pArray& other) {
 			this->_size = other._size;

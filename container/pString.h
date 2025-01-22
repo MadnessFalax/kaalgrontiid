@@ -17,16 +17,12 @@ namespace nspString {
 	// operator+ is not implemented so that new heap objects arent constructed unintentionally
 	class pString
 	{
-		char* _data;			// holds trailing '\0'
-		size_t _size;			// total bytes allocated ('\0' included)
-		size_t _count;			// string char length ('\0' NOT included)
+		char* _data = nullptr;			// holds trailing '\0'
+		size_t _size = START_SIZE;			// total bytes allocated ('\0' included)
+		size_t _count = 0;			// string char length ('\0' NOT included)
 
 	public:
-		pString() {
-			this->_data = new char[START_SIZE];
-			this->_size = START_SIZE;
-			this->_count = 0;
-
+		pString() : _data(new char[START_SIZE]) {
 			memset(this->_data, '\0', this->_size);
 		}
 
