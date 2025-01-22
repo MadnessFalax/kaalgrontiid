@@ -4,13 +4,7 @@
 
 /**
 * 
-*	Minimalistic vector-like array used in parser implementations.
-* 
-*	note: since this array's main purpose is to be used in parsers, 
-*	you should not modify current contents for other purposes, 
-*	yet adding new functionality or using this array structure 
-*	for other purposes is not prohibited, but be cautious as the behaviour
-*	might be overriden for parser purposes
+*	Owns elements!
 * 
 */
 
@@ -23,7 +17,7 @@ namespace nspArray {
 	class pArray
 	{
 	protected:
-		T* _data = nullptr;
+		T** _data = nullptr;
 		size_t _size = START_SIZE;
 		size_t _count = 0;
 
@@ -35,18 +29,18 @@ namespace nspArray {
 		using const_reference = const T&;
 
 
-		pArray() : _data(new T[START_SIZE]) {}
+		pArray() : _data(new T*[START_SIZE]) {}
 
-		pArray(size_t initial_size) : _size(initial_size), _data(new T[initial_size]) {}
+		pArray(size_t initial_size) : _size(initial_size), _data(new pointer[initial_size]) {}
 
 		pArray(const pArray& other) {
 			this->_size = other._size;
 			this->_count = other._count;
 
-			_data = new value_type[this->_size];
+			_data = new pointer[this->_size];
 
 			for (size_t i = 0; i < this->_size; i++) {
-				this->_data[i] = other._data[i];
+				this->_data[i] = new value_type{ *(other._data[i]) };
 			}
 		}
 
@@ -56,10 +50,13 @@ namespace nspArray {
 
 			_data = other._data;
 
-			other.clear();
+			other._data = nullptr;
 		}
 
 		~pArray() {
+			for (size_t i = 0; i < _count; i++) {
+				delete _data[i];
+			}
 			delete[] _data;
 			_data = nullptr;
 		}
@@ -72,10 +69,10 @@ namespace nspArray {
 				delete[] _data;
 				_data = nullptr;
 
-				_data = new value_type[this->_size];
+				_data = new pointer[this->_size];
 
 				for (size_t i = 0; i < this->_size; i++) {
-					this->_data[i] = other._data[i];
+					this->_data[i] = new value_type{ *(other._data[i]) };
 				}
 			}
 		}
@@ -88,8 +85,7 @@ namespace nspArray {
 			_data = nullptr;
 
 			_data = other._data;
-
-			other.clear();
+			other._data = nullptr;
 		}
 
 		void operator+= (pArray& other) noexcept {
@@ -99,7 +95,7 @@ namespace nspArray {
 
 			auto other_start_count = other._count;				// in case other is this
 			for (size_t i = 0; i < other_start_count; i++) {
-				_data[_count] = other._data[i];
+				_data[_count] = new value_type{ *(other._data[i]) };
 				_count++;
 			}
 		}
@@ -110,7 +106,7 @@ namespace nspArray {
 			}
 
 			for (size_t i = 0; i < other._count; i++) {
-				_data[_count] = other._data[i];
+				_data[_count] = new value_type{ *(other._data[i]) };
 				_count++;
 			}
 		}
@@ -121,7 +117,7 @@ namespace nspArray {
 				throw;
 			}
 			else
-				return _data[index];
+				return *(_data[index]);
 		}
 
 		const size_t& size() const noexcept {
@@ -133,7 +129,7 @@ namespace nspArray {
 				increase_size();
 			}
 
-			_data[_count] = val;
+			_data[_count] = new value_type{ val };
 			_count++;
 		}
 
@@ -141,17 +137,20 @@ namespace nspArray {
 			does not dispose elements! sets them to NULL / nullptr value instead
 		*/
 		constexpr void clear() {
-			if (is_pointer<value_type>()) {
-				for (size_t i = 0; i < _count; i++) {
-					_data[i] = nullptr;
-				}
-			}
-			else {
-				for (size_t i = 0; i < _count; i++) {
-					_data[i] = NULL;
-				}
+			for (size_t i = 0; i < _count; i++) {
+				_data[i] = nullptr;
 			}
 				
+			_count = 0;
+		}
+
+		// both disposes every element and resets container
+		constexpr void clear_dispose() {
+			for (size_t i = 0; i < _count; i++) {
+				delete _data[i];
+				_data[i] = nullptr;
+			}
+
 			_count = 0;
 		}
 
@@ -159,10 +158,11 @@ namespace nspArray {
 		// realocation
 		void increase_size() noexcept {
 			size_t new_size = (size_t)(_size * 2.5);
-			pointer new_data = new value_type[new_size];
+			pointer* new_data = new pointer[new_size];
 
 			for (size_t i = 0; i < _count; i++) {
 				new_data[i] = _data[i];
+				_data[i] = nullptr;
 			}
 
 			delete[] _data;
@@ -175,10 +175,11 @@ namespace nspArray {
 		// we know the extra size N needed
 		void increase_size(size_t n) noexcept {
 			size_t new_size = _size + n;
-			pointer new_data = new value_type[new_size];
+			pointer* new_data = new pointer[new_size];
 
 			for (size_t i = 0; i < _count; i++) {
 				new_data[i] = _data[i];
+				_data[i] = nullptr;
 			}
 
 			delete[] _data;
@@ -191,15 +192,15 @@ namespace nspArray {
 	public:
 		// iterator
 		struct Iterator {
-			pointer m_ptr;
+			pointer* m_ptr;
 
 		public:
-			Iterator(pointer ptr) {
+			Iterator(pointer* ptr) {
 				m_ptr = ptr;
 			}
 
-			reference operator*() const { return *m_ptr; }
-			pointer operator->() { return m_ptr; }
+			reference operator*() const { return **m_ptr; }
+			pointer operator->() { return *m_ptr; }
 			Iterator& operator++() { m_ptr++; return *this; }
 			Iterator operator++(int) { Iterator tmp = *this; ++(*this); return tmp; }
 			friend bool operator== (const Iterator& a, const Iterator& b) { return a.m_ptr == b.m_ptr; };
