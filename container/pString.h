@@ -3,7 +3,7 @@
 #include "pArray.h"
 #include "cstdlib"
 #include "cstring"
-#include "../abstract/pHashable.h"
+#include "abstract/pHashable.h"
 
 // REDO to hold null terminator
 
@@ -18,7 +18,7 @@ namespace nspString {
 
 	// stores trailing null terminator
 	// operator+ is not implemented so that new heap objects arent constructed unintentionally
-	class pString : Hashable
+	class pString : public Hashable
 	{
 		char* _data = nullptr;			// holds trailing '\0'
 		size_t _size = START_SIZE;			// total bytes allocated ('\0' included)
@@ -247,14 +247,14 @@ namespace nspString {
 		}
 
 		unsigned long long hash() const override {
-			unsigned long long l_hash = 0xcbf29ce484222325;
+			unsigned long long base = 0xcbf29ce484222325;
 
 			for (size_t i = 0; i < length(); i++) {
-				l_hash ^= _data[i];
-				l_hash *= 0x100000001b3;
+				base ^= _data[i];
+				base *= 0x100000001b3;
 			}
 
-			return l_hash;
+			return base;
 		}
 
 

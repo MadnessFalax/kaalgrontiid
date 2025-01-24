@@ -19,11 +19,15 @@ using Map = nspMap::pMap<T, U>;
 
 // used for out of scope stack disposal check so that _CrtDumpMemoryLeaks doesnt show false positive leaks on stack allocated memory
 void helper() {
-	auto a = String("vykur si");
+	auto* a = new Array<String>{};
 
-	auto temp = nspHashable::hash<unsigned short>(a);
+	a->push_back(String{"vykur si!"});
+
+	auto temp = nspHashable::hash<unsigned short, Array<String>>(a);
 	
 	printf("%u", temp);
+
+	delete a;
 
 	return;
 }
