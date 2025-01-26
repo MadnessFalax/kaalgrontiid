@@ -9,6 +9,7 @@
 #include "container/pMap.h"
 #include "container/pPair.h"
 #include "abstract/pHashable.h"
+#include "parser/regex/pMatch.h"
 
 
 template <class T>
@@ -18,30 +19,15 @@ template <class T, class U, class V = unsigned short>
 using Map = nspMap::pMap<T, U, V>;
 
 // used for out of scope stack disposal check so that _CrtDumpMemoryLeaks doesnt show false positive leaks on stack allocated memory
-Map<int, int, unsigned char>* helper() {
-	auto* a = new Map<int, int, unsigned char>();
+void helper() {
 
-	for (int i = 0; i < 300; i++) {
-		(*a)[i] = i;
-	}
-
-
-	return a;
 }
 
 int main() {
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 	_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG);
 	
-	auto res = helper();
-
-	for (auto x : *res) {
-		printf("%i: %i with key: %c\n", x.first(), x.second(), nspHashable::hash<unsigned char, int>(x.first()));
-	}
-
-	delete res;
-
-	printf("disposed");
+	helper();
 
 	_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG);
 	_CrtDumpMemoryLeaks();

@@ -45,6 +45,15 @@
     <ClInclude Include="container\pString.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="parser\regex\pRegex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="parser\regex\pMatch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="parser\regex\pPattern.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source.cpp">
