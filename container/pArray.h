@@ -35,9 +35,7 @@ namespace nspArray {
 
 		pArray(size_t initial_size) : _size(initial_size), _data(new pointer[initial_size]) {}
 
-		pArray(const pArray& other) {
-			this->_size = other._size;
-			this->_count = other._count;
+		pArray(const pArray& other) : _size(other._size), _count(other._count) {
 
 			_data = new pointer[this->_size];
 
@@ -46,11 +44,7 @@ namespace nspArray {
 			}
 		}
 
-		pArray(pArray&& other) noexcept {
-			this->_size = other._size;
-			this->_count = other._count;
-
-			_data = other._data;
+		pArray(pArray&& other) noexcept : _size(other._size), _count(other._count), _data(other._data) {
 
 			other._data = nullptr;
 		}

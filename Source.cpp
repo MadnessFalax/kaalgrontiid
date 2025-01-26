@@ -21,7 +21,7 @@ using Map = nspMap::pMap<T, U, V>;
 Map<int, int, unsigned char>* helper() {
 	auto* a = new Map<int, int, unsigned char>();
 
-	for (size_t i = 0; i < 300; i++) {
+	for (int i = 0; i < 300; i++) {
 		(*a)[i] = i;
 	}
 

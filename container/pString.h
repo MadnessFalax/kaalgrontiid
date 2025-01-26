@@ -25,24 +25,18 @@ namespace nspString {
 
 	public:
 		pString() : _data(new char[START_SIZE]) {
-			memset(this->_data, '\0', this->_size);
+			memset(_data, '\0', _size);
 		}
 
-		pString(const pString& other) {
-			this->_size = other._size;
-			this->_count = other._count;
-			this->_data = new char[this->_size];
-
-			memset(this->_data, '\0', this->_size);
-
-			memcpy(this->_data, other._data, this->_count);
+		pString(const pString& other) : _size(other._size), _count(other._count) {
+			
+			this->_data = new char[_size];
+			memset(_data, '\0', _size);
+			memcpy(_data, other._data, _count);
 		}
 
-		pString(pString&& other) noexcept {
-			this->_size = other._size;
-			this->_count = other._count;
-			this->_data = other._data;
-
+		pString(pString&& other) noexcept : _size(other._size), _count(other._count), _data(other._data) {
+			
 			other._data = nullptr;
 		}
 
