@@ -11,7 +11,6 @@ namespace nspString {
 
 	using Hashable = nspHashable::pHashable;
 
-	constexpr size_t CAPACITY = 65521;		// highest prime lower than ulong max value
 	constexpr size_t START_SIZE = 16;
 	constexpr size_t LOW_RESIZE = 10;		// higher = less chance that a reallocation will be needed after initial alloc, lower = less unused space after initial allocation
 	constexpr size_t INCR_FACTOR = 2;		// higher = reallocating less often, lower = less unused space after reallocation
