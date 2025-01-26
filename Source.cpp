@@ -14,29 +14,34 @@
 template <class T>
 using Array = nspArray::pArray<T>;
 using String = nspString::pString;
-template <class T, class U>
-using Map = nspMap::pMap<T, U>;
+template <class T, class U, class V = unsigned short>
+using Map = nspMap::pMap<T, U, V>;
 
 // used for out of scope stack disposal check so that _CrtDumpMemoryLeaks doesnt show false positive leaks on stack allocated memory
-void helper() {
-	auto* a = new Array<String>{};
+Map<int, int, unsigned char>* helper() {
+	auto* a = new Map<int, int, unsigned char>();
 
-	a->push_back(String{"vykur si!"});
+	for (size_t i = 0; i < 300; i++) {
+		(*a)[i] = i;
+	}
 
-	auto temp = nspHashable::hash<unsigned short, Array<String>>(a);
-	
-	printf("%u", temp);
 
-	delete a;
-
-	return;
+	return a;
 }
 
 int main() {
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 	_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG);
 	
-	helper();
+	auto res = helper();
+
+	for (auto x : *res) {
+		printf("%i: %i with key: %c\n", x.first(), x.second(), nspHashable::hash<unsigned char, int>(x.first()));
+	}
+
+	delete res;
+
+	printf("disposed");
 
 	_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG);
 	_CrtDumpMemoryLeaks();

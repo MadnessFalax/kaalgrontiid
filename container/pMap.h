@@ -234,6 +234,9 @@ namespace nspMap {
 			cur->_next = node;
 			cur->_last = false;
 			_cache_valid = false;
+			if (_table[bucket_id] == _first) {
+				_first_end = node;
+			}
 
 			return *(node->_pair->_second);
 		}

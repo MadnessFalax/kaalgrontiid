@@ -63,6 +63,20 @@ namespace nspHashable {
 		return hash % hash_max_val<ret_T>();
 	}
 
+	template<typename ret_T, typename inp_T>
+	static ret_T hash(const typename std::enable_if<std::is_arithmetic_v<inp_T>, inp_T>::type& val) {
+		unsigned long long hash = 0xcbf29ce484222325;
+
+		const unsigned char* byte_array = reinterpret_cast<const unsigned char*>(&val);
+
+		for (size_t i = 0; i < sizeof(inp_T); i++) {
+			hash = hash ^ byte_array[i];
+			hash *= 0x100000001b3;
+		}
+
+		return hash % hash_max_val<ret_T>();
+	}
+
 	template<typename ret_T, class hashable_T>
 	static ret_T hash(typename std::enable_if_t<std::is_base_of_v<pHashable, hashable_T>, hashable_T>& val) {
 		auto& cast_val = static_cast<pHashable&>(val);
@@ -72,6 +86,18 @@ namespace nspHashable {
 	template<typename ret_T, class hashable_T>
 	static ret_T hash(typename std::enable_if_t<std::is_base_of_v<pHashable, hashable_T>, hashable_T>* val) {
 		auto* cast_val = static_cast<pHashable*>(val);
+		return cast_val->hash() % hash_max_val<ret_T>();
+	}
+
+	template<typename ret_T, class hashable_T>
+	static ret_T hash(const typename std::enable_if_t<std::is_base_of_v<pHashable, hashable_T>, hashable_T>& val) {
+		const auto& cast_val = static_cast<const pHashable&>(val);
+		return cast_val.hash() % hash_max_val<ret_T>();
+	}
+
+	template<typename ret_T, class hashable_T>
+	static ret_T hash(const typename std::enable_if_t<std::is_base_of_v<pHashable, hashable_T>, hashable_T>* val) {
+		const auto* cast_val = static_cast<const pHashable*>(val);
 		return cast_val->hash() % hash_max_val<ret_T>();
 	}
 

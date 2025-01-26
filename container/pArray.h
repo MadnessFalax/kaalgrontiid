@@ -1,7 +1,6 @@
 #pragma once
 #include <cstdio>
 #include "utils\is_pointer.h"
-#include "abstract\pHashable.h"
 #include <type_traits>
 
 /**
@@ -12,13 +11,12 @@
 
 namespace nspArray {
 
-	using Hashable = nspHashable::pHashable;
 
 	constexpr size_t START_SIZE = 16;
 	constexpr size_t MAX_INCREASE = 1024;
 
 	template <class T>
-	class pArray : public Hashable
+	class pArray
 	{
 	protected:
 		T** _data = nullptr;
@@ -156,30 +154,6 @@ namespace nspArray {
 			}
 
 			_count = 0;
-		}
-
-		typename std::enable_if_t<std::is_arithmetic_v<value_type>, unsigned long long>
-		hash() const override {
-			unsigned long long base = 0xcbf29ce484222325;
-
-			for (size_t i = 0; i < size(); i++) {
-				base = base ^ *(_data[i]);
-				base *= 0x100000001b3;
-			}
-
-			return base;
-		}
-
-		typename std::enable_if_t<std::is_base_of_v<pHashable, value_type>, unsigned long long>
-			hash() const override {
-			unsigned long long base = 0xcbf29ce484222325;
-
-			for (size_t i = 0; i < size(); i++) {
-				base = base ^ *(_data[i]);
-				base *= 0x100000001b3;
-			}
-
-			return base;
 		}
 
 	private:
