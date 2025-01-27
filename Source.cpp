@@ -19,7 +19,7 @@ template <class T, class U, class V = unsigned short>
 using Map = nspMap::pMap<T, U, V>;
 
 // used for out of scope stack disposal check so that _CrtDumpMemoryLeaks doesnt show false positive leaks on stack allocated memory
-void helper() {
+static void helper() {
 
 }
 
