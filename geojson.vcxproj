@@ -133,6 +133,8 @@
     <ClInclude Include="abstract\pHashable.h" />
     <ClInclude Include="container\pMap.h" />
     <ClInclude Include="container\pPair.h" />
+    <ClInclude Include="parser\regex\NFA\pAutomaton.h" />
+    <ClInclude Include="parser\regex\NFA\pState.h" />
     <ClInclude Include="parser\regex\pMatch.h" />
     <ClInclude Include="parser\regex\pPattern.h" />
     <ClInclude Include="parser\regex\pRegex.h" />

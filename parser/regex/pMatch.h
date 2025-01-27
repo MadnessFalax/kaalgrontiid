@@ -17,12 +17,12 @@ namespace nspRegex {
 		pMatch() {};
 
 		pMatch(pMatch& other) : _is_match(other._is_match) {
-			for (auto group : *(other._groups)) {
+			for (String group : *(other._groups)) {
 				add_group(group);
 			}
 		};
 
-		pMatch(pMatch&& other) : _is_match(other._is_match), _groups(other._groups) {
+		pMatch(pMatch&& other) noexcept : _is_match(other._is_match), _groups(other._groups) {
 			other._groups = nullptr;
 		};
 
@@ -32,7 +32,7 @@ namespace nspRegex {
 		};
 		
 
-		bool is_match() { return _is_match; };
+		bool is_match() const { return _is_match; };
 		bool set_match() { return _is_match = true; };
 		
 		String& add_group(String& group) {
@@ -44,7 +44,7 @@ namespace nspRegex {
 			if (this != &other) {
 				_is_match = other._is_match;
 				_groups = new Array<String>();
-				for (auto group : *(other._groups)) {
+				for (String group : *(other._groups)) {
 					add_group(group);
 				}
 			}
@@ -52,7 +52,7 @@ namespace nspRegex {
 			return *this;
 		}
 
-		pMatch& operator=(pMatch&& other) {
+		pMatch& operator=(pMatch&& other) noexcept {
 			if (this != &other) {
 				_is_match = other._is_match;
 				_groups = other._groups;

@@ -1,6 +1,6 @@
 #pragma once
 #include "pPair.h"
-#include "abstract/pHashable.h"
+#include "../abstract/pHashable.h"
 
 
 namespace nspMap {
