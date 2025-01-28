@@ -103,8 +103,8 @@ namespace nspMap {
 
 		pMap(pMap& other) {
 			_table = new Node * [_capacity];
-			for (auto cur : other) {
-				_table[cur->_first] = cur->_second;
+			for (Pair<key_type, value_type> cur : other) {
+				(*this)[cur.first()] = cur.second();
 			}
 		}
 
