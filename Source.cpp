@@ -10,6 +10,7 @@
 #include "container/pPair.h"
 #include "abstract/pHashable.h"
 #include "parser/regex/pMatch.h"
+#include "parser/regex/NFA/pState.h"
 
 
 template <class T>
@@ -20,7 +21,9 @@ using Map = nspMap::pMap<T, U, V>;
 
 // used for out of scope stack disposal check so that _CrtDumpMemoryLeaks doesnt show false positive leaks on stack allocated memory
 static void helper() {
+	auto state = nspNFA::pState();
 
+	return;
 }
 
 int main() {

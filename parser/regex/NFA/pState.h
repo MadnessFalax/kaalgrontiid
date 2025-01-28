@@ -11,22 +11,46 @@ namespace nspNFA {
 
 	class pState {
 		bool _is_final = false;
-		Map<char, pState*>* _transitions = new Map<char, pState*>();
-		Array<pState*>* _epsilon_transitions = new Array<pState*>();
+		Map<char, Array<pState*>>* _transitions = nullptr;
+		Array<pState*>* _epsilon_transitions = nullptr;
 
-		pState() {};
-		pState(pState& other) : _is_final(other._is_final) {
-			delete _transitions;
-			_transitions = new Map<char, pState*>(*other._transitions);
-			_epsilon_transitions = new Array<pState*>(*other._epsilon_transitions);
+	public:
+		pState() : 
+			_transitions(new Map<char, Array<pState*>>()), 
+			_epsilon_transitions(new Array<pState*>()) 
+		{};
+
+		pState(pState& other) : 
+			_is_final(other._is_final), 
+			_transitions(new Map<char, Array<pState*>>(*other._transitions)),
+			_epsilon_transitions (new Array<pState*>(*other._epsilon_transitions))
+		{}
+
+		pState(pState&& other) noexcept : 
+			_is_final(other._is_final),
+			_transitions(other._transitions),
+			_epsilon_transitions(other._epsilon_transitions)
+		{
+			other._transitions = nullptr;
+			other._epsilon_transitions = nullptr;
 		}
 
-		pState(pState&& other) : _is_final(other._is_final) {
-			delete _transitions;
-			_transitions = other._transitions;
-			other._transitions = nullptr;
-			_epsilon_transitions = other._epsilon_transitions;
-			other._epsilon_transitions = nullptr;
+		Array<pState*>& register_transition(const char token, pState* to_state) {
+			auto& transition_set = (*_transitions)[token];
+			transition_set.push_back(to_state);
+
+			return transition_set;
+		}
+
+		Array<pState*>& register_epsilon(pState* to_state) {
+			auto& transition_set = (*_epsilon_transitions);
+			transition_set.push_back(to_state);
+
+			return transition_set;
+		}
+
+		Array<pState*>& consume(const char input_token) {
+
 		}
 
 		~pState() {
@@ -40,14 +64,14 @@ namespace nspNFA {
 			if (this != &other) {
 				_is_final = other._is_final;
 				delete _transitions;
-				_transitions = new Map<char, pState*>(*other._transitions);
+				_transitions = new Map<char, Array<pState*>>(*other._transitions);
 				_epsilon_transitions = new Array<pState*>(*other._epsilon_transitions);
 			}
 			
 			return *this;
 		}
 
-		pState& operator=(pState&& other) {
+		pState& operator=(pState&& other) noexcept {
 			if (this != &other) {
 				_is_final = other._is_final;
 				delete _transitions;
