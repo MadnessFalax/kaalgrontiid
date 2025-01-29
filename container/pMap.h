@@ -139,7 +139,7 @@ namespace nspMap {
 		}
 
 		pMap& operator=(const pMap& other) {
-			if (this != other) {
+			if (this != &other) {
 				for (size_t i = 0; i < _capacity; i++) {
 					if (_table[i] != nullptr) {
 						_table[i]->delete_bucket();
@@ -154,7 +154,7 @@ namespace nspMap {
 
 				_table = new Node * [_capacity];
 				for (auto cur : other) {
-					_table[cur->_first] = cur->_second;
+					(*this)[cur.first()] = cur.second();
 				}
 			}
 

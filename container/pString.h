@@ -3,7 +3,8 @@
 #include "pArray.h"
 #include "cstdlib"
 #include "cstring"
-#include "abstract/pHashable.h"
+#include "../abstract/pHashable.h"
+#include "../utils/exception/pOutOfRangeException.h"
 
 // REDO to hold null terminator
 
@@ -218,8 +219,7 @@ namespace nspString {
 
 		char& operator[](const size_t index) const {
 			if (index >= _count + 1 || index < 0)
-				// out of bounds
-				throw;
+				throw pOutOfRangeException();
 			else
 				return _data[index];
 		}

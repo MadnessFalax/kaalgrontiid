@@ -2,6 +2,7 @@
 #include <cstdio>
 #include "../utils/is_pointer.h"
 #include <type_traits>
+#include "../utils/exception/pOutOfRangeException.h"
 
 /**
 * 
@@ -109,8 +110,7 @@ namespace nspArray {
 
 		reference operator[](const size_t index) {
 			if (index >= _count || index < 0) {
-				// index out of bounds
-				throw;
+				throw pOutOfRangeException();
 			}
 			else
 				return *(_data[index]);
