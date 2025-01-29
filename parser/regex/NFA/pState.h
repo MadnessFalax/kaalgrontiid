@@ -1,6 +1,7 @@
 #pragma once
 #include "../../../container/pMap.h"
 #include "../../../container/pArray.h"
+#include "../../../abstract/pHasId.h"
 
 namespace nspNFA {
 
@@ -9,48 +10,68 @@ namespace nspNFA {
 	template<class type>
 	using Array = nspArray::pArray<type>;
 
-	class pState {
+	class pState : nspHasId::pHasId<unsigned int> {
+		static unsigned int _id_counter;
+		unsigned int _id;
 		bool _is_final = false;
-		Map<char, Array<pState*>>* _transitions = nullptr;
-		Array<pState*>* _epsilon_transitions = nullptr;
+		Map<char, Map<unsigned int, pState*, unsigned char>>* _transitions = nullptr;
+		Map<unsigned int, pState*, unsigned char>* _epsilon_transitions = nullptr;
+
+		unsigned int _get_id() { return _id_counter++; }
+
 
 	public:
-		pState() : 
-			_transitions(new Map<char, Array<pState*>>()), 
-			_epsilon_transitions(new Array<pState*>()) 
+		pState() :
+			_id(_get_id()),
+			_transitions(new Map<char, Map<unsigned int, pState*, unsigned char>>()),
+			_epsilon_transitions(new Map<unsigned int, pState*, unsigned char>())
 		{};
 
-		pState(pState& other) : 
+		pState(pState& other) :
+			_id(_get_id()),
 			_is_final(other._is_final), 
-			_transitions(new Map<char, Array<pState*>>(*other._transitions)),
-			_epsilon_transitions (new Array<pState*>(*other._epsilon_transitions))
+			_transitions(new Map<char, Map<unsigned int, pState*, unsigned char>>(*other._transitions)),
+			_epsilon_transitions (new Map<unsigned int, pState*, unsigned char>(*other._epsilon_transitions))
 		{}
 
-		pState(pState&& other) noexcept : 
+		pState(pState&& other) noexcept :
+			_id(other._id),
 			_is_final(other._is_final),
 			_transitions(other._transitions),
 			_epsilon_transitions(other._epsilon_transitions)
 		{
+			other._id = 0;
 			other._transitions = nullptr;
 			other._epsilon_transitions = nullptr;
 		}
 
-		Array<pState*>& register_transition(const char token, pState* to_state) {
+		const unsigned int& get_id() { return _id; }
+
+		Map<unsigned int, pState*, unsigned char>& register_transition(const char token, pState* to_state) {
 			auto& transition_set = (*_transitions)[token];
-			transition_set.push_back(to_state);
+			transition_set[to_state->get_id()] = to_state;
 
 			return transition_set;
 		}
 
-		Array<pState*>& register_epsilon(pState* to_state) {
+		Map<unsigned int, pState*, unsigned char>& register_epsilon(pState* to_state) {
 			auto& transition_set = (*_epsilon_transitions);
-			transition_set.push_back(to_state);
+			transition_set[to_state->get_id()] = to_state;
 
 			return transition_set;
 		}
 
-		Array<pState*>& consume(const char input_token) {
+		Map<unsigned int, pState*, unsigned char> consume(const char input_token) {
+			auto ret_val = Map<unsigned int, pState*, unsigned char>();
+			for (auto pair : *_epsilon_transitions) {
+				ret_val[pair.first()] = pair.second();
+			}
 
+			for (auto pair : (*_transitions)[input_token]) {
+				ret_val[pair.first()] = pair.second();
+			}
+
+			return ret_val;
 		}
 
 		~pState() {
@@ -62,10 +83,11 @@ namespace nspNFA {
 
 		pState& operator=(pState& other) {
 			if (this != &other) {
+				_id = other._get_id();
 				_is_final = other._is_final;
 				delete _transitions;
-				_transitions = new Map<char, Array<pState*>>(*other._transitions);
-				_epsilon_transitions = new Array<pState*>(*other._epsilon_transitions);
+				_transitions = new Map<char, Map<unsigned int, pState*, unsigned char>>(*other._transitions);
+				_epsilon_transitions = new Map<unsigned int, pState*, unsigned char>(*other._epsilon_transitions);
 			}
 			
 			return *this;
@@ -73,6 +95,8 @@ namespace nspNFA {
 
 		pState& operator=(pState&& other) noexcept {
 			if (this != &other) {
+				_id = other._id;
+				other._id = 0;
 				_is_final = other._is_final;
 				delete _transitions;
 				_transitions = other._transitions;

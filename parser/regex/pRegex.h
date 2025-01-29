@@ -7,8 +7,8 @@ namespace nspRegex {
 	public:
 		pRegex() {};
 
-		bool compile() {
-
+		static bool compile(const char* pattern) {
+			return true;
 		}
 
 

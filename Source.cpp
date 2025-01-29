@@ -11,7 +11,7 @@
 #include "abstract/pHashable.h"
 #include "parser/regex/pMatch.h"
 #include "parser/regex/NFA/pState.h"
-
+#include "parser/regex/pRegex.h"
 
 template <class T>
 using Array = nspArray::pArray<T>;
@@ -21,6 +21,8 @@ using Map = nspMap::pMap<T, U, V>;
 
 // used for out of scope stack disposal check so that _CrtDumpMemoryLeaks doesnt show false positive leaks on stack allocated memory
 static void helper() {
+	auto tmp = nspRegex::pRegex::compile(R"(^-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?$)");			// json number
+
 	auto state = nspNFA::pState();
 
 	return;
