@@ -8,7 +8,9 @@ namespace nspRegex {
 	using Array = nspArray::pArray<arr_type>;
 	using String = nspString::pString;
 
-
+	/*
+	* Reconsider group extraction necessity
+	*/
 	class pMatch {
 		bool _is_match = false;
 		Array<String>* _groups = new Array<String>();

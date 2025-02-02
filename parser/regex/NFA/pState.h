@@ -13,7 +13,7 @@ namespace nspNFA {
 	class pState : nspHasId::pHasId<unsigned int> {
 		static unsigned int _id_counter;
 		unsigned int _id;
-		bool _is_final = false;
+		bool _is_final = false;;
 		Map<char, Map<unsigned int, pState*, unsigned char>>* _transitions = nullptr;
 		Map<unsigned int, pState*, unsigned char>* _epsilon_transitions = nullptr;
 
@@ -27,9 +27,16 @@ namespace nspNFA {
 			_epsilon_transitions(new Map<unsigned int, pState*, unsigned char>())
 		{};
 
+		pState(bool is_final) :
+			_id(_get_id()),
+			_is_final(is_final),
+			_transitions(new Map<char, Map<unsigned int, pState*, unsigned char>>()),
+			_epsilon_transitions(new Map<unsigned int, pState*, unsigned char>())
+		{};
+
 		pState(pState& other) :
 			_id(_get_id()),
-			_is_final(other._is_final), 
+			_is_final(other._is_final),
 			_transitions(new Map<char, Map<unsigned int, pState*, unsigned char>>(*other._transitions)),
 			_epsilon_transitions (new Map<unsigned int, pState*, unsigned char>(*other._epsilon_transitions))
 		{}
@@ -46,6 +53,7 @@ namespace nspNFA {
 		}
 
 		const unsigned int& get_id() { return _id; }
+		const bool& is_final() { return _is_final; }
 
 		Map<unsigned int, pState*, unsigned char>& register_transition(const char token, pState* to_state) {
 			auto& transition_set = (*_transitions)[token];
@@ -96,8 +104,8 @@ namespace nspNFA {
 		pState& operator=(pState&& other) noexcept {
 			if (this != &other) {
 				_id = other._id;
-				other._id = 0;
 				_is_final = other._is_final;
+				other._id = 0;
 				delete _transitions;
 				_transitions = other._transitions;
 				other._transitions = nullptr;

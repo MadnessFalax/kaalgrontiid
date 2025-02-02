@@ -90,9 +90,6 @@ namespace nspMap {
 		Node* _first_end = nullptr;					//	last element of first bucket
 		address_type _capacity = nspHashable::hash_max_val<address_type>();
 
-		size_t _size_cache = 0;
-		bool _cache_valid = true;
-
 	public:
 		pMap() {
 			_table = new Node * [_capacity];
@@ -108,7 +105,7 @@ namespace nspMap {
 			}
 		}
 
-		pMap(pMap&& other) {
+		pMap(pMap&& other) noexcept {
 			_table = other._table;
 			other._table = nullptr;
 
@@ -117,9 +114,6 @@ namespace nspMap {
 
 			_first_end = other._first_end;
 			other._first_end = nullptr;
-
-			_size_cache = other._size_cache;
-			_cache_valid = other._cache_valid;
 		}
 
 		~pMap() {
@@ -183,9 +177,6 @@ namespace nspMap {
 
 				_first_end = other._first_end;
 				other._first_end = nullptr;
-
-				_size_cache = other._size_cache;
-				_cache_valid = other._cache_valid;
 			}
 
 			return *this;
@@ -212,7 +203,6 @@ namespace nspMap {
 					_first_end->_next = node;
 				}
 
-				_cache_valid = false;
 				return *(node->_pair->_second);
 			}
 
@@ -233,7 +223,6 @@ namespace nspMap {
 			node->_next = cur->_next;
 			cur->_next = node;
 			cur->_last = false;
-			_cache_valid = false;
 			if (_table[bucket_id] == _first) {
 				_first_end = node;
 			}
@@ -246,18 +235,11 @@ namespace nspMap {
 		}
 
 		size_t size() const {						// mark noexcept after test
-			if (_cache_valid) {
-				return _size_cache;
-			}
 
 			size_t count = 0;
 			for (auto x : (*this)) {
 				count++;
 			}
-
-			_size_cache = count;
-			_cache_valid = true;
-			return count;
 		}
 
 		bool contains(const key_type& key) const {

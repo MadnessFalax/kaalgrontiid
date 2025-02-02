@@ -54,9 +54,36 @@
     <ClInclude Include="parser\regex\pPattern.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="abstract\pException.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="abstract\pHasId.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="parser\regex\NFA\pAutomaton.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="parser\regex\NFA\pState.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\exception\pOutOfRangeException.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="abstract\pASTNode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="abstract\pASTVisitor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="parser\regex\NFA\exception\pNFAUndefinedException.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="parser\regex\NFA\pState.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

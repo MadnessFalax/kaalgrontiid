@@ -12,6 +12,7 @@
 #include "parser/regex/pMatch.h"
 #include "parser/regex/NFA/pState.h"
 #include "parser/regex/pRegex.h"
+#include "parser/regex/NFA/pAutomaton.h"
 
 template <class T>
 using Array = nspArray::pArray<T>;
@@ -23,7 +24,17 @@ using Map = nspMap::pMap<T, U, V>;
 static void helper() {
 	auto tmp = nspRegex::pRegex::compile(R"(^-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?$)");			// json number
 
-	auto state = nspNFA::pState();
+	auto start_state = nspNFA::pState();
+	auto epsilon_state = nspNFA::pState(true);
+	auto c_state = nspNFA::pState(true);
+
+	start_state.register_transition('c', &c_state);
+
+	auto res = start_state.consume('d');
+
+	for (auto& x : res) {
+		printf("now in state: <%i>", x.first());
+	}
 
 	return;
 }
