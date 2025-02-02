@@ -20,21 +20,46 @@ using String = nspString::pString;
 template <class T, class U, class V = unsigned short>
 using Map = nspMap::pMap<T, U, V>;
 
+using State = nspNFA::pState;
+
 // used for out of scope stack disposal check so that _CrtDumpMemoryLeaks doesnt show false positive leaks on stack allocated memory
 static void helper() {
 	auto tmp = nspRegex::pRegex::compile(R"(^-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?$)");			// json number
 
-	auto start_state = nspNFA::pState();
-	auto epsilon_state = nspNFA::pState(true);
-	auto c_state = nspNFA::pState(true);
+	auto* start_state = new State();
+	auto* a_state = new State();
+	auto* at_state = new State();
+	auto* b_state = new State();
+	auto* dot_state = new State();
+	auto* c_state = new State();
+	auto* z_state = new State(true);
 
-	start_state.register_transition('c', &c_state);
+	start_state->register_transition('a', a_state);
+	a_state->register_epsilon(start_state);
+	a_state->register_transition('@', at_state);
+	at_state->register_transition('b', b_state);
+	b_state->register_epsilon(at_state);
+	b_state->register_transition('.', dot_state);
+	dot_state->register_transition('c', c_state);
+	c_state->register_transition('z', z_state);
 
-	auto res = start_state.consume('d');
+	auto* aut = new nspNFA::pAutomaton();
 
-	for (auto& x : res) {
-		printf("now in state: <%i>", x.first());
-	}
+	Array<State*>* arr = new Array<State*>();
+
+	arr->push_back(start_state);
+	arr->push_back(a_state);
+	arr->push_back(at_state);
+	arr->push_back(b_state);
+	arr->push_back(dot_state);
+	arr->push_back(c_state);
+	arr->push_back(z_state);
+
+	aut->set_states(arr, start_state);
+	
+	printf("%i\n", aut->match("aaaa@bbbbbbb.cz"));
+
+	delete aut;
 
 	return;
 }

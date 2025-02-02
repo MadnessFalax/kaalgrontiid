@@ -62,36 +62,43 @@ namespace nspNFA {
 
 			size_t length = strlen(input);
 
-			auto current_states = Map<unsigned int, pState*, unsigned char>();
-			current_states[_starting_state->get_id()] = _starting_state;
+			auto* current_states = new Map<unsigned int, pState*, unsigned char>();
+			(*current_states)[_starting_state->get_id()] = _starting_state;
 
 			for (size_t i = 0; i < length; i++) {
-				auto new_states = Map<unsigned int, pState*, unsigned char>();
+				auto* new_states = new Map<unsigned int, pState*, unsigned char>();
 
-				for (auto& state : current_states) {
+				for (auto& state : *current_states) {
 					auto temp_states = state.second()->consume(input[i]);
 					for (auto& temp_state : temp_states) {
-						new_states[temp_state.first()] = temp_state.second();
+						(*new_states)[temp_state.first()] = temp_state.second();
 					}
 				}
 
-				if (new_states.size() == 0) {
+				if (new_states->size() == 0) {
+					delete current_states;
+					delete new_states;
+					current_states = nullptr;
+					new_states = nullptr;
 					return false;
 				}
 
-				current_states = Map<unsigned int, pState*, unsigned char>();
-				for (auto& state : new_states) {
-					current_states[state.first()] = state.second();
-				}
+				delete current_states;
+				current_states = new_states;
+				new_states = nullptr;
 			}
 
-			for (auto& state : current_states) {
+			bool found_match = false;
+
+			for (auto& state : *current_states) {
 				if (state.second()->is_final()) {
-					return true;
+					found_match = true;
 				}
 			}
 
-			return false;
+			delete current_states;
+
+			return found_match;
 		}
 
 		// automaton takes ownership of passed objects

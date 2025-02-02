@@ -19,7 +19,6 @@ namespace nspNFA {
 
 		unsigned int _get_id() { return _id_counter++; }
 
-
 	public:
 		pState() :
 			_id(_get_id()),
@@ -52,31 +51,43 @@ namespace nspNFA {
 			other._epsilon_transitions = nullptr;
 		}
 
-		const unsigned int& get_id() { return _id; }
+		unsigned int get_id() { return _id; }
 		const bool& is_final() { return _is_final; }
 
-		Map<unsigned int, pState*, unsigned char>& register_transition(const char token, pState* to_state) {
-			auto& transition_set = (*_transitions)[token];
-			transition_set[to_state->get_id()] = to_state;
-
-			return transition_set;
+		void register_transition(const char token, pState* to_state) {
+			(*_transitions)[token][to_state->get_id()] = to_state;
 		}
 
-		Map<unsigned int, pState*, unsigned char>& register_epsilon(pState* to_state) {
-			auto& transition_set = (*_epsilon_transitions);
-			transition_set[to_state->get_id()] = to_state;
-
-			return transition_set;
+		void register_epsilon(pState* to_state) {
+			(*_epsilon_transitions)[to_state->get_id()] = to_state;
 		}
 
-		Map<unsigned int, pState*, unsigned char> consume(const char input_token) {
+		Map<unsigned int, pState*, unsigned char> consume(
+			const char input_token,
+			Map<unsigned int, pState*, unsigned char>* closure = new Map<unsigned int, pState*, unsigned char>(),
+			bool closure_owner = true
+		) {
 			auto ret_val = Map<unsigned int, pState*, unsigned char>();
+
+			if (closure->contains(get_id())) {
+				return ret_val;
+			}
+
+			(*closure)[get_id()] = this;
+
 			for (auto pair : *_epsilon_transitions) {
-				ret_val[pair.first()] = pair.second();
+				auto temp = pair.second()->consume(input_token, closure, false);
+				for (auto& res : temp) {
+					ret_val[res.first()] = res.second();
+				}
 			}
 
 			for (auto pair : (*_transitions)[input_token]) {
 				ret_val[pair.first()] = pair.second();
+			}
+
+			if (closure_owner) {
+				delete closure;
 			}
 
 			return ret_val;

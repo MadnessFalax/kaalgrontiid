@@ -240,9 +240,11 @@ namespace nspMap {
 			for (auto x : (*this)) {
 				count++;
 			}
+
+			return count;
 		}
 
-		bool contains(const key_type& key) const {
+		bool contains(key_type key) const {
 			address_type bucket_id = nspHashable::hash<address_type, key_type>(key);
 
 			// head
@@ -251,7 +253,7 @@ namespace nspMap {
 				return false;
 			}
 
-			if (cur->_pair->_first == key) {
+			if (cur->_pair->first() == key) {
 				return true;
 			}
 
@@ -261,7 +263,7 @@ namespace nspMap {
 				if (cur == nullptr) {
 					return false;
 				}
-				if (cur->_pair->_first == key) {
+				if (cur->_pair->first() == key) {
 					return true;
 				}
 			}
