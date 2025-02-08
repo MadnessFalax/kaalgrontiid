@@ -130,18 +130,31 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="abstract\pASTNode.h" />
     <ClInclude Include="abstract\pASTVisitor.h" />
     <ClInclude Include="abstract\pException.h" />
     <ClInclude Include="abstract\pHashable.h" />
     <ClInclude Include="abstract\pHasId.h" />
     <ClInclude Include="container\pMap.h" />
     <ClInclude Include="container\pPair.h" />
+    <ClInclude Include="parser\regex\AST\node\abstract\pLiteralListNode.h" />
+    <ClInclude Include="parser\regex\AST\node\pConcatNode.h" />
+    <ClInclude Include="parser\regex\AST\node\pQualifierNode.h" />
+    <ClInclude Include="parser\regex\AST\node\pQuantifierNode.h" />
+    <ClInclude Include="parser\regex\AST\node\pWildcardNode.h" />
+    <ClInclude Include="parser\regex\AST\node\pAlternationNode.h" />
+    <ClInclude Include="parser\regex\AST\node\pDigitNode.h" />
+    <ClInclude Include="parser\regex\AST\node\pEndNode.h" />
+    <ClInclude Include="parser\regex\AST\node\pLiteralNode.h" />
+    <ClInclude Include="parser\regex\AST\node\pPlusNode.h" />
+    <ClInclude Include="parser\regex\AST\node\pStartNode.h" />
+    <ClInclude Include="parser\regex\AST\node\pWhiteSpaceNode.h" />
+    <ClInclude Include="parser\regex\AST\pRegexNode.h" />
+    <ClInclude Include="parser\regex\AST\pRegexVisitor.h" />
     <ClInclude Include="parser\regex\NFA\exception\pNFAUndefinedException.h" />
     <ClInclude Include="parser\regex\NFA\pAutomaton.h" />
     <ClInclude Include="parser\regex\NFA\pState.h" />
     <ClInclude Include="parser\regex\pMatch.h" />
-    <ClInclude Include="parser\regex\pPattern.h" />
+    <ClInclude Include="parser\regex\pPatternParser.h" />
     <ClInclude Include="parser\regex\pRegex.h" />
     <ClInclude Include="utils\exception\pOutOfRangeException.h" />
     <ClInclude Include="utils\is_pointer.h" />

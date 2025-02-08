@@ -51,7 +51,7 @@
     <ClInclude Include="parser\regex\pMatch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="parser\regex\pPattern.h">
+    <ClInclude Include="parser\regex\pPatternParser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="abstract\pException.h">
@@ -69,13 +69,52 @@
     <ClInclude Include="utils\exception\pOutOfRangeException.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="abstract\pASTNode.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="abstract\pASTVisitor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="parser\regex\NFA\exception\pNFAUndefinedException.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="parser\regex\AST\pRegexVisitor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="parser\regex\AST\pRegexNode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="parser\regex\AST\node\pLiteralNode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="parser\regex\AST\node\pPlusNode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="parser\regex\AST\node\abstract\pLiteralListNode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="parser\regex\AST\node\pStartNode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="parser\regex\AST\node\pEndNode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="parser\regex\AST\node\pDigitNode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="parser\regex\AST\node\pWhiteSpaceNode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="parser\regex\AST\node\pAlternationNode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="parser\regex\AST\node\pWildcardNode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="parser\regex\AST\node\pQuantifierNode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="parser\regex\AST\node\pQualifierNode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="parser\regex\AST\node\pConcatNode.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
