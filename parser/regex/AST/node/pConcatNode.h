@@ -8,6 +8,7 @@ namespace nspRegexAST {
 	using Array = nspArray::pArray<value_type>;
 
 	class pConcatNode : public pRegexNode {
+
 	public:
 		Array<pRegexNode*>* _child_nodes = nullptr;
 
@@ -51,9 +52,22 @@ namespace nspRegexAST {
 			return *this;
 		}
 
+		void operator+=(pRegexNode* node) {
+			_child_nodes->push_back(node);
+		}
+
 		template <class visitor_type>
 		void accept(Visitor<visitor_type>& visitor) {
+			visitor.visit(*this);
+		}
+
+		template <class visitor_type>
+		void accept(Visitor<visitor_type>* visitor) {
 			visitor->visit(*this);
+		}
+
+		char get_type() override { 
+			return 'c'; 
 		}
 	};
 }

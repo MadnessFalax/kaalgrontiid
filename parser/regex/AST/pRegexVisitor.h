@@ -11,7 +11,11 @@
 namespace nspRegexAST {
 	using baseNode = pRegexNode;
 
+	template<class value_type>
+	using Array = nspArray::pArray<value_type>;
+
 	class pRegexVisitor : public nspAST::pASTVisitor<pRegexVisitor> {
+		
 	public:
 		void resolve_visit(pQuantifierNode& node) {
 			printf("resolve_visit for pQuantifierNode");
@@ -19,7 +23,6 @@ namespace nspRegexAST {
 
 		void resolve_visit(pQualifierNode& node) {
 			printf("resolve_visit for pQualifierNode");
-
 		}
 
 		void resolve_visit(pConcatNode& node) {

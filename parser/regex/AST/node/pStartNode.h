@@ -13,7 +13,16 @@ namespace nspRegexAST {
 
 		template <class visitor_type>
 		void accept(Visitor<visitor_type>& visitor) {
+			visitor.visit(*this);
+		}
+
+		template <class visitor_type>
+		void accept(Visitor<visitor_type>* visitor) {
 			visitor->visit(*this);
+		}
+
+		char get_type() override {
+			return 's';
 		}
 	};
 }

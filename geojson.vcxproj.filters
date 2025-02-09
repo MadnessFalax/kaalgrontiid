@@ -117,12 +117,18 @@
     <ClInclude Include="parser\regex\AST\pRegexContext.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="parser\regex\pBadPatternException.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="parser\regex\NFA\pState.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="parser\regex\pPatternParser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="parser\regex\AST\pRegexNode.cpp">

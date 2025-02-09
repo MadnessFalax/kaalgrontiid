@@ -4,17 +4,17 @@
 #include "AST/pRegexVisitor.h"
 
 namespace nspRegex {
-
+	using String = nspString::pString;
+	using Automaton = nspNFA::pAutomaton;
+	using Visitor = nspRegexAST::pRegexVisitor;
+	using AltNode = nspRegexAST::pAlternationNode;
+	using ConcNode = nspRegexAST::pConcatNode;
+	using EndNode = nspRegexAST::pEndNode;
+	using QualNode = nspRegexAST::pQualifierNode;
+	using QuantNode = nspRegexAST::pQuantifierNode;
+	using StartNode = nspRegexAST::pStartNode;
+	
 	class pRegex {
-		using String = nspString::pString;
-		using Automaton = nspNFA::pAutomaton;
-		using Visitor = nspRegexAST::pRegexVisitor;
-		using AltNode = nspRegexAST::pAlternationNode;
-		using ConcNode = nspRegexAST::pConcatNode;
-		using EndNode = nspRegexAST::pEndNode;
-		using QualNode = nspRegexAST::pQualifierNode;
-		using QuantNode = nspRegexAST::pQuantifierNode;
-		using StartNode = nspRegexAST::pStartNode;
 
 
 		String* _pattern = nullptr;

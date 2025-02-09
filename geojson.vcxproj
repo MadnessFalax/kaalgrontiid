@@ -154,6 +154,7 @@
     <ClInclude Include="parser\regex\NFA\exception\pNFAUndefinedException.h" />
     <ClInclude Include="parser\regex\NFA\pAutomaton.h" />
     <ClInclude Include="parser\regex\NFA\pState.h" />
+    <ClInclude Include="parser\regex\pBadPatternException.h" />
     <ClInclude Include="parser\regex\pPatternParser.h" />
     <ClInclude Include="parser\regex\pRegex.h" />
     <ClInclude Include="utils\exception\pOutOfRangeException.h" />
@@ -168,6 +169,7 @@
   <ItemGroup>
     <ClCompile Include="parser\regex\AST\pRegexNode.cpp" />
     <ClCompile Include="parser\regex\NFA\pState.cpp" />
+    <ClCompile Include="parser\regex\pPatternParser.cpp" />
     <ClCompile Include="Source.cpp" />
   </ItemGroup>
   <ItemGroup>
