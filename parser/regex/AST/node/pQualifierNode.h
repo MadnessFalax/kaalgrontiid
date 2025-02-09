@@ -8,9 +8,9 @@ namespace nspRegexAST {
 	using Array = nspArray::pArray<value_type>;
 
 	class pQualifierNode : public pRegexNode {
+	public:
 		Array<unsigned char>* _qualified_characters = nullptr;
 
-	public:
 		// takes ownership of qualified_characters array 
 		pQualifierNode() : _qualified_characters(new Array<unsigned char>()) {};
 		pQualifierNode(Array<unsigned char>* qualified_characters) {
@@ -51,5 +51,9 @@ namespace nspRegexAST {
 			return *this;
 		}
 
+		template <class visitor_type>
+		void accept(Visitor<visitor_type>& visitor) {
+			visitor->visit(*this);
+		}
 	};
 }

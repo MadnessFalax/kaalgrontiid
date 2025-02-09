@@ -35,7 +35,10 @@ namespace nspRegex {
 		
 
 		bool is_match() const { return _is_match; };
-		bool set_match() { return (_is_match = true); };
+		bool set_match() {
+			_is_match = true;
+			return _is_match; 
+		};
 		
 		String& add_group(String& group) {
 			_groups->push_back(group);

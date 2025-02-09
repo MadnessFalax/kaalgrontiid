@@ -48,9 +48,6 @@
     <ClInclude Include="parser\regex\pRegex.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="parser\regex\pMatch.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="parser\regex\pPatternParser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -117,12 +114,18 @@
     <ClInclude Include="parser\regex\AST\node\pConcatNode.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="parser\regex\AST\pRegexContext.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="parser\regex\NFA\pState.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="parser\regex\AST\pRegexNode.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

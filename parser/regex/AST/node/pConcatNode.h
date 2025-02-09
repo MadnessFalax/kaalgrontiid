@@ -8,9 +8,9 @@ namespace nspRegexAST {
 	using Array = nspArray::pArray<value_type>;
 
 	class pConcatNode : public pRegexNode {
+	public:
 		Array<pRegexNode*>* _child_nodes = nullptr;
 
-	public:
 		// takes ownership of qualified_characters array 
 		pConcatNode() : _child_nodes(new Array<pRegexNode*>()) {};
 		pConcatNode(Array<pRegexNode*>* qualified_characters) {
@@ -51,5 +51,9 @@ namespace nspRegexAST {
 			return *this;
 		}
 
+		template <class visitor_type>
+		void accept(Visitor<visitor_type>& visitor) {
+			visitor->visit(*this);
+		}
 	};
 }

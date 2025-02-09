@@ -22,9 +22,11 @@ using Map = nspMap::pMap<T, U, V>;
 
 using State = nspNFA::pState;
 
+using Regex = nspRegex::pRegex;
+
 // used for out of scope stack disposal check so that _CrtDumpMemoryLeaks doesnt show false positive leaks on stack allocated memory
 static void helper() {
-	auto tmp = nspRegex::pRegex::compile(R"(^-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?$)");			// json number
+	auto tmp = Regex(R"(^-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?$)").compile();			// json number
 
 	auto* start_state = new State();
 	auto* a_state = new State();
