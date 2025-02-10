@@ -30,7 +30,10 @@ namespace nspRegexAST {
 			_state_closure->push_back(_starting_state);
 			_connector_state = _starting_state;
 		};
-		pRegexVisitor(pRegexNode* root_node) : _root_node(root_node) {};
+		pRegexVisitor(pRegexNode* root_node) : _root_node(root_node), _starting_state(new State()) {
+			_state_closure->push_back(_starting_state);
+			_connector_state = _starting_state;
+		};
 		~pRegexVisitor() {
 			_starting_state = nullptr;
 			_connector_state = nullptr;
@@ -82,21 +85,33 @@ namespace nspRegexAST {
 				starting_state->register_epsilon(ending_state);
 			}
 
+			auto node_type = node._qual_node->get_type();
+			pAlternationNode* alt_node = nullptr;
+			pConcatNode* conc_node = nullptr;
+			pQualifierNode* qual_node = nullptr;
+			if (node_type == 'a') {
+				alt_node = dynamic_cast<pAlternationNode*>(node._qual_node);
+			}
+			else if (node_type == 'c') {
+				conc_node = dynamic_cast<pConcatNode*>(node._qual_node);
+			}
+			else if (node_type == 'l') {
+				qual_node = dynamic_cast<pQualifierNode*>(node._qual_node);
+			}
+			else {
+				throw pBadPatternException();
+			}
 			for (unsigned int i = 1; i <= node._max; i++) {
-				auto node_type = node._qual_node->get_type();
 				auto* sequence_start = _connector_state;
 
-				if (node_type == 'a') {
-					dynamic_cast<pAlternationNode*>(node._qual_node)->accept(*this);
+				if (alt_node) {
+					alt_node->accept(*this);
 				}
-				else if (node_type == 'c') {
-					dynamic_cast<pConcatNode*>(node._qual_node)->accept(*this);
+				else if (conc_node) {
+					conc_node->accept(*this);
 				}
-				else if (node_type == 'l') {
-					dynamic_cast<pQualifierNode*>(node._qual_node)->accept(*this);
-				}
-				else {
-					throw pBadPatternException();
+				else if (qual_node) {
+					qual_node->accept(*this);
 				}
 
 				auto* sequence_end = _connector_state;
