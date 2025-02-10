@@ -13,6 +13,7 @@
 #include "parser/regex/NFA/pState.h"
 #include "parser/regex/pRegex.h"
 #include "parser/regex/NFA/pAutomaton.h"
+#include "parser/regex/AST/pRegexVisitor.h"
 
 template <class T>
 using Array = nspArray::pArray<T>;
@@ -26,43 +27,53 @@ using Regex = nspRegex::pRegex;
 
 // used for out of scope stack disposal check so that _CrtDumpMemoryLeaks doesnt show false positive leaks on stack allocated memory
 static void helper() {
-	auto tmp = Regex(R"(^-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?$)").compile();			// json number
+	//auto tmp = Regex(R"(^-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?$)").compile();			// json number
 
-	auto* start_state = new State();
-	auto* a_state = new State();
-	auto* at_state = new State();
-	auto* b_state = new State();
-	auto* dot_state = new State();
-	auto* c_state = new State();
-	auto* z_state = new State(true);
-
-	start_state->register_transition('a', a_state);
-	a_state->register_epsilon(start_state);
-	a_state->register_transition('@', at_state);
-	at_state->register_transition('b', b_state);
-	b_state->register_epsilon(at_state);
-	b_state->register_transition('.', dot_state);
-	dot_state->register_transition('c', c_state);
-	c_state->register_transition('z', z_state);
-
-	auto* aut = new nspNFA::pAutomaton();
-
-	Array<State*>* arr = new Array<State*>();
-
-	arr->push_back(start_state);
-	arr->push_back(a_state);
-	arr->push_back(at_state);
-	arr->push_back(b_state);
-	arr->push_back(dot_state);
-	arr->push_back(c_state);
-	arr->push_back(z_state);
-
-	aut->set_states(arr, start_state);
+	const char* pattern = R"(a+@\d+\.[a-z]{2,})";
 	
-	printf("%i\n", aut->match("aaaa@bbbbbbb.cz"));
+	auto* tmp_arr = new Array<unsigned char>();
+	tmp_arr->push_back('a');
+	auto* a = new nspRegexAST::pQualifierNode(tmp_arr);
 
-	delete aut;
+	auto* a_star = new nspRegexAST::pQuantifierNode(0, 0, a);
 
+	tmp_arr = new Array<unsigned char>();
+	tmp_arr->push_back('@');
+	auto* at = new nspRegexAST::pQualifierNode(tmp_arr);
+
+	tmp_arr = new Array<unsigned char>();
+	for (unsigned char i = '0'; i <= '9'; i++) {
+		tmp_arr->push_back(i);
+	}
+	auto* digit = new nspRegexAST::pQualifierNode(tmp_arr);
+
+	auto* digit_plus = new nspRegexAST::pQuantifierNode(1, 0, digit);
+
+	tmp_arr = new Array<unsigned char>();
+	tmp_arr->push_back('.');
+	auto* dot1 = new nspRegexAST::pQualifierNode(tmp_arr);
+
+	tmp_arr = new Array<unsigned char>();
+	for (unsigned char i = 'a'; i <= 'z'; i++) {
+		tmp_arr->push_back(i);
+	}
+	auto* range = new nspRegexAST::pQualifierNode(tmp_arr);
+
+	auto* range_quant = new nspRegexAST::pQuantifierNode(2, 0, range);
+
+	auto* conc_arr = new Array<nspRegexAST::pRegexNode*>();
+	conc_arr->push_back(a_star);
+	conc_arr->push_back(at);
+	conc_arr->push_back(digit_plus);
+	conc_arr->push_back(dot1);
+	conc_arr->push_back(range_quant);
+	auto* conc = new nspRegexAST::pConcatNode(conc_arr);
+
+	auto* visitor = new nspRegexAST::pRegexVisitor(conc);
+
+	visitor->visit(*conc);
+
+	delete visitor;
 	return;
 }
 

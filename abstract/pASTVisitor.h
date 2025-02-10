@@ -12,7 +12,7 @@ namespace nspAST {
 	public:
 		template<typename node_type>
 		void visit(node_type& node) {
-			static_cast<derived*>(this)->resolve_visit(node);
+			static_cast<derived*>(this)->resolve_visit(static_cast<node_type&>(node));
 		}
 	};
 }

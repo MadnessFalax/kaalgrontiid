@@ -27,6 +27,11 @@ namespace nspRegexAST {
 			other._child_nodes = nullptr;
 		}
 		~pConcatNode() {
+			for (size_t i = 0; i < _child_nodes->size(); i++) {
+				delete (*_child_nodes)[i];
+				(*_child_nodes)[i] = nullptr;
+			}
+
 			delete _child_nodes;
 			_child_nodes = nullptr;
 		}

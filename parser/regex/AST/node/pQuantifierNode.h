@@ -12,7 +12,10 @@ namespace nspRegexAST {
 		pQuantifierNode(unsigned int min, unsigned int max, pRegexNode* qual) : _min{ min }, _max{ max }, _qual_node(qual) {};
 		pQuantifierNode(const pQuantifierNode& other) = default;
 		pQuantifierNode(pQuantifierNode&& other) = default;
-		~pQuantifierNode() { _qual_node = nullptr; };
+		~pQuantifierNode() { 
+			delete _qual_node;
+			_qual_node = nullptr;
+		};
 		pQuantifierNode& operator=(const pQuantifierNode& other) = default;
 		pQuantifierNode& operator=(pQuantifierNode&& other) = default;
 
