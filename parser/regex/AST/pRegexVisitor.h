@@ -7,6 +7,8 @@
 #include "node/pStartNode.h"
 #include "node/pEndNode.h"
 #include "node/pConcatNode.h"
+#include "../NFA/pState.h"
+#include "../pBadPatternException.h"
 #include <type_traits>
 
 namespace nspRegexAST {
@@ -15,13 +17,31 @@ namespace nspRegexAST {
 	template<class value_type>
 	using Array = nspArray::pArray<value_type>;
 
+	using State = nspNFA::pState;
+
 	class pRegexVisitor : public nspAST::pASTVisitor<pRegexVisitor> {
 		pRegexNode* _root_node = nullptr;
+		State* _starting_state = nullptr;
+		State* _connector_state = new State();
+		Array<State*>* _state_closure = new Array<State*>();
 
 	public:
-		pRegexVisitor() {};
+		pRegexVisitor() : _starting_state(new State()) {
+			_state_closure->push_back(_starting_state);
+			_connector_state = _starting_state;
+		};
 		pRegexVisitor(pRegexNode* root_node) : _root_node(root_node) {};
 		~pRegexVisitor() {
+			_starting_state = nullptr;
+			_connector_state = nullptr;
+			
+			for (size_t i = 0; i < _state_closure->size(); i++) {
+				delete (*_state_closure)[i];
+				(*_state_closure)[i] = nullptr;
+			}
+			delete _state_closure;
+
+
 			delete _root_node;
 			_root_node = nullptr;
 		}
@@ -53,33 +73,62 @@ namespace nspRegexAST {
 		}
 
 		void resolve_visit(pQuantifierNode& node) {
-			printf("resolve_visit for pQuantifierNode\n");
-			auto node_type = node._qual_node->get_type();
-			if (node_type == 'a') {
-				dynamic_cast<pAlternationNode*>(node._qual_node)->accept(*this);
+			auto* ending_state = new State();
+			_state_closure->push_back(ending_state);
+
+			auto* starting_state = _connector_state;
+
+			if (node._min == 0) {
+				starting_state->register_epsilon(ending_state);
 			}
-			else if (node_type == 'c') {
-				dynamic_cast<pConcatNode*>(node._qual_node)->accept(*this);
-			}
-			else if (node_type == 'e') {
-				dynamic_cast<pEndNode*>(node._qual_node)->accept(*this);
-			}
-			else if (node_type == 'l') {
-				dynamic_cast<pQualifierNode*>(node._qual_node)->accept(*this);
-			}
-			else if (node_type == 'n') {
-				dynamic_cast<pQuantifierNode*>(node._qual_node)->accept(*this);
-			}
-			else if (node_type == 's') {
-				dynamic_cast<pStartNode*>(node._qual_node)->accept(*this);
+
+			for (unsigned int i = 1; i <= node._max; i++) {
+				auto node_type = node._qual_node->get_type();
+				auto* sequence_start = _connector_state;
+
+				if (node_type == 'a') {
+					dynamic_cast<pAlternationNode*>(node._qual_node)->accept(*this);
+				}
+				else if (node_type == 'c') {
+					dynamic_cast<pConcatNode*>(node._qual_node)->accept(*this);
+				}
+				else if (node_type == 'l') {
+					dynamic_cast<pQualifierNode*>(node._qual_node)->accept(*this);
+				}
+				else {
+					throw pBadPatternException();
+				}
+
+				auto* sequence_end = _connector_state;
+
+				if (node._is_infinite && i == node._max) {
+					sequence_end->register_epsilon(sequence_start);
+				}
+				if (i >= node._min) {
+					sequence_end->register_epsilon(ending_state);
+				}
 			}
 		}
 
 		void resolve_visit(pQualifierNode& node) {
-			printf("resolve_visit for pQualifierNode\n");
+			auto* ending_state = new State();
+			_state_closure->push_back(ending_state);
+
+			auto* starting_state = _connector_state;
+			
 			for (auto ch : *node._qualified_characters) {
-				printf("%c\n", ch);
+				auto* l_state = new State();
+				_state_closure->push_back(l_state);
+
+				auto* r_state = new State();
+				_state_closure->push_back(r_state);
+
+				starting_state->register_epsilon(l_state);
+				l_state->register_transition(ch, r_state);
+				r_state->register_epsilon(ending_state);
 			}
+			
+			_connector_state = ending_state;
 		}
 
 		void resolve_visit(pConcatNode& node) {
