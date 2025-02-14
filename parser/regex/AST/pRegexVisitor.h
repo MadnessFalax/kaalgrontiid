@@ -135,6 +135,8 @@ namespace nspRegexAST {
 					sequence_end->register_epsilon(ending_state);
 				}
 			}
+
+			_connector_state = ending_state;
 		}
 
 		void resolve_visit(pQualifierNode& node) {

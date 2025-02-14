@@ -74,7 +74,7 @@ static void helper() {
 	Regex* re = new Regex(visitor);
 	re->compile();
 
-	String str = String("@1.cz");
+	String str = String("@1.czz");
 
 	bool result = re->match(str);
 
