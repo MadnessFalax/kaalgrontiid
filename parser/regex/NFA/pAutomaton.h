@@ -4,9 +4,14 @@
 #include "exception/pNFAUndefinedException.h"
 #include <cstring>
 
+namespace nspRegexAST {
+	class pRegexVisitor;
+}
+
 namespace nspNFA {
 
 	class pAutomaton {
+		friend nspRegexAST::pRegexVisitor;
 
 		template<class key_type, class value_type, class address_type = unsigned short>
 		using Map = nspMap::pMap<key_type, value_type, address_type>;
@@ -27,7 +32,11 @@ namespace nspNFA {
 		pAutomaton() {};
 
 		// automaton takes ownership of passed objects
-		pAutomaton(Array<pState*>* all_state_closure, pState* starting_state) : _all_state_closure(all_state_closure), _starting_state(starting_state)
+		pAutomaton(
+			Array<pState*>* all_state_closure,
+			pState* starting_state
+		) : _all_state_closure(all_state_closure),
+			_starting_state(starting_state)
 		{}
 
 		pAutomaton(pAutomaton& other) = delete;
@@ -57,8 +66,6 @@ namespace nspNFA {
 
 		bool match(const char* input) {
 			_perform_state_check();
-			if (_starting_state->is_final())
-				return true;
 
 			size_t length = strlen(input);
 
@@ -95,6 +102,7 @@ namespace nspNFA {
 					found_match = true;
 				}
 			}
+
 
 			delete current_states;
 

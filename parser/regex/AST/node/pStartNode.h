@@ -2,6 +2,7 @@
 #include "../pRegexNode.h"
 
 namespace nspRegexAST {
+	// discontinued as it will likely not be needed in lexer
 	class pStartNode : public pRegexNode {
 	public:
 		pStartNode() = default;

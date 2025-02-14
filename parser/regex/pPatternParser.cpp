@@ -24,12 +24,6 @@ namespace nspRegex {
 		else if (_cur == '?') {
 			return _consume_question(prec, parent);
 		}
-		else if (_cur == '^') {
-			return _consume_start(prec, parent);
-		}
-		else if (_cur == '$') {
-			return _consume_end(prec, parent);
-		}
 		else if (_cur == '|') {
 			return _consume_alternation(prec, parent);
 		}
@@ -77,26 +71,6 @@ namespace nspRegex {
 			new_node->context->set_parent(parent);
 		}
 
-		return new_node;
-	}
-
-	pPatternParser::RegexNode* pPatternParser::_consume_start(RegexNode* preceding, RegexNode* parent)
-	{
-		if (preceding->get_type() != 'c') {
-			throw pBadPatternException();
-		}
-		auto new_node = new StartNode();
-		new_node->context->set_left(preceding);
-		new_node->context->set_parent(preceding);
-
-		return new_node;
-	}
-
-	pPatternParser::RegexNode* pPatternParser::_consume_end(RegexNode* preceding, RegexNode* parent)
-	{
-		auto new_node = new EndNode();
-		new_node->context->set_left(preceding);
-		new_node->context->set_parent(parent);
 		return new_node;
 	}
 

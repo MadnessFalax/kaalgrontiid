@@ -71,9 +71,16 @@ static void helper() {
 
 	auto* visitor = new nspRegexAST::pRegexVisitor(conc);
 
-	visitor->visit(*conc);
+	Regex* re = new Regex(visitor);
+	re->compile();
 
-	delete visitor;
+	String str = String("@1.cz");
+
+	bool result = re->match(str);
+
+	delete re;
+	re = nullptr;
+
 	return;
 }
 

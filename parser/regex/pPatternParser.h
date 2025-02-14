@@ -5,8 +5,6 @@
 #include "AST/node/pQuantifierNode.h"
 #include "AST/node/pAlternationNode.h"
 #include "AST/node/pQualifierNode.h"
-#include "AST/node/pStartNode.h"
-#include "AST/node/pEndNode.h"
 #include "AST/node/pConcatNode.h"
 #include "pBadPatternException.h"
 
@@ -14,14 +12,13 @@ namespace nspRegex {
 
 	/*
 	* Handles pattern parsing and validation
+	* check this shit out https://matt.might.net/articles/parsing-regex-with-recursive-descent/#:~:text=In%20order%20to%20parse%2C%20we%20need%20a%20context-free,%3Cchar%3E%20%7C%20%27%27%20%3Cchar%3E%20%7C%20%27%28%27%20%3Cregex%3E%20%27%29%27
 	*/
 	class pPatternParser {
 		using AltNode = nspRegexAST::pAlternationNode;
 		using ConcNode = nspRegexAST::pConcatNode;
-		using EndNode = nspRegexAST::pEndNode;
 		using QualNode = nspRegexAST::pQualifierNode;
 		using QuantNode = nspRegexAST::pQuantifierNode;
-		using StartNode = nspRegexAST::pStartNode;
 		using RegexNode = nspRegexAST::pRegexNode;
 		using String = nspString::pString;
 
@@ -49,10 +46,6 @@ namespace nspRegex {
 		RegexNode* _consume_quantifier(RegexNode* preceding, RegexNode* parent);
 
 		RegexNode* _consume_qualifier(RegexNode* preceding, RegexNode* parent);
-
-		RegexNode* _consume_start(RegexNode* preceding, RegexNode* parent);
-
-		RegexNode* _consume_end(RegexNode* preceding, RegexNode* parent);
 
 		RegexNode* _consume_wildcard(RegexNode* preceding, RegexNode* parent);
 

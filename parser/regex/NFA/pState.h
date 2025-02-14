@@ -51,8 +51,22 @@ namespace nspNFA {
 			other._epsilon_transitions = nullptr;
 		}
 
-		unsigned int get_id() { return _id; }
-		const bool& is_final() { return _is_final; }
+		void set_final() { _is_final = true; }
+		unsigned int get_id() const { return _id; }
+		bool is_final() const { 
+			if (_is_final) {
+				return true;
+			}
+			else {
+				for (auto& pair : *_epsilon_transitions) {
+					if (pair.second()->is_final()) {
+						return true;
+					}
+				}
+			}
+
+			return false;
+		}
 
 		void register_transition(const char token, pState* to_state) {
 			(*_transitions)[token][to_state->get_id()] = to_state;

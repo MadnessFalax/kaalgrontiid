@@ -9,10 +9,8 @@ namespace nspRegex {
 	using Visitor = nspRegexAST::pRegexVisitor;
 	using AltNode = nspRegexAST::pAlternationNode;
 	using ConcNode = nspRegexAST::pConcatNode;
-	using EndNode = nspRegexAST::pEndNode;
 	using QualNode = nspRegexAST::pQualifierNode;
 	using QuantNode = nspRegexAST::pQuantifierNode;
-	using StartNode = nspRegexAST::pStartNode;
 	
 	class pRegex {
 
@@ -24,6 +22,7 @@ namespace nspRegex {
 	public:
 		pRegex() : _pattern(new String()), _visitor(new Visitor()) {};
 		pRegex(String& pattern) : _pattern(new String(pattern)), _visitor(new Visitor()) {};
+		pRegex(Visitor* visitor) : _visitor(visitor) {};
 		pRegex(const char* pattern) : _pattern(new String(pattern)) {};
 
 		~pRegex() {
@@ -31,24 +30,37 @@ namespace nspRegex {
 			_pattern = nullptr;
 			delete _nfa;
 			_nfa = nullptr;
-		}
-		
-		bool compile(const char* pattern) {
-			return true;
+			delete _visitor;
+			_visitor = nullptr;
 		}
 
 		bool compile() {
-			auto an = AltNode();
-			an.accept<Visitor>(_visitor);
-			return true;
+			if (_visitor) {
+				_visitor->resolve_tree();
+				_nfa = _visitor->create_NFA();
+				delete _visitor;
+				_visitor = nullptr;
+				return true;
+			}
+			return false;
 		}
 
 		bool match(String& input) {
-			return false;
+			if (_nfa) {
+				return _nfa->match(input.c_str());
+			}
+			else {
+				throw pNFAUndefinedException();
+			}
 		}
 
 		bool match(String* input) {
-			return false;
+			if (_nfa) {
+				return _nfa->match(input->c_str());
+			}
+			else {
+				throw pNFAUndefinedException();
+			}
 		}
 
 
