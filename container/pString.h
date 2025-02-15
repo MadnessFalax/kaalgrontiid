@@ -239,7 +239,7 @@ namespace nspString {
 			this->_count = 0;
 		}
 
-		unsigned long long hash() const override {
+		unsigned long long hash(unsigned long long bucket_count_override) const override {
 			unsigned long long base = 0xcbf29ce484222325;
 
 			for (size_t i = 0; i < length(); i++) {

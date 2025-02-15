@@ -98,6 +98,14 @@ namespace nspMap {
 			}
 		};
 
+		pMap(address_type capacity_override) {
+			_capacity = capacity_override;
+			_table = new Node * [_capacity];
+			for (size_t i = 0; i < _capacity; i++) {
+				_table[i] = nullptr;
+			}
+		}
+
 		pMap(pMap& other) {
 			_table = new Node * [_capacity];
 			for (Pair<key_type, value_type> cur : other) {
@@ -183,7 +191,7 @@ namespace nspMap {
 		}
 			 
 		value_type& operator[](const key_type& key) {
-			address_type bucket_id = nspHashable::hash<address_type, key_type>(key);
+			address_type bucket_id = nspHashable::hash<address_type, key_type>(key, _capacity);
 
 			// head
 			Node* cur = _table[bucket_id];
@@ -245,7 +253,7 @@ namespace nspMap {
 		}
 
 		bool contains(key_type key) const {
-			address_type bucket_id = nspHashable::hash<address_type, key_type>(key);
+			address_type bucket_id = nspHashable::hash<address_type, key_type>(key, _capacity);
 
 			// head
 			Node* cur = _table[bucket_id];

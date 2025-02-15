@@ -69,11 +69,11 @@ namespace nspNFA {
 
 			size_t length = strlen(input);
 
-			auto* current_states = new Map<unsigned int, pState*, unsigned char>();
+			auto* current_states = new Map<unsigned int, pState*, unsigned char>(13);
 			(*current_states)[_starting_state->get_id()] = _starting_state;
 
 			for (size_t i = 0; i < length; i++) {
-				auto* new_states = new Map<unsigned int, pState*, unsigned char>();
+				auto* new_states = new Map<unsigned int, pState*, unsigned char>(13);
 
 				for (auto& state : *current_states) {
 					auto temp_states = state.second()->consume(input[i]);

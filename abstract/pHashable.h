@@ -40,7 +40,7 @@ namespace nspHashable {
 	{
 	public:
 		virtual ~pHashable() = default;
-		virtual unsigned long long hash() const = 0;			// used in pMap class	
+		virtual unsigned long long hash(unsigned long long bucket_count_override = 0) const = 0;			// used in pMap class	
 	};
 
 	/*
@@ -50,7 +50,12 @@ namespace nspHashable {
 		works with inp_T being primitive type, other types cause UB
 	*/
 	template<typename ret_T, typename inp_T>
-	static ret_T hash(typename std::enable_if<std::is_arithmetic_v<inp_T>, inp_T>::type& val) {
+	static ret_T hash(typename std::enable_if<std::is_arithmetic_v<inp_T>, inp_T>::type& val, unsigned long long bucket_count_override = 0) {
+		unsigned long long modulo = hash_max_val<ret_T>();
+		if (bucket_count_override > 0 && bucket_count_override < hash_max_val<ret_T>()) {
+			modulo = bucket_count_override;
+		}
+		
 		unsigned long long hash = 0xcbf29ce484222325;
 
 		unsigned char* byte_array = reinterpret_cast<unsigned char*>(&val);
@@ -60,11 +65,16 @@ namespace nspHashable {
 			hash *= 0x100000001b3;
 		}
 
-		return hash % hash_max_val<ret_T>();
+		return (ret_T) hash % modulo;
 	}
-
+	
 	template<typename ret_T, typename inp_T>
-	static ret_T hash(const typename std::enable_if<std::is_arithmetic_v<inp_T>, inp_T>::type& val) {
+	static ret_T hash(const typename std::enable_if<std::is_arithmetic_v<inp_T>, inp_T>::type& val, unsigned long long bucket_count_override = 0) {
+		unsigned long long modulo = hash_max_val<ret_T>();
+		if (bucket_count_override > 0 && bucket_count_override < hash_max_val<ret_T>()) {
+			modulo = bucket_count_override;
+		}
+		
 		unsigned long long hash = 0xcbf29ce484222325;
 
 		const unsigned char* byte_array = reinterpret_cast<const unsigned char*>(&val);
@@ -74,31 +84,47 @@ namespace nspHashable {
 			hash *= 0x100000001b3;
 		}
 
-		return hash % hash_max_val<ret_T>();
+		return (ret_T) hash % modulo;
 	}
 
 	template<typename ret_T, class hashable_T>
-	static ret_T hash(typename std::enable_if_t<std::is_base_of_v<pHashable, hashable_T>, hashable_T>& val) {
+	static ret_T hash(typename std::enable_if_t<std::is_base_of_v<pHashable, hashable_T>, hashable_T>& val, unsigned long long bucket_count_override = 0) {
+		unsigned long long modulo = hash_max_val<ret_T>();
+		if (bucket_count_override > 0 && bucket_count_override < hash_max_val<ret_T>()) {
+			modulo = bucket_count_override;
+		}
 		auto& cast_val = static_cast<pHashable&>(val);
-		return cast_val.hash() % hash_max_val<ret_T>();
+		return (ret_T) cast_val.hash() % modulo;
 	}
 
 	template<typename ret_T, class hashable_T>
-	static ret_T hash(typename std::enable_if_t<std::is_base_of_v<pHashable, hashable_T>, hashable_T>* val) {
+	static ret_T hash(typename std::enable_if_t<std::is_base_of_v<pHashable, hashable_T>, hashable_T>* val, unsigned long long bucket_count_override = 0) {
+		unsigned long long modulo = hash_max_val<ret_T>();
+		if (bucket_count_override > 0 && bucket_count_override < hash_max_val<ret_T>()) {
+			modulo = bucket_count_override;
+		}
 		auto* cast_val = static_cast<pHashable*>(val);
-		return cast_val->hash() % hash_max_val<ret_T>();
+		return (ret_T) cast_val->hash() % modulo;
 	}
 
 	template<typename ret_T, class hashable_T>
-	static ret_T hash(const typename std::enable_if_t<std::is_base_of_v<pHashable, hashable_T>, hashable_T>& val) {
+	static ret_T hash(const typename std::enable_if_t<std::is_base_of_v<pHashable, hashable_T>, hashable_T>& val, unsigned long long bucket_count_override = 0) {
+		unsigned long long modulo = hash_max_val<ret_T>();
+		if (bucket_count_override > 0 && bucket_count_override < hash_max_val<ret_T>()) {
+			modulo = bucket_count_override;
+		}
 		const auto& cast_val = static_cast<const pHashable&>(val);
-		return cast_val.hash() % hash_max_val<ret_T>();
+		return (ret_T) cast_val.hash() % modulo;
 	}
 
 	template<typename ret_T, class hashable_T>
-	static ret_T hash(const typename std::enable_if_t<std::is_base_of_v<pHashable, hashable_T>, hashable_T>* val) {
+	static ret_T hash(const typename std::enable_if_t<std::is_base_of_v<pHashable, hashable_T>, hashable_T>* val, unsigned long long bucket_count_override = 0) {
+		unsigned long long modulo = hash_max_val<ret_T>();
+		if (bucket_count_override > 0 && bucket_count_override < hash_max_val<ret_T>()) {
+			modulo = bucket_count_override;
+		}
 		const auto* cast_val = static_cast<const pHashable*>(val);
-		return cast_val->hash() % hash_max_val<ret_T>();
+		return (ret_T) cast_val->hash() % modulo;
 	}
 
 }

@@ -136,6 +136,7 @@
     <ClInclude Include="abstract\pHasId.h" />
     <ClInclude Include="container\pMap.h" />
     <ClInclude Include="container\pPair.h" />
+    <ClInclude Include="parser\buffer\pFileBuffer.h" />
     <ClInclude Include="parser\regex\AST\node\abstract\pLiteralListNode.h" />
     <ClInclude Include="parser\regex\AST\node\pConcatNode.h" />
     <ClInclude Include="parser\regex\AST\node\pQualifierNode.h" />

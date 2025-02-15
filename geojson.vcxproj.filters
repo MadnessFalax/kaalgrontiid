@@ -120,6 +120,9 @@
     <ClInclude Include="parser\regex\pBadPatternException.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="parser\buffer\pFileBuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source.cpp">

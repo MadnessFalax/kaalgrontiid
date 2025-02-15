@@ -22,15 +22,15 @@ namespace nspNFA {
 	public:
 		pState() :
 			_id(_get_id()),
-			_transitions(new Map<char, Map<unsigned int, pState*, unsigned char>>()),
-			_epsilon_transitions(new Map<unsigned int, pState*, unsigned char>())
+			_transitions(new Map<char, Map<unsigned int, pState*, unsigned char>>(7)),
+			_epsilon_transitions(new Map<unsigned int, pState*, unsigned char>(7))
 		{};
 
 		pState(bool is_final) :
 			_id(_get_id()),
 			_is_final(is_final),
-			_transitions(new Map<char, Map<unsigned int, pState*, unsigned char>>()),
-			_epsilon_transitions(new Map<unsigned int, pState*, unsigned char>())
+			_transitions(new Map<char, Map<unsigned int, pState*, unsigned char>>(7)),
+			_epsilon_transitions(new Map<unsigned int, pState*, unsigned char>(7))
 		{};
 
 		pState(pState& other) :
@@ -78,7 +78,7 @@ namespace nspNFA {
 
 		Map<unsigned int, pState*, unsigned char> consume(
 			const char input_token,
-			Map<unsigned int, pState*, unsigned char>* closure = new Map<unsigned int, pState*, unsigned char>(),
+			Map<unsigned int, pState*, unsigned char>* closure = new Map<unsigned int, pState*, unsigned char>(7),
 			bool closure_owner = true
 		) {
 			auto ret_val = Map<unsigned int, pState*, unsigned char>();
