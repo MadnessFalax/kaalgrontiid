@@ -15,6 +15,7 @@
 #include "parser/regex/NFA/pAutomaton.h"
 #include "parser/regex/AST/pRegexVisitor.h"
 #include "parser/buffer/pFileHandler.h"
+#include "utils/primitive_match.h"
 
 template <class T>
 using Array = nspArray::pArray<T>;
@@ -26,19 +27,22 @@ using State = nspNFA::pState;
 using Regex = nspRegex::pRegex;
 
 using FileHandler = nspFile::pFileHandler;
+using Pattern = nspPattern::pPattern;
 
 // used for out of scope stack disposal check so that _CrtDumpMemoryLeaks doesnt show false positive leaks on stack allocated memory
 static void helper() {
 	//auto tmp = Regex(R"(^-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?$)").compile();			// json number
 
+	auto p = Pattern(String(" "));
+
 	auto* filename = "C:\\Users\\Petr\\Downloads\\src\\test\\kaalgrontiid\\test\\utf8_test.json";
 
 	auto fh = FileHandler(filename);
-	String s = fh.get_string(1024);
+	String s = fh.get_string(1);
 
-	for (auto& c : s) {
-		printf("%c", c);
-	}
+	printf("%s\n", p.match(s) ? "True" : "False");
+
+
 
 	/*const char* pattern = R"(a+@\d+\.[a-z]{2,})";
 	

@@ -166,6 +166,7 @@
     <ClInclude Include="parser\JSON\JSONParser.h" />
     <ClInclude Include="parser\JSON\JSONType.h" />
     <ClInclude Include="container\pString.h" />
+    <ClInclude Include="utils\primitive_match.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="parser\regex\AST\pRegexNode.cpp" />
