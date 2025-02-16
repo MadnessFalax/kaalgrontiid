@@ -119,7 +119,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
@@ -136,7 +136,7 @@
     <ClInclude Include="abstract\pHasId.h" />
     <ClInclude Include="container\pMap.h" />
     <ClInclude Include="container\pPair.h" />
-    <ClInclude Include="parser\buffer\pFileBuffer.h" />
+    <ClInclude Include="parser\buffer\pFileHandler.h" />
     <ClInclude Include="parser\regex\AST\node\abstract\pLiteralListNode.h" />
     <ClInclude Include="parser\regex\AST\node\pConcatNode.h" />
     <ClInclude Include="parser\regex\AST\node\pQualifierNode.h" />
@@ -175,9 +175,18 @@
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />
-    <None Include="test\sample_geo.json" />
-    <None Include="test\sample_geo_feature.json" />
-    <None Include="test\sample_json.json" />
+    <None Include="test\sample_geo.json">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="test\sample_geo_feature.json">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="test\sample_json.json">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <FileType>Document</FileType>
+    </None>
     <None Include="test\sample_json2.json" />
     <None Include="test\sample_json3.json" />
     <None Include="test\type_sample.json" />

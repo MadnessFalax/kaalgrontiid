@@ -41,6 +41,7 @@ namespace nspString {
 			other._data = nullptr;
 		}
 
+		// creates copy, delete heap allocated input manually
 		pString(const char* other) {
 			if (other != nullptr) {
 				_count = strlen(other);

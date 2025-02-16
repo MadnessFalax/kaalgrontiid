@@ -14,6 +14,7 @@
 #include "parser/regex/pRegex.h"
 #include "parser/regex/NFA/pAutomaton.h"
 #include "parser/regex/AST/pRegexVisitor.h"
+#include "parser/buffer/pFileHandler.h"
 
 template <class T>
 using Array = nspArray::pArray<T>;
@@ -22,14 +23,24 @@ template <class T, class U, class V = unsigned short>
 using Map = nspMap::pMap<T, U, V>;
 
 using State = nspNFA::pState;
-
 using Regex = nspRegex::pRegex;
+
+using FileHandler = nspFile::pFileHandler;
 
 // used for out of scope stack disposal check so that _CrtDumpMemoryLeaks doesnt show false positive leaks on stack allocated memory
 static void helper() {
 	//auto tmp = Regex(R"(^-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?$)").compile();			// json number
 
-	const char* pattern = R"(a+@\d+\.[a-z]{2,})";
+	auto* filename = "C:\\Users\\Petr\\Downloads\\src\\test\\kaalgrontiid\\test\\utf8_test.json";
+
+	auto fh = FileHandler(filename);
+	String s = fh.get_string(1024);
+
+	for (auto& c : s) {
+		printf("%c", c);
+	}
+
+	/*const char* pattern = R"(a+@\d+\.[a-z]{2,})";
 	
 	auto* tmp_arr = new Array<unsigned char>();
 	tmp_arr->push_back('a');
@@ -79,7 +90,7 @@ static void helper() {
 	bool result = re->match(str);
 
 	delete re;
-	re = nullptr;
+	re = nullptr;*/
 
 	return;
 }
