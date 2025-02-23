@@ -31,7 +31,7 @@ namespace nspString {
 
 		pString(const pString& other) : _size(other._size), _count(other._count) {
 			
-			this->_data = new char[_size];
+			_data = new char[_size];
 			memset(_data, '\0', _size);
 			memcpy(_data, other._data, _count);
 		}
@@ -66,7 +66,7 @@ namespace nspString {
 
 		void operator= (const pString& other) noexcept {
 			if (this != &other) {
-				size_t _count = other._count;
+				_count = other._count;
 
 				if (_count > this->_size) {
 					_size = _count + START_SIZE;
