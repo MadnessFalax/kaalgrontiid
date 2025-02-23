@@ -155,8 +155,10 @@
     <ClInclude Include="parser\regex\NFA\exception\pNFAUndefinedException.h" />
     <ClInclude Include="parser\regex\NFA\pAutomaton.h" />
     <ClInclude Include="parser\regex\NFA\pState.h" />
+    <ClInclude Include="parser\regex\parser\pRegexParser.h" />
+    <ClInclude Include="parser\regex\parser\pRegexLexer.h" />
+    <ClInclude Include="parser\regex\parser\pRegexParserException.h" />
     <ClInclude Include="parser\regex\pBadPatternException.h" />
-    <ClInclude Include="parser\regex\pPatternParser.h" />
     <ClInclude Include="parser\regex\pRegex.h" />
     <ClInclude Include="utils\exception\pOutOfRangeException.h" />
     <ClInclude Include="utils\is_pointer.h" />
@@ -171,11 +173,11 @@
   <ItemGroup>
     <ClCompile Include="parser\regex\AST\pRegexNode.cpp" />
     <ClCompile Include="parser\regex\NFA\pState.cpp" />
-    <ClCompile Include="parser\regex\pPatternParser.cpp" />
     <ClCompile Include="Source.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />
+    <None Include="parser\LL1\grammar\regex.g" />
     <None Include="test\sample_geo.json">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <FileType>Document</FileType>

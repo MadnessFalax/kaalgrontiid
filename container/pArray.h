@@ -40,8 +40,8 @@ namespace nspArray {
 
 			_data = new pointer[this->_size];
 
-			for (size_t i = 0; i < this->_size; i++) {
-				this->_data[i] = new value_type{ *(other._data[i]) };
+			for (size_t i = 0; i < this->_count; i++) {
+				this->_data[i] = new value_type{ (*other._data[i]) };
 			}
 		}
 
@@ -53,11 +53,12 @@ namespace nspArray {
 		~pArray() {
 			for (size_t i = 0; i < _count; i++) {
 				delete _data[i];
+				_data[i] = nullptr;
 			}
 			delete[] _data;
 			_data = nullptr;
 		}
-
+	
 		void operator= (pArray& other) {
 			if (this != &other) {
 				this->_size = other._size;
@@ -75,11 +76,17 @@ namespace nspArray {
 		}
 
 		void operator= (pArray&& other) noexcept {
+			for (size_t i = 0; i < _count; i++) {
+				delete _data[i];
+				_data[i] = nullptr;
+			}
+			delete[] _data;
+			_data = nullptr;
+
 			this->_size = other._size;
 			this->_count = other._count;
 
-			delete[] _data;
-			_data = nullptr;
+			other._count = 0;
 
 			_data = other._data;
 			other._data = nullptr;

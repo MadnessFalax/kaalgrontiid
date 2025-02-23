@@ -1,11 +1,20 @@
 #pragma once
 #include "../pRegexNode.h"
 #include "../../../../container/pArray.h"
+#include "../../../../container/pString.h"
 
+#ifdef _DEBUG
+#define __PROFILE_CN printf("ConcatNode.\n");
+#endif
+
+#ifndef _DEBUG
+#define __PROFILE_CN
+#endif
 
 namespace nspRegexAST {
 	template <class value_type>
 	using Array = nspArray::pArray<value_type>;
+	using String = nspString::pString;
 
 	class pConcatNode : public pRegexNode {
 
@@ -13,8 +22,9 @@ namespace nspRegexAST {
 		Array<pRegexNode*>* _child_nodes = nullptr;
 
 		// takes ownership of qualified_characters array 
-		pConcatNode() : _child_nodes(new Array<pRegexNode*>()) {};
+		pConcatNode() = delete;
 		pConcatNode(Array<pRegexNode*>* qualified_characters) {
+			__PROFILE_CN
 			if (qualified_characters == nullptr) {
 				_child_nodes = new Array<pRegexNode*>();
 			}
@@ -34,6 +44,18 @@ namespace nspRegexAST {
 
 			delete _child_nodes;
 			_child_nodes = nullptr;
+		}
+
+		void print(unsigned int indent = 0) override {
+			auto prefix = String("");
+			for (unsigned int i = 0; i < indent; i++) {
+				prefix += "  ";
+			}
+			printf("%sConcatenationNode\n", prefix.c_str());
+			auto size = _child_nodes->size();
+			for (size_t i = 0; i < size; i++) {
+				(*_child_nodes)[i]->print(indent + 1);
+			}
 		}
 
 		pConcatNode& operator=(const pConcatNode& other) {

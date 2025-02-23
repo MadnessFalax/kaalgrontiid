@@ -1,8 +1,12 @@
 #pragma once
+#include <cstdio>
 #include "../../../abstract/pASTVisitor.h"
 #include "../../../container/pArray.h"
 
 namespace nspRegexAST {
+	constexpr unsigned char qual_min = 32;
+	constexpr unsigned char qual_max = 126;
+
 	class pRegexNode  {
 	public:
 		template<class value_type>
@@ -56,6 +60,10 @@ namespace nspRegexAST {
 		Context* context = new Context(this);
 
 		virtual ~pRegexNode() { delete context; };
+
+		virtual void print(unsigned int indent = 0) {
+			printf("generic RegexNode\n");
+		}
 
 		template <class visitor_type>
 		void accept(Visitor<visitor_type>& visitor) {

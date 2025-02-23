@@ -16,6 +16,8 @@
 #include "parser/regex/AST/pRegexVisitor.h"
 #include "parser/buffer/pFileHandler.h"
 #include "utils/primitive_match.h"
+#include "parser/regex/parser/pRegexLexer.h"
+#include "parser/regex/parser/pRegexParser.h"
 
 template <class T>
 using Array = nspArray::pArray<T>;
@@ -29,23 +31,32 @@ using Regex = nspRegex::pRegex;
 using FileHandler = nspFile::pFileHandler;
 using Pattern = nspPattern::pPattern;
 
+using RegexLexer = nspRegexParser::pRegexLexer;
+using RegexParser = nspRegexParser::pRegexParser;
+
 // used for out of scope stack disposal check so that _CrtDumpMemoryLeaks doesnt show false positive leaks on stack allocated memory
 static void helper() {
 	//auto tmp = Regex(R"(^-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?$)").compile();			// json number
 
-	auto p = Pattern(String(" "));
+	//auto p = Pattern(String(" "));
 
-	auto* filename = "C:\\Users\\Petr\\Downloads\\src\\test\\kaalgrontiid\\test\\utf8_test.json";
+	//auto* filename = "C:\\Users\\Petr\\Downloads\\src\\test\\kaalgrontiid\\test\\utf8_test.json";
 
-	auto fh = FileHandler(filename);
-	String s = fh.get_string(1);
+	//auto fh = FileHandler(filename);
+	//String s = fh.get_string(1);
 
-	printf("%s\n", p.match(s) ? "True" : "False");
+	//printf("%s\n", p.match(s) ? "True" : "False");
 
+	auto pattern = String(R"(\-?(0|[1-9]\d*)(\.\d+)?([eE][\+\-]?\d+)?)");
+	//auto pattern = R"(a+@\d+\.[a-z]{234,0})";
 
+	auto parser = RegexParser(pattern);
+	auto* root = parser.parse();
+	root->print();
+	delete root;
 
-	/*const char* pattern = R"(a+@\d+\.[a-z]{2,})";
-	
+	/*
+	const char* pattern = R"(a+@\d+\.[a-z]{2,})";
 	auto* tmp_arr = new Array<unsigned char>();
 	tmp_arr->push_back('a');
 	auto* a = new nspRegexAST::pQualifierNode(tmp_arr);

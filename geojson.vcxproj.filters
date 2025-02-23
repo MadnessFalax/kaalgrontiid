@@ -48,9 +48,6 @@
     <ClInclude Include="parser\regex\pRegex.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="parser\regex\pPatternParser.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="abstract\pException.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -126,15 +123,21 @@
     <ClInclude Include="utils\primitive_match.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="parser\regex\parser\pRegexParser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="parser\regex\parser\pRegexLexer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="parser\regex\parser\pRegexParserException.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="parser\regex\NFA\pState.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="parser\regex\pPatternParser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="parser\regex\AST\pRegexNode.cpp">
@@ -160,5 +163,6 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="test\sample_geo.json" />
+    <None Include="parser\LL1\grammar\regex.g" />
   </ItemGroup>
 </Project>
