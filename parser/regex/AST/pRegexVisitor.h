@@ -35,6 +35,8 @@ namespace nspRegexAST {
 			_starting_state = _new_state();
 			_connector_state = _starting_state;
 		};
+
+		// takes ownership of root_node
 		pRegexVisitor(pRegexNode* root_node) : _root_node(root_node) {
 			_starting_state = _new_state();
 			_connector_state = _starting_state;

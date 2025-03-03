@@ -22,10 +22,7 @@ namespace nspRegexAST {
 	
 		pQuantifierNode() = delete;
 		// max lower than min means that higher bound is infinite
-		pQuantifierNode(unsigned int min, unsigned int max, pRegexNode* qual) : _min{ min }, _max{ max }, _qual_node(qual) {
-			
-			__PROFILE_QN
-			
+		pQuantifierNode(unsigned int min, unsigned int max, pRegexNode* qual) : _min{ min }, _max{ max }, _qual_node(qual) {			
 			if (_max < _min || _max == 0) {
 				_is_infinite = true;
 			}

@@ -23,7 +23,6 @@ namespace nspRegexAST {
 		pQualifierNode() = delete;
 
 		pQualifierNode(const char lower_bound, const char upper_bound) {
-			__PROFILE_QL
 			_qualified_characters = new Array<unsigned char>();
 			for (unsigned char i = lower_bound; i <= upper_bound; i++) {
 				_qualified_characters->push_back(i);
@@ -31,14 +30,12 @@ namespace nspRegexAST {
 		}
 
 		pQualifierNode(const char c) {
-			__PROFILE_QL	
 			_qualified_characters = new Array<unsigned char>();
 			_qualified_characters->push_back(c);
 		}
 
 		// takes ownership of qualified_characters array 
 		pQualifierNode(Array<unsigned char>* qualified_characters) {
-			__PROFILE_QL
 			if (qualified_characters == nullptr) {
 				_qualified_characters = new Array<unsigned char>();
 			}
@@ -49,7 +46,6 @@ namespace nspRegexAST {
 
 		// takes ownership of qualifier_characters_ptr pointed object, and sets ptr to nullptr
 		pQualifierNode(Array<unsigned char>** qualifier_characters_ptr) {
-			__PROFILE_QL
 			if (qualifier_characters_ptr == nullptr) {
 				_qualified_characters = new Array<unsigned char>();
 			}

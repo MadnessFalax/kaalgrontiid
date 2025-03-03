@@ -24,7 +24,6 @@ namespace nspRegexAST {
 		// takes ownership of qualified_characters array 
 		pConcatNode() = delete;
 		pConcatNode(Array<pRegexNode*>* qualified_characters) {
-			__PROFILE_CN
 			if (qualified_characters == nullptr) {
 				_child_nodes = new Array<pRegexNode*>();
 			}

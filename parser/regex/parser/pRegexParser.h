@@ -87,25 +87,27 @@ namespace nspRegexParser {
 		pRegexParser& operator= (pRegexParser& other) = default;
 		pRegexParser& operator= (pRegexParser&& other) noexcept = default;
 
+		// resulting tree is owned by the caller
 		BaseNode* parse() {
 			_tokens = _lexer.tokenize();
-			BaseNode* _root = parse_regex();
+			BaseNode* _root = _parse_regex();
 
 			return _root;
 		}
 		
-		BaseNode* parse_regex(RuleId parent_rule = RuleId::BEGIN, TokenType preceding = TokenType::END) {
+	private:
+		BaseNode* _parse_regex(RuleId parent_rule = RuleId::BEGIN, TokenType preceding = TokenType::END) {
 			BaseNode* node = nullptr;
-			BaseNode* conc = parse_conc(RuleId::REGEX);
-			node = parse_regex_post(conc, RuleId::REGEX, TokenType::END);
+			BaseNode* conc = _parse_conc(RuleId::REGEX);
+			node = _parse_regex_post(conc, RuleId::REGEX, TokenType::END);
 			return node;
 		}
 
-		BaseNode* parse_regex_post(BaseNode* prec, RuleId parent_rule = RuleId::BEGIN, TokenType preceding = TokenType::END) {
+		BaseNode* _parse_regex_post(BaseNode* prec, RuleId parent_rule = RuleId::BEGIN, TokenType preceding = TokenType::END) {
 			BaseNode* node = nullptr;
 			if (_match(TokenType::PIPE)) {
 				_consume();
-				BaseNode* alt = parse_regex(RuleId::REGEX_POST, TokenType::PIPE);
+				BaseNode* alt = _parse_regex(RuleId::REGEX_POST, TokenType::PIPE);
 				node = new AltNode(prec, alt);
 			}
 			else {
@@ -115,29 +117,29 @@ namespace nspRegexParser {
 			return node;
 		}
 
-		BaseNode* parse_conc(RuleId parent_rule = RuleId::BEGIN, TokenType preceding = TokenType::END, Array<BaseNode*> node_arr = Array<BaseNode*>()) {
+		BaseNode* _parse_conc(RuleId parent_rule = RuleId::BEGIN, TokenType preceding = TokenType::END, Array<BaseNode*> node_arr = Array<BaseNode*>()) {
 			BaseNode* node = nullptr;
 			if (_match(TokenType::RPAR)) {
 				node = new ConcNode(new Array<BaseNode*>(node_arr));
 			}
 			else if (_match(TokenType::DOT) || _match(TokenType::BSLASH) || _match(TokenType::LPAR) || _match(TokenType::LBRACKET) || _match(TokenType::NUM) || _match(TokenType::CHAR)) {
-				node_arr.push_back(parse_qual_quant(RuleId::CONC, preceding));
-				node = parse_conc_post(RuleId::CONC, preceding, node_arr);
+				node_arr.push_back(_parse_qual_quant(RuleId::CONC, preceding));
+				node = _parse_conc_post(RuleId::CONC, preceding, node_arr);
 			}
 			else if (_match(TokenType::END)) {
 				node = new ConcNode(new Array<BaseNode*>(node_arr));
 			}
 			else {
-				throw pRegexParserException("Invalid token in parse_conc");
+				throw pRegexParserException("Invalid token in _parse_conc");
 			}
 			return node;
 		}
 
-		BaseNode* parse_conc_post(RuleId parent_rule = RuleId::BEGIN, TokenType preceding = TokenType::END, Array<BaseNode*> node_arr = Array<BaseNode*>()) {
+		BaseNode* _parse_conc_post(RuleId parent_rule = RuleId::BEGIN, TokenType preceding = TokenType::END, Array<BaseNode*> node_arr = Array<BaseNode*>()) {
 			BaseNode* node = nullptr;
 			if (_match(TokenType::DOT) || _match(TokenType::BSLASH) || _match(TokenType::LPAR) || _match(TokenType::LBRACKET) || _match(TokenType::NUM) || _match(TokenType::CHAR)) {
-				node_arr.push_back(parse_qual_quant(RuleId::CONC_POST, preceding));
-				node = parse_conc(RuleId::CONC_POST, preceding, node_arr);
+				node_arr.push_back(_parse_qual_quant(RuleId::CONC_POST, preceding));
+				node = _parse_conc(RuleId::CONC_POST, preceding, node_arr);
 			}
 			else {
 				node = new ConcNode(new Array<BaseNode*>(node_arr));
@@ -145,18 +147,18 @@ namespace nspRegexParser {
 			return node;
 		}
 
-		BaseNode* parse_qual_quant(RuleId parent_rule = RuleId::BEGIN, TokenType preceding = TokenType::END) {
+		BaseNode* _parse_qual_quant(RuleId parent_rule = RuleId::BEGIN, TokenType preceding = TokenType::END) {
 			BaseNode* node = nullptr;
-			BaseNode* qual = parse_qual(RuleId::QUAL_QUANT, TokenType::END);
-			node = parse_quant(qual, RuleId::QUAL_QUANT, TokenType::END);
+			BaseNode* qual = _parse_qual(RuleId::QUAL_QUANT, TokenType::END);
+			node = _parse_quant(qual, RuleId::QUAL_QUANT, TokenType::END);
 			return node;
 		}
 
-		BaseNode* parse_quant(BaseNode* prec, RuleId parent_rule = RuleId::BEGIN, TokenType preceding = TokenType::END) {
+		BaseNode* _parse_quant(BaseNode* prec, RuleId parent_rule = RuleId::BEGIN, TokenType preceding = TokenType::END) {
 			BaseNode* node = nullptr;
 			if (_match(TokenType::LBRACE)) {
 				_consume();
-				node = parse_quant_core(prec, RuleId::QUANT, TokenType::LBRACE);
+				node = _parse_quant_core(prec, RuleId::QUANT, TokenType::LBRACE);
 				_consume(TokenType::RBRACE);
 			}
 			else if (_match(TokenType::PLUS)) {
@@ -177,7 +179,7 @@ namespace nspRegexParser {
 			return node;
 		}
 
-		BaseNode* parse_quant_core(BaseNode* prec, RuleId parent_rule = RuleId::BEGIN, TokenType preceding = TokenType::END) {
+		BaseNode* _parse_quant_core(BaseNode* prec, RuleId parent_rule = RuleId::BEGIN, TokenType preceding = TokenType::END) {
 			BaseNode* node = nullptr;
 			if (_match(TokenType::COMMA)) {
 				_consume();
@@ -198,13 +200,13 @@ namespace nspRegexParser {
 					node = new QuantNode(l_num, 0, prec);
 				}
 				else {
-					throw pRegexParserException("Invalid token in parse_quant_core");
+					throw pRegexParserException("Invalid token in _parse_quant_core");
 				}
 			}
 			return node;
 		}
 
-		BaseNode* parse_qual(RuleId parent_rule = RuleId::BEGIN, TokenType preceding = TokenType::END) {
+		BaseNode* _parse_qual(RuleId parent_rule = RuleId::BEGIN, TokenType preceding = TokenType::END) {
 			BaseNode* node = nullptr;
 			if (_match(TokenType::DOT)) {
 				_consume();
@@ -212,12 +214,12 @@ namespace nspRegexParser {
 			}
 			else if (_match(TokenType::LBRACKET)) {
 				_consume();
-				node = parse_qual_range(RuleId::QUAL, TokenType::LBRACKET);
+				node = _parse_qual_range(RuleId::QUAL, TokenType::LBRACKET);
 				_consume(TokenType::RBRACKET);
 			}
 			else if (_match(TokenType::LPAR)) {
 				_consume();
-				node = parse_regex(RuleId::QUAL, TokenType::LPAR);
+				node = _parse_regex(RuleId::QUAL, TokenType::LPAR);
 				_consume(TokenType::RPAR);
 			}
 			else if (_match(TokenType::BSLASH)) {
@@ -241,7 +243,7 @@ namespace nspRegexParser {
 					node = new QualNode(value);
 				}
 				else {
-					throw pRegexParserException("Invalid escape sequence in parse_qual: only characters \\n, \\r, \\t and characters in range char(32) - char(136) are allowed");
+					throw pRegexParserException("Invalid escape sequence in _parse_qual: only characters \\n, \\r, \\t and characters in range char(32) - char(136) are allowed");
 				}
 			}
 			else if (_match(TokenType::CHAR)) {
@@ -250,13 +252,13 @@ namespace nspRegexParser {
 				return node;
 			}
 			else {
-				throw pRegexParserException("Invalid token in parse_qual");
+				throw pRegexParserException("Invalid token in _parse_qual");
 			}
 
 			return node;
 		}
 
-		BaseNode* parse_qual_range(RuleId parent_rule = RuleId::BEGIN, TokenType preceding = TokenType::END, Array<unsigned char> char_arr = Array<unsigned char>()) {
+		BaseNode* _parse_qual_range(RuleId parent_rule = RuleId::BEGIN, TokenType preceding = TokenType::END, Array<unsigned char> char_arr = Array<unsigned char>()) {
 			auto token = _peek();
 			BaseNode* node = nullptr;
 			auto character = _get_char();
@@ -270,48 +272,48 @@ namespace nspRegexParser {
 				if (value == 'd') {
 					_consume();
 					if (_peek().type == TokenType::DASH) {
-						throw pRegexParserException("Invalid token type in parse_qual_range");
+						throw pRegexParserException("Invalid token type in _parse_qual_range");
 					}
 					else {
 						for (unsigned char i = '0'; i <= '9'; i++) {
 							char_arr.push_back(i);
 						}
-						node = parse_qual_range_post('\0', RuleId::QUAL_RANGE, TokenType::CHAR, char_arr);
+						node = _parse_qual_range_post('\0', RuleId::QUAL_RANGE, TokenType::CHAR, char_arr);
 					}
 				}
 				else if (value == 's') {
 					_consume();
 					if (_peek().type == TokenType::DASH) {
-						throw pRegexParserException("Invalid token type in parse_qual_range");
+						throw pRegexParserException("Invalid token type in _parse_qual_range");
 					}
 					else {
 						char_arr.push_back(' ');
 						char_arr.push_back('\t');
 						char_arr.push_back('\n');
 						char_arr.push_back('\r');
-						node = parse_qual_range_post('\0', RuleId::QUAL_RANGE, TokenType::CHAR, char_arr);
+						node = _parse_qual_range_post('\0', RuleId::QUAL_RANGE, TokenType::CHAR, char_arr);
 					}
 				}
 				else if (_check_range(value)) {
 					_consume();
-					node = parse_qual_range_post(value, RuleId::QUAL_RANGE, TokenType::CHAR, char_arr);
+					node = _parse_qual_range_post(value, RuleId::QUAL_RANGE, TokenType::CHAR, char_arr);
 				}
 				else {
-					throw pRegexParserException("Invalid escape sequence in parse_qual_range: \\r, \\t, \\n are not supported throughout implementation");
+					throw pRegexParserException("Invalid escape sequence in _parse_qual_range: \\r, \\t, \\n are not supported throughout implementation");
 				}
 			}
 			else if (token.type == TokenType::CHAR) {
 				_consume();
-				node = parse_qual_range_post(character, RuleId::QUAL_RANGE, TokenType::CHAR, char_arr);
+				node = _parse_qual_range_post(character, RuleId::QUAL_RANGE, TokenType::CHAR, char_arr);
 			}
 			else {
-				throw pRegexParserException("Invalid token type in parse_qual_range");
+				throw pRegexParserException("Invalid token type in _parse_qual_range");
 			}
 
 			return node;
 		}
 
-		BaseNode* parse_qual_range_post(unsigned char character, RuleId parent_rule = RuleId::BEGIN, TokenType preceding = TokenType::END, Array<unsigned char> char_arr = Array<unsigned char>()) {
+		BaseNode* _parse_qual_range_post(unsigned char character, RuleId parent_rule = RuleId::BEGIN, TokenType preceding = TokenType::END, Array<unsigned char> char_arr = Array<unsigned char>()) {
 			auto token = _peek();
 			BaseNode* node = nullptr;
 			if (token.type == TokenType::DASH) {
@@ -319,13 +321,13 @@ namespace nspRegexParser {
 				token = _peek();
 				if (token.type == TokenType::CHAR) {
 					if (character > _get_char()) {
-						throw pRegexParserException("Invalid range in parse_qual_range_post");
+						throw pRegexParserException("Invalid range in _parse_qual_range_post");
 					}
 					for (unsigned char i = character; i <= _get_char(); i++) {
 						char_arr.push_back(i);
 					}
 					_consume();
-					node = parse_qual_range(RuleId::QUAL_RANGE_POST, TokenType::CHAR, char_arr);
+					node = _parse_qual_range(RuleId::QUAL_RANGE_POST, TokenType::CHAR, char_arr);
 				}
 				else if (token.type == TokenType::BSLASH) {
 					_consume();
@@ -333,24 +335,24 @@ namespace nspRegexParser {
 					unsigned char value = _get_char();
 					if (_check_range(value) && value != 'd' && value != 's') {
 						if (character > value) {
-							throw pRegexParserException("Invalid range in parse_qual_range_post");
+							throw pRegexParserException("Invalid range in _parse_qual_range_post");
 						}
 						else {
 							for (unsigned char i = character; i <= value; i++) {
 								char_arr.push_back(i);
 							}
 							_consume();
-							node = parse_qual_range_post('\0', RuleId::QUAL_RANGE_POST, TokenType::CHAR, char_arr);
+							node = _parse_qual_range_post('\0', RuleId::QUAL_RANGE_POST, TokenType::CHAR, char_arr);
 						}
 					}
 				}
 				else {
-					throw pRegexParserException("Invalid token type in parse_qual_range_post");
+					throw pRegexParserException("Invalid token type in _parse_qual_range_post");
 				}
 			}
 			else if (token.type == TokenType::CHAR || token.type == TokenType::BSLASH) {
 				char_arr.push_back(character);
-				node = parse_qual_range(RuleId::QUAL_RANGE_POST, preceding, char_arr);
+				node = _parse_qual_range(RuleId::QUAL_RANGE_POST, preceding, char_arr);
 			}
 			else {
 				if (character != '\0') {
