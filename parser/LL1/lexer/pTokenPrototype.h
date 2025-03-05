@@ -13,11 +13,11 @@ namespace nspLexer {
 
 	template<typename enum_t, PrototypeKind t = PrototypeKind::DEFAULT, typename = std::enable_if_t<std::is_enum_v<enum_t>>>
 	class pTokenPrototype {
-		enum_t _type_id = enum_t{};
 		String _pattern = "";
 		Regex* _regex = nullptr;
 
 	public:
+		enum_t _type_id = enum_t{};
 
 		template<PrototypeKind class_t = t>
 		pTokenPrototype(enum_t type_id, std::enable_if_t<class_t != PrototypeKind::REGEX, String> pattern) : _type_id(type_id), _pattern(pattern) {};

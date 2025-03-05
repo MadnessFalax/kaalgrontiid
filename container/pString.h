@@ -175,6 +175,13 @@ namespace nspString {
 			_count++;
 		}
 
+		void operator--(int) {
+			if (_count > 0) {
+				_count--;
+				_data[_count] = '\0';
+			}
+		}
+
 		bool operator== (const char* other) const {
 			if (other == nullptr) {
 				return false;

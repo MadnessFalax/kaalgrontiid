@@ -124,6 +124,10 @@ namespace nspFile {
 			return '\0';
 		}
 
+		void unget_char() {
+			_pos--;
+		}
+
 		char operator[] (size_t index) {
 			_pos = index;
 			if (_pos < _file_size) {

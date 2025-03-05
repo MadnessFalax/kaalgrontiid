@@ -5,72 +5,73 @@
 
 #include "container/pArray.h"
 #include "container/pString.h"
-#include "utils/is_pointer.h"
 #include "container/pMap.h"
 #include "container/pPair.h"
 #include "abstract/pHashable.h"
-#include "parser/regex/pMatch.h"
-#include "parser/regex/NFA/pState.h"
 #include "parser/regex/pRegex.h"
-#include "parser/regex/NFA/pAutomaton.h"
-#include "parser/regex/AST/pRegexVisitor.h"
-#include "parser/buffer/pFileHandler.h"
-#include "utils/primitive_match.h"
-#include "parser/regex/parser/pRegexLexer.h"
-#include "parser/regex/parser/pRegexParser.h"
+#include "utils/match.h"
+#include "parser/LL1/lexer/pLexer.h"
+#include "parser/GeoJSON/gjLexer.h"
 
 template <class T>
 using Array = nspArray::pArray<T>;
 using String = nspString::pString;
 template <class T, class U, class V = unsigned short>
 using Map = nspMap::pMap<T, U, V>;
+template<class enum_t>
+using Lexer = nspLexer::pLexer<enum_t>;
 
-using State = nspNFA::pState;
 using Regex = nspRegex::pRegex;
+template<class enum_t, nspLexer::PrototypeKind t = nspLexer::PrototypeKind::DEFAULT>
+using Token = nspLexer::pTokenPrototype<enum_t, t>;
 
-using FileHandler = nspFile::pFileHandler;
-using Pattern = nspPattern::pPattern;
-
-using RegexLexer = nspRegexParser::pRegexLexer;
-using RegexParser = nspRegexParser::pRegexParser;
 
 // used for out of scope stack disposal check so that _CrtDumpMemoryLeaks doesnt show false positive leaks on stack allocated memory
 static void helper() {
-	auto pattern = String(R"(\-?(0|[1-9]\d*)(\.\d+)?([eE][\+\-]?\d+)?)");
+	//auto pattern = String(R"(\-?(0|[1-9]\d*)(\.\d+)?([eE][\+\-]?\d+)?)");
 
-	auto* regex = new Regex(pattern);
-	if (regex->compile()) {
-		printf("result: %s\n", regex->match(String(".5")) ? "True" : "False");   
-		printf("result: %s\n", regex->match(String("5.")) ? "True" : "False");   
-		printf("result: %s\n", regex->match(String("-.5")) ? "True" : "False");  
-		printf("result: %s\n", regex->match(String("+42")) ? "True" : "False");  
-		printf("result: %s\n", regex->match(String("00")) ? "True" : "False");   
-		printf("result: %s\n", regex->match(String("01")) ? "True" : "False");   
-		printf("result: %s\n", regex->match(String("1e")) ? "True" : "False");   
-		printf("result: %s\n", regex->match(String("1e+")) ? "True" : "False");  
-		printf("result: %s\n", regex->match(String("1.0e")) ? "True" : "False"); 
-		printf("result: %s\n", regex->match(String("e10")) ? "True" : "False");  
-		printf("result: %s\n", regex->match(String("--42")) ? "True" : "False"); 
-		printf("result: %s\n", regex->match(String("3.14.15")) ? "True" : "False");
-		printf("result: %s\n", regex->match(String("1e2.5")) ? "True" : "False"); 
-		printf("result: %s\n", regex->match(String(" ")) ? "True" : "False");    
-		printf("result: %s\n", regex->match(String("")) ? "True" : "False");     
+	//auto* regex = new Regex(pattern);
+	//if (regex->compile()) {
+	//	printf("result: %s\n", regex->match(String(".5")) ? "True" : "False");    
+	//}
 
+	//delete regex;
+	//regex = nullptr;
+
+	String path = "C:\\Users\\Petr\\Downloads\\src\\test\\kaalgrontiid\\test\\sample_geo.json";
+	auto l = nsGeoJSON::setup_lexer();
+	l.open(path);
+	for (size_t i = 0; i < 1024; i++) {
+		auto t = l.get_token();
+		t.print();
 	}
+	//enum a {
+	//	A,
+	//	B,
+	//	C
+	//};
 
-	delete regex;
-	regex = nullptr;
+	//Token<a> token = Token<a>(a::A, String(R"(\-?(0|[1-9]\d*)(\.\d+)?([eE][\+\-]?\d+)?)"));
+
+	//auto tmp = String("12.35d");
+
+	//auto res = token.match(tmp);
+	//printf("%s", res ? "True" : "False");
 
 	return;
 }
 
 int main() {
+#ifdef _DEBUG
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 	_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG);
+#endif
 	
 	helper();
 
+#ifdef _DEBUG
 	_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG);
 	_CrtDumpMemoryLeaks();
+#endif
 	return 0;
 }

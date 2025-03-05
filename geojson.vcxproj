@@ -43,7 +43,7 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>MultiByte</CharacterSet>
     <EnableASAN>false</EnableASAN>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
@@ -103,9 +103,9 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..;..\..\common;..\..\common\stream;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp14</LanguageStandard>
     </ClCompile>
     <Link>
@@ -137,6 +137,12 @@
     <ClInclude Include="container\pMap.h" />
     <ClInclude Include="container\pPair.h" />
     <ClInclude Include="parser\buffer\pFileHandler.h" />
+    <ClInclude Include="parser\GeoJSON\gjLexer.h" />
+    <ClInclude Include="parser\GeoJSON\gjTokenEnum.h" />
+    <ClInclude Include="parser\LL1\lexer\pLexer.h" />
+    <ClInclude Include="parser\LL1\lexer\pPrototypeKind.h" />
+    <ClInclude Include="parser\LL1\lexer\pTokenInstance.h" />
+    <ClInclude Include="parser\LL1\lexer\pTokenPrototype.h" />
     <ClInclude Include="parser\regex\AST\node\abstract\pLiteralListNode.h" />
     <ClInclude Include="parser\regex\AST\node\pConcatNode.h" />
     <ClInclude Include="parser\regex\AST\node\pQualifierNode.h" />
@@ -163,21 +169,22 @@
     <ClInclude Include="utils\exception\pOutOfRangeException.h" />
     <ClInclude Include="utils\is_pointer.h" />
     <ClInclude Include="container\pArray.h" />
-    <ClInclude Include="parser\JSON\GeoJSONType.h" />
-    <ClInclude Include="parser\JSON\GeoJSONConverter.h" />
-    <ClInclude Include="parser\JSON\JSONParser.h" />
-    <ClInclude Include="parser\JSON\JSONType.h" />
     <ClInclude Include="container\pString.h" />
-    <ClInclude Include="utils\primitive_match.h" />
+    <ClInclude Include="utils\match.h" />
+    <ClInclude Include="..\..\common\cCommon.h" />
+    <ClInclude Include="..\..\common\stream\cFileStream.h" />
+    <ClInclude Include="..\..\common\stream\cStream.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\common\cCommon.cpp" />
+    <ClCompile Include="..\..\common\stream\cFileStream.cpp" />
     <ClCompile Include="parser\regex\AST\pRegexNode.cpp" />
     <ClCompile Include="parser\regex\NFA\pState.cpp" />
     <ClCompile Include="Source.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />
-    <None Include="parser\LL1\grammar\regex.g" />
+    <None Include="parser\LL1\grammar\regex.grammar" />
     <None Include="test\sample_geo.json">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
@@ -194,6 +201,9 @@
     <None Include="test\sample_json3.json" />
     <None Include="test\type_sample.json" />
     <None Include="test\utf8_test.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="parser\LL1\grammar\geojson.grammar" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
