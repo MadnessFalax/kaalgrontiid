@@ -1,66 +1,65 @@
 #pragma once
-#include <cstdio>
+#include "common/stream/cFileStream.h"
+#include "common/stream/cStream_win.h"
 #include "../../container/pString.h"
-
-#ifdef _DEBUG
-#define fread(a, b, c, d) fread_s(a, c + 1, b, c, d)
-#define clearerr(a) clearerr_s(a)
-#define open(file, filename, mode, err) err = fopen_s(&file, filename, mode)
-#endif
-
-#ifndef _DEBUG
-#define open(file, filename, mode, err) file = fopen(filename, mode)
-#endif
-
-
 
 namespace nspFile {
 
 	using String = nspString::pString;
-	
+	using FileStream = common::stream::cFileStream;
+	constexpr size_t BUFFER_SIZE = 1 * 1024 * 1024;
+
 	class pFileHandler {
+
 		bool _is_open = false;
-		String* _filename = nullptr;
-		FILE* _file = nullptr;
-		bool _is_binary = false;
-		int _err_type = 0;
+		
+		size_t _file_size = 0;
+		size_t _buffer_pos = 0;
+		size_t _buffer_size = BUFFER_SIZE;	
+	public:
+		size_t _pos = 0;
+	private:
+		String _filename = "";
+		String* _buffer = nullptr;
+		
+		FileStream* _file = nullptr;
 
-		void _handle_error() {
-			printf("An error has occured during file operation: %i", _err_type);
-			clearerr(_file);
-		}
-
-		void _open() {
-			if (!_is_open) {
-				open(_file, _filename->c_str(), _is_binary ? "rb" : "r", _err_type);
-				if (_file == nullptr) {
-					_handle_error();
-				}
-				else {
-					_is_open = true;
-				}
-			}
+		void _set_buffer(size_t position = 0) {
+			delete _buffer;
+			_buffer_pos = position;
+			char* tmp_buf = new char[_buffer_size + 1];
+			memset(tmp_buf, '\0', _buffer_size + 1);
+			_file->Seek(_buffer_pos);
+			_file->Read(tmp_buf, (int) _buffer_size);
+			_buffer = new String(tmp_buf);
+			delete[] tmp_buf;
+			tmp_buf = nullptr;
 		}
 
 		void _close() {
-			if (_is_open) {
-				if (_file) {
-					fclose(_file);
-					_file = nullptr;
-				}
-				_is_open = false;
+			if (_file && _is_open) {
+				_file->Close();
 			}
 		}
 
 	public:
 		pFileHandler() = delete;
 
-		pFileHandler(char* filename, bool binary = false) : _filename(new String(filename)), _is_binary(binary) {
-			_open();
+		pFileHandler(String filename, bool binary = false) {
+			_filename = filename;
+			_file = new FileStream();
+			_is_open = _file->Open(_filename.c_str(), ACCESS_READ, FILE_OPEN);
+			_file_size = (size_t)_file->GetSize();
+			_set_buffer();
 		}
-		
-		pFileHandler(const char* filename, bool binary = false) : _filename(new String(filename)), _is_binary(binary) {
-			_open();
+
+		pFileHandler(const char* filename, size_t buf_size_override, bool binary = false) {
+			_filename = String(filename);
+			_file = new FileStream();
+			_is_open = _file->Open(_filename.c_str(), ACCESS_READ, FILE_OPEN);
+			_file_size = (size_t)_file->GetSize();
+			_buffer_size = buf_size_override;
+			_set_buffer();
 		}
 
 		pFileHandler(pFileHandler& other) = delete;
@@ -68,66 +67,74 @@ namespace nspFile {
 		pFileHandler(pFileHandler&& other) noexcept
 			: _is_open(other._is_open),
 			_filename(other._filename),
-			_file(other._file),
-			_is_binary(other._is_binary),
-			_err_type(other._err_type)
+			_file_size(other._file_size),
+			_file(other._file)
 		{
-			other._filename = nullptr;
 			other._file = nullptr;
 		}
 
 		~pFileHandler() {
 			_close();
-			delete _filename;
+			delete _buffer;
+			_buffer = nullptr;
+			delete _file;
+			_file = nullptr;
 		}
 
 		pFileHandler& operator=(pFileHandler& other) = delete;
 		
 		pFileHandler& operator=(pFileHandler&& other) noexcept {
-			if (this != &other) {
-				_is_open = other._is_open;
-				_is_binary = other._is_binary;
-				_file = other._file;
-				_filename = other._filename;
-				_err_type = other._err_type;
-				other._file = nullptr;
-				other._filename = nullptr;
-			}
-
+			_close();
+			delete _file;
+			_file = nullptr;
+			_is_open = other._is_open;
+			_filename = other._filename;
+			_file_size = other._file_size;
+			_file = other._file;
+			other._file = nullptr;
 			return *this;
 		}
 
-		String get_string(size_t byte_size) {
-			_open();
-			char* buf = new char[byte_size + 1];
-			memset(buf, '\0', byte_size + 1);
-			size_t count = fread(buf, sizeof(char), byte_size, _file);
-			if (count < byte_size) {
-				if (!feof(_file)) {
-					_err_type = ferror(_file);
-					_handle_error();
+		size_t position() const {
+			return _pos;
+		}
+
+		bool set_position(size_t pos) {
+			if (pos < _file_size) {
+				_pos = pos;
+				if (_pos < _buffer_pos || _pos >= _buffer_pos + _buffer_size) {
+					_set_buffer(_pos);
 				}
+				return true;
 			}
+			return false;
+		}
 
-			auto ret_val = String(buf);
-
-			delete[] buf;
-
-			return ret_val;
+		size_t size() const {
+			return _file_size;
 		}
 
 		char get_char() {
-			_open();
-			char read_val = fgetc(_file);
-			if (read_val == EOF) {
-				read_val = '\0';
-				if (!feof(_file)) {
-					_err_type = ferror(_file);
-					_handle_error();
+			if (_pos < _file_size) {
+				if (_pos >= _buffer_pos + _buffer_size || _pos < _buffer_pos) {
+					_set_buffer(_pos);
 				}
+				char read_val = (*_buffer)[_pos - _buffer_pos];
+				_pos++;
+				return read_val;
 			}
+			return '\0';
+		}
 
-			return read_val;
+		char operator[] (size_t index) {
+			_pos = index;
+			if (_pos < _file_size) {
+				if (_pos >= _buffer_pos + _buffer_size || _pos < _buffer_pos) {
+					_set_buffer(_pos);
+				}
+				return (*_buffer)[_pos - _buffer_pos];
+			}
+			return '\0';
 		}
 	};
 }

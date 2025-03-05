@@ -29,6 +29,11 @@ namespace nspString {
 			memset(_data, '\0', _size);
 		}
 
+		pString(size_t start_size_override) : _size(start_size_override) {
+			_data = new char[_size];
+			memset(_data, '\0', _size);
+		}
+
 		pString(const pString& other) : _size(other._size), _count(other._count) {
 			
 			_data = new char[_size];
