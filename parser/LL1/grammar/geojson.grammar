@@ -1,0 +1,47 @@
+﻿GeoJSON           -> FeatureCollection
+                  | Feature
+                  | Geometry
+
+FeatureCollection -> { Members }
+Members           -> Member Members'
+Members'          -> , Member Members' | ε
+Member            -> "type" : "FeatureCollection" | "features" : [ Features ] | Property
+
+Features          -> Feature Features'
+Features'         -> , Feature Features' | ε
+
+Feature           -> { Members }
+Members           -> Member Members'
+Members'          -> , Member Members' | ε
+Member            -> "type" : "Feature" | "geometry" : Geometry | "properties" : Properties | Property
+
+Geometry          -> { Members }
+Members           -> Member Members'
+Members'          -> , Member Members' | ε
+Member            -> "type" : GeometryType | "coordinates" : Coordinates | Property
+
+GeometryType      -> "Point" | "LineString" | "Polygon" | "MultiPoint" | "MultiLineString" | "MultiPolygon" | "GeometryCollection"
+
+Properties        -> { Property Properties' }
+Properties'       -> , Property Properties' | ε
+Property          -> STRING : Value
+
+Coordinates       -> Array
+
+Array             -> [ Elements ]
+Elements          -> Element Elements'
+Elements'         -> , Element Elements' | ε
+Element           -> Value
+
+Value             -> STRING
+                  | NUMBER
+                  | Object
+                  | Array
+                  | true
+                  | false
+                  | null
+
+Object            -> { Members }
+Members           -> Member Members'
+Members'          -> , Member Members' | ε
+Member            -> STRING : Value
