@@ -16,9 +16,7 @@ namespace nspFile {
 		size_t _file_size = 0;
 		size_t _buffer_pos = 0;
 		size_t _buffer_size = BUFFER_SIZE;	
-	public:
 		size_t _pos = 0;
-	private:
 		String _filename = "";
 		String* _buffer = nullptr;
 		
