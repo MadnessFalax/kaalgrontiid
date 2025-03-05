@@ -64,15 +64,6 @@ namespace nspRegex {
 			}
 		}
 
-		bool match(String input) {
-			if (_nfa) {
-				return _nfa->match(input.c_str());
-			}
-			else {
-				throw pNFAUndefinedException();
-			}
-		}
-
 		bool match(String& input) {
 			if (_nfa) {
 				return _nfa->match(input.c_str());
