@@ -73,13 +73,13 @@ namespace nspString {
 			if (this != &other) {
 				_count = other._count;
 
-				if (_count > this->_size) {
+				if (_count >= this->_size) {
 					_size = _count + START_SIZE;
 					delete[] _data;
 					_data = nullptr;
 					_data = new char[_size];
-					memset(this->_data, '\0', this->_size);
 				}
+				memset(this->_data, '\0', this->_size);
 
 				memcpy(this->_data, other._data, _count);
 			}
