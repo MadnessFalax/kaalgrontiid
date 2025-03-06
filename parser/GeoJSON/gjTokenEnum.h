@@ -7,6 +7,7 @@
 namespace nsGeoJSON {
 	enum gjToken {
 		ERROR,
+		END,
 		WS,
 		LBRACE,
 		RBRACE,
@@ -18,7 +19,6 @@ namespace nsGeoJSON {
 		TRUE,
 		FALSE,
 		NULL,
-		NUMBER,
-		END
+		NUMBER
 	};
 }

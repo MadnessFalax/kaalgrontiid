@@ -9,6 +9,7 @@ namespace nsGeoJSON {
 	Lexer setup_lexer() {
 		Lexer l = Lexer();
 		l.add_token_definition(gjToken::ERROR, "ERR");
+		l.add_token_definition(gjToken::END, "\0");	
 		l.add_token_definition(gjToken::WS, R"(\s+)");
 		l.add_token_definition(gjToken::LBRACE, R"(\{)");
 		l.add_token_definition(gjToken::RBRACE, R"(\})");

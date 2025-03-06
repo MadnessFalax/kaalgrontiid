@@ -119,19 +119,25 @@ namespace nspString {
 			_data[0] = other;
 		}
 
+		pString operator+ (const pString& other) {
+			pString tmp = pString(*this);
+			tmp += other;
+			return tmp;
+		}
+
 		void operator+= (const pString& other) {
 			if (other._count > 0) {
 				if (this != &other) {
 					size_t tmp_count = other._count + _count;
-					if (tmp_count + 1 > _size) {
+					if (tmp_count + 1 >= _size) {
 						increase_size(other._count + 1);
 					}
-					memcpy(&(_data[_count]), other._data, tmp_count);
+					memcpy(&(_data[_count]), other._data, other._count);
 					_count = tmp_count;
 				}
 				else {
 					size_t target_count = _count * 2;
-					if (target_count + 1 > _size) {
+					if (target_count + 1 >= _size) {
 						increase_size(_count + 1);
 					}
 					memmove(&(_data[_count]), _data, _count);
@@ -144,7 +150,7 @@ namespace nspString {
 			if (other != nullptr) {
 				if (this->_data != other) {
 					size_t tmp_count = strlen(other);
-					if (_count + tmp_count + 1> _size) {
+					if (_count + tmp_count + 1 >= _size) {
 						increase_size(tmp_count + 1);
 					}
 
@@ -153,7 +159,7 @@ namespace nspString {
 				}
 				else {
 					size_t target_count = _count * 2;
-					if (target_count + 1 > _size) {
+					if (target_count + 1 >= _size) {
 						increase_size(_count + 1);
 					}
 					memmove(&(_data[_count]), _data, _count);
@@ -167,7 +173,7 @@ namespace nspString {
 				return;
 			}
 
-			if (_count + 1 > _size) {
+			if (_count + 2 >= _size) {
 				increase_size(2);
 			}
 
