@@ -38,7 +38,7 @@ namespace nspArray {
 
 		pArray(const pArray& other) : _size(other._size), _count(other._count) {
 
-			_data = new pointer[_size];
+			_data = new pointer[other._size];
 
 			for (size_t i = 0; i < _count; i++) {
 				_data[i] = new value_type{ *(other._data[i]) };
@@ -155,6 +155,15 @@ namespace nspArray {
 			}
 
 			_count = 0;
+		}
+
+		bool contains(value_type el) {
+			for (size_t i = 0; i < _count; i++) {
+				if (*_data[i] == el) {
+					return true;
+				}
+			}
+			return false;
 		}
 
 	private:

@@ -1,5 +1,5 @@
 #pragma once
-#include "../../../abstract/pASTVisitor.h"
+#include "../../../abstract/pBaseVisitor.h"
 #include "pRegexNode.h"
 #include "node/pQuantifierNode.h"
 #include "node/pAlternationNode.h"
@@ -18,7 +18,7 @@ namespace nspRegexAST {
 	using NFA = nspNFA::pAutomaton;
 	using State = nspNFA::pState;
 
-	class pRegexVisitor : public nspAST::pASTVisitor<pRegexVisitor> {
+	class pRegexVisitor : public pBaseVisitor<pRegexVisitor> {
 		pRegexNode* _root_node = nullptr;
 		State* _starting_state = nullptr;
 		State* _connector_state = nullptr;

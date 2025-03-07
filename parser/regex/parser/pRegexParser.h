@@ -259,12 +259,20 @@ namespace nspRegexParser {
 			return node;
 		}
 
-		BaseNode* _parse_qual_range(RuleId parent_rule = RuleId::BEGIN, TokenType preceding = TokenType::END, Array<unsigned char> char_arr = Array<unsigned char>()) {
+		BaseNode* _parse_qual_range(RuleId parent_rule = RuleId::BEGIN, TokenType preceding = TokenType::END, Array<unsigned char> char_arr = Array<unsigned char>(), bool is_not = false) {
 			auto token = _peek();
 			BaseNode* node = nullptr;
 			auto character = _get_char();
+			if (token.type == TokenType::NOT && preceding == TokenType::LBRACKET) {
+				if (!is_not) {
+					is_not = true;
+					_consume();
+					token = _peek();
+					character = _get_char();
+				}
+			}
 			if (token.type == TokenType::RBRACKET) {
-				node = new QualNode(new Array<unsigned char>(char_arr));
+				node = new QualNode(new Array<unsigned char>(char_arr), is_not);
 			}
 			else if (token.type == TokenType::BSLASH) {
 				_consume();
@@ -279,7 +287,7 @@ namespace nspRegexParser {
 						for (unsigned char i = '0'; i <= '9'; i++) {
 							char_arr.push_back(i);
 						}
-						node = _parse_qual_range_post('\0', RuleId::QUAL_RANGE, TokenType::CHAR, char_arr);
+						node = _parse_qual_range_post('\0', RuleId::QUAL_RANGE, TokenType::CHAR, char_arr, is_not);
 					}
 				}
 				else if (value == 's') {
@@ -292,20 +300,20 @@ namespace nspRegexParser {
 						char_arr.push_back('\t');
 						char_arr.push_back('\n');
 						char_arr.push_back('\r');
-						node = _parse_qual_range_post('\0', RuleId::QUAL_RANGE, TokenType::CHAR, char_arr);
+						node = _parse_qual_range_post('\0', RuleId::QUAL_RANGE, TokenType::CHAR, char_arr, is_not);
 					}
 				}
 				else if (_check_range(value)) {
 					_consume();
-					node = _parse_qual_range_post(value, RuleId::QUAL_RANGE, TokenType::CHAR, char_arr);
+					node = _parse_qual_range_post(value, RuleId::QUAL_RANGE, TokenType::CHAR, char_arr, is_not);
 				}
 				else {
 					throw pRegexParserException("Invalid escape sequence in _parse_qual_range: \\r, \\t, \\n are not supported throughout implementation");
 				}
 			}
-			else if (token.type == TokenType::CHAR) {
+			else if (token.type == TokenType::CHAR || token.type == TokenType::NOT) {
 				_consume();
-				node = _parse_qual_range_post(character, RuleId::QUAL_RANGE, TokenType::CHAR, char_arr);
+				node = _parse_qual_range_post(character, RuleId::QUAL_RANGE, token.type, char_arr, is_not);
 			}
 			else {
 				throw pRegexParserException("Invalid token type in _parse_qual_range");
@@ -314,7 +322,7 @@ namespace nspRegexParser {
 			return node;
 		}
 
-		BaseNode* _parse_qual_range_post(unsigned char character, RuleId parent_rule = RuleId::BEGIN, TokenType preceding = TokenType::END, Array<unsigned char> char_arr = Array<unsigned char>()) {
+		BaseNode* _parse_qual_range_post(unsigned char character, RuleId parent_rule = RuleId::BEGIN, TokenType preceding = TokenType::END, Array<unsigned char> char_arr = Array<unsigned char>(), bool is_not = false) {
 			auto token = _peek();
 			BaseNode* node = nullptr;
 			if (token.type == TokenType::DASH) {
@@ -328,7 +336,7 @@ namespace nspRegexParser {
 						char_arr.push_back(i);
 					}
 					_consume();
-					node = _parse_qual_range(RuleId::QUAL_RANGE_POST, TokenType::CHAR, char_arr);
+					node = _parse_qual_range(RuleId::QUAL_RANGE_POST, TokenType::CHAR, char_arr, is_not);
 				}
 				else if (token.type == TokenType::BSLASH) {
 					_consume();
@@ -343,7 +351,7 @@ namespace nspRegexParser {
 								char_arr.push_back(i);
 							}
 							_consume();
-							node = _parse_qual_range_post('\0', RuleId::QUAL_RANGE_POST, TokenType::CHAR, char_arr);
+							node = _parse_qual_range_post('\0', RuleId::QUAL_RANGE_POST, TokenType::CHAR, char_arr, is_not);
 						}
 					}
 				}
@@ -353,13 +361,13 @@ namespace nspRegexParser {
 			}
 			else if (token.type == TokenType::CHAR || token.type == TokenType::BSLASH) {
 				char_arr.push_back(character);
-				node = _parse_qual_range(RuleId::QUAL_RANGE_POST, preceding, char_arr);
+				node = _parse_qual_range(RuleId::QUAL_RANGE_POST, preceding, char_arr, is_not);
 			}
 			else {
 				if (character != '\0') {
 					char_arr.push_back(character);
 				}
-				node = new QualNode(new Array<unsigned char>(char_arr));
+				node = new QualNode(new Array<unsigned char>(char_arr), is_not);
 			}
 
 			return node;

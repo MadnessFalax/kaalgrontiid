@@ -35,12 +35,29 @@ namespace nspRegexAST {
 		}
 
 		// takes ownership of qualified_characters array 
-		pQualifierNode(Array<unsigned char>* qualified_characters) {
-			if (qualified_characters == nullptr) {
+		pQualifierNode(Array<unsigned char>* qualified_characters, bool is_not = false) {
+			if (is_not) {
 				_qualified_characters = new Array<unsigned char>();
+				if (qualified_characters == nullptr) {
+					for (unsigned char i = nspRegexAST::qual_min; i >= nspRegexAST::qual_min && i <= nspRegexAST::qual_max_utf8; i++) {
+						_qualified_characters->push_back(i);
+					}
+				}
+				else {
+					for (unsigned char i = nspRegexAST::qual_min; i >= nspRegexAST::qual_min && i <= nspRegexAST::qual_max_utf8; i++) {
+						if (!qualified_characters->contains(i)) {
+							_qualified_characters->push_back(i);
+						}
+					}
+				}
 			}
 			else {
-				_qualified_characters = qualified_characters;
+				if (qualified_characters == nullptr) {
+					_qualified_characters = new Array<unsigned char>();
+				}
+				else {
+					_qualified_characters = qualified_characters;
+				}
 			}
 		};
 

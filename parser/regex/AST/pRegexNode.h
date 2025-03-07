@@ -1,6 +1,6 @@
 #pragma once
 #include <cstdio>
-#include "../../../abstract/pASTVisitor.h"
+#include "../../../abstract/pBaseVisitor.h"
 #include "../../../container/pArray.h"
 
 namespace nspRegexAST {
@@ -56,7 +56,7 @@ namespace nspRegexAST {
 		};
 
 		template<class visitor_type>
-		using Visitor = nspAST::pASTVisitor<visitor_type>;
+		using Visitor = pBaseVisitor<visitor_type>;
 
 		Context* context = new Context(this);
 

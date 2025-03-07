@@ -8,7 +8,7 @@ namespace nspRegexParser {
 	using Array = nspArray::pArray<T>;
 
 	enum class TokenType {
-		PIPE, PLUS, STAR, QMARK, LBRACE, RBRACE, LPAR, RPAR, LBRACKET, RBRACKET, COMMA, DOT, BSLASH, DASH, NUM, CHAR, END
+		NOT, PIPE, PLUS, STAR, QMARK, LBRACE, RBRACE, LPAR, RPAR, LBRACKET, RBRACKET, COMMA, DOT, BSLASH, DASH, NUM, CHAR, END
 	};
 
 	struct Token {
@@ -30,6 +30,8 @@ namespace nspRegexParser {
 			while (_pos < _pattern.length()) {
 				char c = _consume();
 				switch (c) {
+				case '^':
+					return Token(TokenType::NOT, "^");
 				case '|':
 					return Token(TokenType::PIPE, "|");
 				case '+':
