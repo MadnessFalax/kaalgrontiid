@@ -162,6 +162,18 @@
     <ClInclude Include="parser\LL1\parser\pErrorReporter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="parser\LL1\parser\node\pParserNode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="parser\LL1\parser\node\pCustomNode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="parser\LL1\parser\node\pForwardNode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="parser\LL1\parser\node\pConsumeNode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source.cpp">
@@ -203,5 +215,6 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="parser\LL1\grammar\geojson.grammar" />
+    <Text Include="parser\LL1\grammar\geojson_new.grammar" />
   </ItemGroup>
 </Project>

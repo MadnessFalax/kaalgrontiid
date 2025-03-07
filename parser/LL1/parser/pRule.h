@@ -12,5 +12,9 @@ namespace nspParser {
 	class pRule {
 		String _lhs;
 		Array<Sequence*> _rhs;
+
+		pRule(String name) : _lhs(name), _rhs(Array<Sequence*>()) {
+			
+		}
 	};
 }

@@ -1,5 +1,6 @@
 #pragma once
 #include "pRule.h"
+#include "node/pParserNode.h"
 
 namespace nspParser {
 	using Rule = nspParser::pRule;
@@ -7,4 +8,8 @@ namespace nspParser {
 	class pParser {
 
 	};
+
+	pParserNode* parse() {
+
+	}
 }
