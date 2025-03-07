@@ -130,7 +130,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="abstract\pASTVisitor.h" />
+    <ClInclude Include="abstract\pBaseVisitor.h" />
     <ClInclude Include="abstract\pException.h" />
     <ClInclude Include="abstract\pHashable.h" />
     <ClInclude Include="abstract\pHasId.h" />
@@ -139,12 +139,14 @@
     <ClInclude Include="parser\buffer\pFileHandler.h" />
     <ClInclude Include="parser\GeoJSON\gjLexer.h" />
     <ClInclude Include="parser\GeoJSON\gjTokenEnum.h" />
+    <ClInclude Include="parser\GeoJSON\gjVisitor.h" />
     <ClInclude Include="parser\LL1\lexer\pLexer.h" />
     <ClInclude Include="parser\LL1\lexer\pPrototypeKind.h" />
     <ClInclude Include="parser\LL1\lexer\pTokenInstance.h" />
     <ClInclude Include="parser\LL1\lexer\pTokenPrototype.h" />
     <ClInclude Include="parser\LL1\parser\node\pConsumeNode.h" />
     <ClInclude Include="parser\LL1\parser\node\pCustomNode.h" />
+    <ClInclude Include="parser\LL1\parser\node\pExtractNode.h" />
     <ClInclude Include="parser\LL1\parser\node\pForwardNode.h" />
     <ClInclude Include="parser\LL1\parser\node\pParserNode.h" />
     <ClInclude Include="parser\LL1\parser\pErrorReporter.h" />

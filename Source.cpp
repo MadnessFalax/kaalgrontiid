@@ -12,6 +12,7 @@
 #include "utils/match.h"
 #include "parser/LL1/lexer/pLexer.h"
 #include "parser/GeoJSON/gjLexer.h"
+#include "parser/LL1/parser/node/pConsumeNode.h"
 
 template <class T>
 using Array = nspArray::pArray<T>;
@@ -38,7 +39,7 @@ static void helper() {
 	//delete regex;
 	//regex = nullptr;
 
-	String path = "C:\\Users\\Petr\\Downloads\\src\\test\\kaalgrontiid\\test\\utf8_test.json";
+	String path = "C:\\Users\\Petr\\Downloads\\src\\test\\kaalgrontiid\\test\\h9gi-nx95.geojson";
 	auto l = nsGeoJSON::setup_lexer();
 	l.open(path);
 	auto t = l.get_token();

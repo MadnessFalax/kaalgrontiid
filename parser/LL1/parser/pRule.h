@@ -10,10 +10,10 @@ namespace nspParser {
 	using Sequence = nspParser::pSequence;
 
 	class pRule {
-		String _lhs;
-		Array<Sequence*> _rhs;
+		String _lhs = "";
+		Array<Sequence*> _rhs = Array<Sequence*>();
 
-		pRule(String name) : _lhs(name), _rhs(Array<Sequence*>()) {
+		pRule(String name) : _lhs(name) {
 			
 		}
 	};
