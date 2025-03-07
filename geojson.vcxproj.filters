@@ -159,6 +159,9 @@
     <ClInclude Include="utils\string.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="parser\LL1\parser\pErrorReporter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source.cpp">

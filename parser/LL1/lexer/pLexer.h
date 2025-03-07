@@ -13,9 +13,14 @@ namespace nspLexer {
 
 	template<class enum_t>
 	class pLexer {
-		Array<pTokenPrototype<enum_t, pPrototypeKind::REGEX>*> _tokens = Array<pTokenPrototype<enum_t, pPrototypeKind::REGEX>*>();
+		using Token = pTokenPrototype<enum_t, PrototypeKind::REGEX>;
+		using Instance = pTokenInstance<enum_t, PrototypeKind::REGEX>;
+
+		Array<Token*> _tokens = Array<Token*>();
 		FileHandler* _file = nullptr;
 		String _path = "";
+		bool _discard_whitespace = true;
+		Token* _whitespace_token = nullptr;
 
 		char _peek_char() {
 			char c = _file->get_char();
@@ -38,7 +43,7 @@ namespace nspLexer {
 		}
 
 	public:
-		pLexer() {}
+		pLexer(bool discard_whitespace = true) : _discard_whitespace(discard_whitespace) {}
 
 		~pLexer() {
 			size_t size = _tokens.size();
@@ -58,16 +63,21 @@ namespace nspLexer {
 			_file = new FileHandler(path);
 		}
 
-		void add_token_definition(enum_t type, String pattern) {
-			_tokens.push_back(new pTokenPrototype<enum_t, pPrototypeKind::REGEX>(type, pattern));
+		void add_token_definition(enum_t type, String pattern, bool is_whitespace = false) {
+			Token* t = new Token(type, pattern);
+			_tokens.push_back(t);
+			if (is_whitespace) {
+				_whitespace_token = t;
+			}
+			t = nullptr;
 		}
 		
-		pTokenInstance<enum_t, pPrototypeKind::REGEX> get_token(size_t lookahead_limit = 1) {
+		Instance get_token(size_t lookahead_limit = 1) {
 			if (_file) {
 				String tmp = String();
 				auto f_size = _file->size();
 				auto t_count = _tokens.size();
-				pTokenPrototype<enum_t, pPrototypeKind::REGEX>* selected_token = nullptr;
+				Token* selected_token = nullptr;
 				for (; _file->position() < f_size;) {
 					tmp += _file->get_char();
 					if (!selected_token) {
@@ -97,13 +107,18 @@ namespace nspLexer {
 							if (!matched) {
 								tmp--;
 								_file->unget_char();
-								return pTokenInstance<enum_t, pPrototypeKind::REGEX>(selected_token, tmp, _file->position());
+								if (_discard_whitespace && selected_token == _whitespace_token) {
+									return get_token(lookahead_limit);
+								}
+								else {
+									return Instance(selected_token, tmp, _file->position());
+								}
 							}
 						}
 					}
 				}
 			}
-			return pTokenInstance<enum_t, pPrototypeKind::REGEX>(nullptr, "err_token", 0);			// either error or eof
+			return Instance(nullptr, "err_token", 0);			// either error or eof
 		}
 	};
 }

@@ -143,6 +143,7 @@
     <ClInclude Include="parser\LL1\lexer\pPrototypeKind.h" />
     <ClInclude Include="parser\LL1\lexer\pTokenInstance.h" />
     <ClInclude Include="parser\LL1\lexer\pTokenPrototype.h" />
+    <ClInclude Include="parser\LL1\parser\pErrorReporter.h" />
     <ClInclude Include="parser\LL1\parser\pParser.h" />
     <ClInclude Include="parser\LL1\parser\pRule.h" />
     <ClInclude Include="parser\LL1\parser\pSequence.h" />
