@@ -1,47 +1,50 @@
-﻿GeoJSON           -> FeatureCollection
-                  | Feature
-                  | Geometry
+﻿GeoJSON				-> FeatureCollection
+					| Feature
+					| Geometry
 
-FeatureCollection -> { Members }
-Members           -> Member Members'
-Members'          -> , Member Members' | ε
-Member            -> "type" : "FeatureCollection" | "features" : [ Features ] | Property
+FeatureCollection	-> { FCMembers }
+FCMembers			-> FCMember FCMembersTail
+FCMembersTail		-> , FCMember FCMembersTail | null
+FCMember			-> "type" : "FeatureCollection" | "features" : [ Features ] | Property
 
-Features          -> Feature Features'
-Features'         -> , Feature Features' | ε
+Features			-> Feature FeaturesTail
+FeaturesTail		-> , Feature FeaturesTail | null
 
-Feature           -> { Members }
-Members           -> Member Members'
-Members'          -> , Member Members' | ε
-Member            -> "type" : "Feature" | "geometry" : Geometry | "properties" : Properties | Property
+Feature				-> { FMembers }
+FMembers			-> FMember FMembersTail
+FMembersTail		-> , FMember FMembersTail | null
+FMember				-> "type" : "Feature" | "geometry" : Geometry | "properties" : Properties | Property
 
-Geometry          -> { Members }
-Members           -> Member Members'
-Members'          -> , Member Members' | ε
-Member            -> "type" : GeometryType | "coordinates" : Coordinates | Property
+Geometry			-> { GMembers }
+GMembers			-> GMember GMembersTail
+GMembersTail		-> , GMember GMembersTail | null
+GMember				-> "type" : GeometryType | "coordinates" : Coordinates | Property
 
-GeometryType      -> "Point" | "LineString" | "Polygon" | "MultiPoint" | "MultiLineString" | "MultiPolygon" | "GeometryCollection"
+GeometryType		-> "Point" | "LineString" | "Polygon" | "MultiPoint" | "MultiLineString" | "MultiPolygon" | "GeometryCollection"
 
-Properties        -> { Property Properties' }
-Properties'       -> , Property Properties' | ε
-Property          -> STRING : Value
+Properties			-> { Property PropertiesTail }
+PropertiesTail		-> , Property PropertiesTail | null
+Property			-> STRING : Value
 
-Coordinates       -> Array
+Coordinates			-> [ CoordinateBody ]
+CoordinatesBody		-> Coordinate, Coordinate, CoordinateTail | null
+CoordinateTail		-> , Coordinate CoordinateTail, null
+Coordinate			-> Number
 
-Array             -> [ Elements ]
-Elements          -> Element Elements'
-Elements'         -> , Element Elements' | ε
-Element           -> Value
+Array				-> [ Elements ]
+Elements			-> Element ElementsTail
+ElementsTail		-> , Element ElementsTail | null
+Element				-> Value
 
-Value             -> STRING
-                  | NUMBER
-                  | Object
-                  | Array
-                  | true
-                  | false
-                  | null
+Value				-> STRING
+					| NUMBER
+					| Object
+					| Array
+					| true
+					| false
+					| null
 
-Object            -> { Members }
-Members           -> Member Members'
-Members'          -> , Member Members' | ε
-Member            -> STRING : Value
+Object				-> { OMembers }
+OMembers			-> OMember OMembersTail
+OMembersTail		-> , OMember OMembersTail | null
+OMember				-> STRING : Value
