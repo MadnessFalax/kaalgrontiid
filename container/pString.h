@@ -249,6 +249,10 @@ namespace nspString {
 			return !(this->operator==(other));
 		}
 
+		bool operator!= (pString&& other) const {
+			return !(this->operator==(other));
+		}
+
 		bool operator< (const pString& other) const {
 			return strcmp(this->_data, other._data) < 0;
 		}
