@@ -55,7 +55,7 @@ namespace nspRegex {
 			return false;
 		}
 
-		bool match(const char* input) {
+		bool match(const unsigned char* input) {
 			if (_nfa) {
 				return _nfa->match(input);
 			}

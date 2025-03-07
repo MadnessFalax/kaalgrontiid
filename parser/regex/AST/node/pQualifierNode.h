@@ -22,9 +22,9 @@ namespace nspRegexAST {
 
 		pQualifierNode() = delete;
 
-		pQualifierNode(const char lower_bound, const char upper_bound) {
+		pQualifierNode(const unsigned char lower_bound, const unsigned char upper_bound) {
 			_qualified_characters = new Array<unsigned char>();
-			for (unsigned char i = lower_bound; i <= upper_bound; i++) {
+			for (unsigned char i = lower_bound; i >= lower_bound && i <= upper_bound; i++) {
 				_qualified_characters->push_back(i);
 			}
 		}

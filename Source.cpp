@@ -38,7 +38,7 @@ static void helper() {
 	//delete regex;
 	//regex = nullptr;
 
-	String path = "C:\\Users\\Petr\\Downloads\\src\\test\\kaalgrontiid\\test\\sample_geo.json";
+	String path = "C:\\Users\\Petr\\Downloads\\src\\test\\kaalgrontiid\\test\\utf8_test.json";
 	auto l = nsGeoJSON::setup_lexer();
 	l.open(path);
 	auto t = l.get_token();

@@ -143,6 +143,9 @@
     <ClInclude Include="parser\LL1\lexer\pPrototypeKind.h" />
     <ClInclude Include="parser\LL1\lexer\pTokenInstance.h" />
     <ClInclude Include="parser\LL1\lexer\pTokenPrototype.h" />
+    <ClInclude Include="parser\LL1\parser\pParser.h" />
+    <ClInclude Include="parser\LL1\parser\pRule.h" />
+    <ClInclude Include="parser\LL1\parser\pSequence.h" />
     <ClInclude Include="parser\regex\AST\node\abstract\pLiteralListNode.h" />
     <ClInclude Include="parser\regex\AST\node\pConcatNode.h" />
     <ClInclude Include="parser\regex\AST\node\pQualifierNode.h" />
@@ -174,6 +177,7 @@
     <ClInclude Include="..\..\common\cCommon.h" />
     <ClInclude Include="..\..\common\stream\cFileStream.h" />
     <ClInclude Include="..\..\common\stream\cStream.h" />
+    <ClInclude Include="utils\string.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\common\cCommon.cpp" />

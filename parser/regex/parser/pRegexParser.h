@@ -54,7 +54,7 @@ namespace nspRegexParser {
 			throw pRegexParserException("Invalid token type in _consume");
 		}
 
-		char _get_char() {
+		unsigned char _get_char() {
 			auto t = _peek();
 			if (t.value.length() == 1) {
 				return t.value[0];
@@ -66,13 +66,13 @@ namespace nspRegexParser {
 			unsigned int num = 0;
 			auto t = _peek();
 			if (t.type == TokenType::NUM) {
-				num = strtol(t.value.c_str(), NULL, 10);
+				num = strtol(reinterpret_cast<const char*>(t.value.c_str()), NULL, 10);
 				return num;
 			}
 			throw pRegexParserException("Invalid token type or value in _get_num");
 		}
 
-		bool _check_range(char c) {
+		bool _check_range(unsigned char c) {
 			return (c >= nspRegexAST::qual_min && c <= nspRegexAST::qual_max) || c == '\n' || c == '\t' || c == '\r';
 		}
 

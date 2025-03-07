@@ -5,6 +5,7 @@
 #include "cstring"
 #include "../abstract/pHashable.h"
 #include "../utils/exception/pOutOfRangeException.h"
+#include "../utils/string.h"
 
 // REDO to hold null terminator
 
@@ -20,23 +21,23 @@ namespace nspString {
 	// operator+ is not implemented so that new heap objects arent constructed unintentionally
 	class pString : public Hashable
 	{
-		char* _data = nullptr;			// holds trailing '\0'
+		unsigned char* _data = nullptr;			// holds trailing '\0'
 		size_t _size = START_SIZE;			// total bytes allocated ('\0' included)
-		size_t _count = 0;			// string char length ('\0' NOT included)
+		size_t _count = 0;			// string unsigned char length ('\0' NOT included)
 
 	public:
-		pString() : _data(new char[START_SIZE]) {
+		pString() : _data(new unsigned char[START_SIZE]) {
 			memset(_data, '\0', _size);
 		}
 
 		pString(size_t start_size_override) : _size(start_size_override) {
-			_data = new char[_size];
+			_data = new unsigned char[_size];
 			memset(_data, '\0', _size);
 		}
 
 		pString(const pString& other) : _size(other._size), _count(other._count) {
 			
-			_data = new char[_size];
+			_data = new unsigned char[_size];
 			memset(_data, '\0', _size);
 			memcpy(_data, other._data, _count);
 		}
@@ -47,7 +48,7 @@ namespace nspString {
 		}
 
 		// creates copy, delete heap allocated input manually
-		pString(const char* other) {
+		pString(const unsigned char* other) {
 			if (other != nullptr) {
 				_count = strlen(other);
 			}
@@ -55,12 +56,28 @@ namespace nspString {
 				_count = 0;
 			}
 			_size = _count + START_SIZE;
-			_data = new char[_size];
+			_data = new unsigned char[_size];
 
 			memset(this->_data, '\0', this->_size);
 
 			if (other != nullptr) {
 				memcpy(this->_data, other, this->_count);
+			}
+		}
+
+		pString(const char* other) {
+			auto* cast_other = reinterpret_cast<const unsigned char*>(other);
+			if (other != nullptr) {
+				_count = strlen(cast_other);
+			}
+			else {
+				_count = 0;
+			}
+			_size = _count + START_SIZE;
+			_data = new unsigned char[_size];
+			memset(this->_data, '\0', this->_size);
+			if (cast_other != nullptr) {
+				memcpy(this->_data, cast_other, _count);
 			}
 		}
 
@@ -77,7 +94,7 @@ namespace nspString {
 					_size = _count + START_SIZE;
 					delete[] _data;
 					_data = nullptr;
-					_data = new char[_size];
+					_data = new unsigned char[_size];
 				}
 				memset(this->_data, '\0', this->_size);
 
@@ -95,7 +112,7 @@ namespace nspString {
 			other._data = nullptr;
 		}
 
-		void operator= (const char* other) {
+		void operator= (const unsigned char* other) {
 			if (other != nullptr) {
 				if (other != this->_data) {
 					_count = strlen(other);
@@ -104,7 +121,7 @@ namespace nspString {
 						delete[] _data;
 						_data = nullptr;
 						this->_size = _count + START_SIZE;
-						_data = new char[_size];
+						_data = new unsigned char[_size];
 						memset(this->_data, '\0', this->_size);
 					}
 
@@ -113,7 +130,7 @@ namespace nspString {
 			}
 		}
 
-		void operator= (const char other) {
+		void operator= (const unsigned char other) {
 			memset(this->_data, '\0', this->_size);
 			_count = 1;
 			_data[0] = other;
@@ -146,7 +163,7 @@ namespace nspString {
 			}
 		}
 
-		void operator+= (const char* other) {
+		void operator+= (const unsigned char* other) {
 			if (other != nullptr) {
 				if (this->_data != other) {
 					size_t tmp_count = strlen(other);
@@ -168,7 +185,7 @@ namespace nspString {
 			}
 		}
 
-		void operator+= (const char other) {
+		void operator+= (const unsigned char other) {
 			if (other == '\0') {
 				return;
 			}
@@ -188,7 +205,7 @@ namespace nspString {
 			}
 		}
 
-		bool operator== (const char* other) const {
+		bool operator== (const unsigned char* other) const {
 			if (other == nullptr) {
 				return false;
 			}
@@ -236,7 +253,7 @@ namespace nspString {
 			return strcmp(this->_data, other._data) < 0;
 		}
 
-		char& operator[](const size_t index) const {
+		unsigned char& operator[](const size_t index) const {
 			if (index >= _count + 1 || index < 0)
 				throw pOutOfRangeException();
 			else
@@ -247,7 +264,7 @@ namespace nspString {
 			return this->_count;
 		}
 
-		const char* c_str() const {
+		const unsigned char* c_str() const {
 			return this->_data;
 		}
 
@@ -278,7 +295,7 @@ namespace nspString {
 			if (incr < LOW_RESIZE)
 				incr = LOW_RESIZE;
 			this->_size += incr;
-			char* tmp_buf = new char[this->_size];
+			unsigned char* tmp_buf = new unsigned char[this->_size];
 
 			memset(tmp_buf, '\0', this->_size);
 			memcpy(tmp_buf, this->_data, this->_count);
@@ -291,7 +308,7 @@ namespace nspString {
 		// suggested for usage in loop
 		size_t increase_size() {
 			this->_size *= INCR_FACTOR;
-			char* tmp_buf = new char[this->_size];
+			unsigned char* tmp_buf = new unsigned char[this->_size];
 
 			memset(tmp_buf, '\0', this->_size);
 			memcpy(tmp_buf, this->_data, this->_count);
@@ -305,15 +322,15 @@ namespace nspString {
 
 	public:
 		struct Iterator {
-			char* m_ptr;
+			unsigned char* m_ptr;
 
 		public:
-			Iterator(char* ptr) {
+			Iterator(unsigned char* ptr) {
 				m_ptr = ptr;
 			}
 
-			char& operator*() const { return *m_ptr; }
-			char* operator->() { return m_ptr; }
+			unsigned char& operator*() const { return *m_ptr; }
+			unsigned char* operator->() { return m_ptr; }
 			Iterator& operator++() { m_ptr++; return *this; }
 			Iterator operator++(int) { Iterator tmp = *this; ++(*this); return tmp; }
 			friend bool operator== (const Iterator& a, const Iterator& b) { return a.m_ptr == b.m_ptr; };

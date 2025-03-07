@@ -38,10 +38,10 @@ namespace nspArray {
 
 		pArray(const pArray& other) : _size(other._size), _count(other._count) {
 
-			_data = new pointer[this->_size];
+			_data = new pointer[_size];
 
-			for (size_t i = 0; i < this->_count; i++) {
-				this->_data[i] = new value_type{ (*other._data[i]) };
+			for (size_t i = 0; i < _count; i++) {
+				_data[i] = new value_type{ *(other._data[i]) };
 			}
 		}
 

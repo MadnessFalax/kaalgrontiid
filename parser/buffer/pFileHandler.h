@@ -46,7 +46,7 @@ namespace nspFile {
 		pFileHandler(String filename, bool binary = false) {
 			_filename = filename;
 			_file = new FileStream();
-			_is_open = _file->Open(_filename.c_str(), ACCESS_READ, FILE_OPEN);
+			_is_open = _file->Open(reinterpret_cast<const char*>(_filename.c_str()), ACCESS_READ, FILE_OPEN);
 			_file_size = (size_t)_file->GetSize();
 			_set_buffer();
 		}
@@ -54,7 +54,7 @@ namespace nspFile {
 		pFileHandler(const char* filename, size_t buf_size_override, bool binary = false) {
 			_filename = String(filename);
 			_file = new FileStream();
-			_is_open = _file->Open(_filename.c_str(), ACCESS_READ, FILE_OPEN);
+			_is_open = _file->Open(reinterpret_cast<const char*>(_filename.c_str()), ACCESS_READ, FILE_OPEN);
 			_file_size = (size_t)_file->GetSize();
 			_buffer_size = buf_size_override;
 			_set_buffer();

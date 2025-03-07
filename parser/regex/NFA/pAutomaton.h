@@ -3,6 +3,7 @@
 #include "../../../container/pArray.h"
 #include "exception/pNFAUndefinedException.h"
 #include <cstring>
+#include "../../../utils/string.h"
 
 namespace nspRegexAST {
 	class pRegexVisitor;
@@ -64,10 +65,10 @@ namespace nspNFA {
 			}
 		}
 
-		bool match(const char* input) {
+		bool match(const unsigned char* input) {
 			_perform_state_check();
 
-			size_t length = strlen(input);
+			size_t length = nspString::strlen(input);
 
 			auto* current_states = new Map<unsigned int, pState*, unsigned char>(13);
 			(*current_states)[_starting_state->get_id()] = _starting_state;
