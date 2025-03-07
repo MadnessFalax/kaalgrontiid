@@ -43,7 +43,7 @@ static void helper() {
 	l.open(path);
 	auto t = l.get_token();
 	t.print();
-	while (t._prototype) {
+	while (t.prototype()) {
 		t = l.get_token();
 		t.print();
 	}

@@ -19,13 +19,14 @@ namespace nspRegex {
 		Parser* _parser = nullptr;
 		Automaton* _nfa = nullptr;
 		Visitor* _visitor = nullptr;
+		bool _utf8 = true;
 
 	public:
 		pRegex() = delete;
 		//doesn't take ownership of pattern
-		pRegex(String& pattern) : _pattern(new String(pattern)) {};
+		pRegex(String& pattern, bool utf8 = true) : _pattern(new String(pattern)), _utf8(utf8) {};
 		//doesn't take ownership of pattern
-		pRegex(const char* pattern) : _pattern(new String(pattern)) {};
+		pRegex(const char* pattern, bool utf8 = true) : _pattern(new String(pattern)), _utf8(utf8) {};
 
 		~pRegex() {
 			delete _parser;
@@ -40,7 +41,7 @@ namespace nspRegex {
 
 		bool compile() {
 			if (_pattern) {
-				_parser = new Parser(*_pattern);
+				_parser = new Parser(*_pattern, _utf8);
 				auto* tmp_node = _parser->parse();
 				delete _parser;
 				_parser = nullptr;

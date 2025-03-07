@@ -21,6 +21,7 @@ namespace nspLexer {
 		String _path = "";
 		bool _discard_whitespace = true;
 		Token* _whitespace_token = nullptr;
+		bool _utf8 = true;
 
 		char _peek_char() {
 			char c = _file->get_char();
@@ -43,7 +44,7 @@ namespace nspLexer {
 		}
 
 	public:
-		pLexer(bool discard_whitespace = true) : _discard_whitespace(discard_whitespace) {}
+		pLexer(bool discard_whitespace = true, bool utf8 = true) : _discard_whitespace(discard_whitespace), _utf8(utf8) {}
 
 		~pLexer() {
 			size_t size = _tokens.size();
@@ -63,8 +64,8 @@ namespace nspLexer {
 			_file = new FileHandler(path);
 		}
 
-		void add_token_definition(enum_t type, String pattern, bool is_whitespace = false) {
-			Token* t = new Token(type, pattern);
+		void add_token_definition(enum_t type, String pattern, String name, bool is_whitespace = false) {
+			Token* t = new Token(type, pattern, name, _utf8);
 			_tokens.push_back(t);
 			if (is_whitespace) {
 				_whitespace_token = t;

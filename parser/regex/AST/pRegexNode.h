@@ -5,7 +5,8 @@
 
 namespace nspRegexAST {
 	constexpr unsigned char qual_min = 32;
-	constexpr unsigned char qual_max = 255;
+	constexpr unsigned char qual_max_utf8 = 255;
+	constexpr unsigned char qual_max = 127;
 
 	class pRegexNode  {
 	public:

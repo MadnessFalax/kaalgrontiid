@@ -15,16 +15,18 @@ namespace nspLexer {
 	class pTokenPrototype {
 		String _pattern = "";
 		Regex* _regex = nullptr;
+		enum_t _type_id = enum_t{};
+		String _name = "";
+		bool _utf8 = true;
 
 	public:
-		enum_t _type_id = enum_t{};
 
 		template<PrototypeKind class_t = t>
-		pTokenPrototype(enum_t type_id, std::enable_if_t<class_t != PrototypeKind::REGEX, String> pattern) : _type_id(type_id), _pattern(pattern) {};
+		pTokenPrototype(enum_t type_id, std::enable_if_t<class_t != PrototypeKind::REGEX, String> pattern, String name, bool utf8 = true) : _type_id(type_id), _pattern(pattern), _utf8(utf8), _name(name) {};
 
 		template<PrototypeKind class_t = t>
-		pTokenPrototype(enum_t type_id, std::enable_if_t<class_t == PrototypeKind::REGEX, String> pattern) : _type_id(type_id), _pattern(pattern) {
-			_regex = new Regex(pattern);
+		pTokenPrototype(enum_t type_id, std::enable_if_t<class_t == PrototypeKind::REGEX, String> pattern, String name, bool utf8 = true) : _type_id(type_id), _pattern(pattern), _utf8(utf8), _name(name) {
+			_regex = new Regex(pattern, _utf8);
 			_regex->compile();
 		};
 
@@ -47,6 +49,9 @@ namespace nspLexer {
 		bool match(std::enable_if_t<class_t == PrototypeKind::BOUNDARY, String> input) {
 			return nspMatch::boundary_match(input, _pattern);
 		}
+
+		enum_t type_id() const { return _type_id; }
+		String name() const { return _name; }
 
 		~pTokenPrototype() {
 			delete _regex;

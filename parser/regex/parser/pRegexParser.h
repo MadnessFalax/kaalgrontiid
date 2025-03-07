@@ -43,6 +43,7 @@ namespace nspRegexParser {
 		pRegexLexer _lexer;
 		Array<Token> _tokens = Array<Token>();
 		size_t _cur = 0;
+		bool _utf8 = true;
 
 		Token _peek() { return _cur < _tokens.size() ? _tokens[_cur] : Token(TokenType::END); }
 		Token _consume() { return _cur < _tokens.size() ? _tokens[_cur++] : Token(TokenType::END); }
@@ -80,7 +81,7 @@ namespace nspRegexParser {
 
 	public:
 		pRegexParser() = delete;
-		pRegexParser(String pattern) : _pattern(pattern), _lexer(pRegexLexer(pattern)) {};
+		pRegexParser(String pattern, bool utf8 = true) : _pattern(pattern), _lexer(pRegexLexer(pattern)), _utf8(utf8) {};
 		pRegexParser(pRegexParser& other) = default;
 		pRegexParser(pRegexParser&& other) noexcept = default;
 
@@ -210,7 +211,7 @@ namespace nspRegexParser {
 			BaseNode* node = nullptr;
 			if (_match(TokenType::DOT)) {
 				_consume();
-				node = new QualNode(nspRegexAST::qual_min, nspRegexAST::qual_max);
+				node = new QualNode(nspRegexAST::qual_min, _utf8 ? nspRegexAST::qual_max_utf8 : nspRegexAST::qual_max);
 			}
 			else if (_match(TokenType::LBRACKET)) {
 				_consume();
