@@ -17,7 +17,7 @@ namespace nsGeoJSON {
 		l.add_token_definition(gjToken::RBRACKET, R"(\])", "RBRACKET");
 		l.add_token_definition(gjToken::COMMA, R"(\,)", "COMMA");
 		l.add_token_definition(gjToken::COLON, R"(:)", "COLON");
-		l.add_token_definition(gjToken::STRING, R"(".+")", "STRING");
+		l.add_token_definition(gjToken::STRING, "\"([^\"\\\\]*(\\\\.[^\"\\\\]*)*)\"", "STRING");
 		l.add_token_definition(gjToken::TRUE, "true", "TRUE");
 		l.add_token_definition(gjToken::FALSE, "false", "FALSE");
 		l.add_token_definition(gjToken::NULL, "null", "NULL");
