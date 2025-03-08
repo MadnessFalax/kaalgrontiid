@@ -6,7 +6,7 @@ namespace nsGeoJSON {
 	class gjVisitor : public nspParser::pParserVisitor<gjToken, gjRule> {
 
 	public:
-		gjVisitor() {
+		gjVisitor(Lexer* lexer) : nspParser::pParserVisitor<gjToken, gjRule>(lexer) {
 
 		}
 	};

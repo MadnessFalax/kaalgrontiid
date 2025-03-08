@@ -77,6 +77,10 @@ namespace nspLexer {
 			}
 			t = nullptr;
 		}
+
+		String get_token_name(enum_t token_id) {
+			return _token_map[token_id]->get_name();
+		}
 		
 		Instance get_token(size_t lookahead_limit = 1) {
 			if (_file) {

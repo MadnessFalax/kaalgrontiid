@@ -92,6 +92,19 @@ namespace nspArray {
 			other._data = nullptr;
 		}
 
+		value_type operator--(int) {
+			if (_count > 0) {
+				value_type val = *(_data[_count - 1]);
+				delete _data[_count - 1];
+				_data[_count - 1] = nullptr;
+				_count--;
+				return val;
+			}
+			else {
+				return value_type{};
+			}
+		}
+
 		void operator+= (pArray& other) noexcept {
 			if (_size < _count + other._count) {
 				increase_size(other._count);

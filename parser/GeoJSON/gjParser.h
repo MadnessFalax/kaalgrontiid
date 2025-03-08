@@ -59,24 +59,24 @@ namespace nsGeoJSON {
 		l->add_token_definition(gjToken::NUMBER, R"(\-?(0|[1-9]\d*)(\.\d+)?([eE][\+\-]?\d+)?)", "NUMBER");
 
 		auto* rules = new Array<Rule*>();
-		auto* visitor = new gjVisitor();	
+		auto* visitor = new gjVisitor(l);	
 		
 
 		// Thanks god for Github Copilot!!!!!!!!!!!!
-		auto* rule = new Rule(gjRule::GeoJSON);
+		auto* rule = new Rule(gjRule::GeoJSON, "GeoJSON");
 		(*rule) += &((*(new Sequence())) << new ConsumeNode(gjToken::LBRACE) << new ForwardNode(gjRule::GJProperties) << new ConsumeNode(gjToken::RBRACE));
 		rules->push_back(rule);
 		
-		rule = new Rule(gjRule::GJProperties);
+		rule = new Rule(gjRule::GJProperties, "GJProperties");
 		(*rule) += &((*(new Sequence())) << new ForwardNode(gjRule::GJProperty) << new ForwardNode(gjRule::GJPropertiesTail));
 		rules->push_back(rule);
 
-		rule = new Rule(gjRule::GJPropertiesTail);
+		rule = new Rule(gjRule::GJPropertiesTail, "GJPropertiesTail");
 		(*rule) += &((*(new Sequence())) << new ConsumeNode(gjToken::COMMA) << new ForwardNode(gjRule::GJProperty) << new ForwardNode(gjRule::GJPropertiesTail));
 		(*rule) += &((*(new Sequence())));
 		rules->push_back(rule);
 
-		rule = new Rule(gjRule::GJProperty);
+		rule = new Rule(gjRule::GJProperty, "GJProperty");
 		(*rule) += &((*(new Sequence())) 
 			<< new ConsumeNode(gjToken::STRING, "type") 
 			<< new ConsumeNode(gjToken::COLON) 
@@ -109,7 +109,7 @@ namespace nsGeoJSON {
 			<< new ForwardNode(gjRule::GenericProperty));
 		rules->push_back(rule);
 
-		rule = new Rule(gjRule::GeometryType);
+		rule = new Rule(gjRule::GeometryType, "GeometryType");
 		(*rule) += &((*(new Sequence())) 
 			<< new ConsumeNode(gjToken::STRING, "Point"));
 		(*rule) += &((*(new Sequence()))
@@ -126,19 +126,19 @@ namespace nsGeoJSON {
 			<< new ConsumeNode(gjToken::STRING, "GeometryCollection"));
 		rules->push_back(rule);
 
-		rule = new Rule(gjRule::TypeVal);
+		rule = new Rule(gjRule::TypeVal, "TypeVal");
 		(*rule) += &((*(new Sequence())) << new ConsumeNode(gjToken::STRING, "FeatureCollection"));
 		(*rule) += &((*(new Sequence())) << new ConsumeNode(gjToken::STRING, "Feature"));
 		(*rule) += &((*(new Sequence())) << new ForwardNode(gjRule::GeometryType));
 		rules->push_back(rule);
 
-		rule = new Rule(gjRule::GenericProperties);
+		rule = new Rule(gjRule::GenericProperties, "GenericProperties");
 		(*rule) += &((*(new Sequence()))
 			<< new ForwardNode(gjRule::GenericProperty)
 			<< new ForwardNode(gjRule::GenericPropertiesTail));
 		rules->push_back(rule);
 
-		rule = new Rule(gjRule::GenericPropertiesTail);
+		rule = new Rule(gjRule::GenericPropertiesTail, "GenericPropertiesTail");
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(gjToken::COMMA)
 			<< new ForwardNode(gjRule::GenericProperty)
@@ -146,14 +146,14 @@ namespace nsGeoJSON {
 		(*rule) += new Sequence();
 		rules->push_back(rule);
 
-		rule = new Rule(gjRule::GenericProperty);
+		rule = new Rule(gjRule::GenericProperty, "GenericProperty");
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(gjToken::STRING)
 			<< new ConsumeNode(gjToken::COLON)
 			<< new ForwardNode(gjRule::Value));
 		rules->push_back(rule);
 
-		rule = new Rule(gjRule::FeatureValues);
+		rule = new Rule(gjRule::FeatureValues, "FeatureValues");
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(gjToken::LBRACE)
 			<< new ForwardNode(gjRule::FProperties)
@@ -162,7 +162,7 @@ namespace nsGeoJSON {
 		(*rule) += new Sequence();
 		rules->push_back(rule);
 
-		rule = new Rule(gjRule::FeatureValuesTail);
+		rule = new Rule(gjRule::FeatureValuesTail, "FeatureValuesTail");
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(gjToken::COMMA)
 			<< new ConsumeNode(gjToken::LBRACE)
@@ -172,13 +172,13 @@ namespace nsGeoJSON {
 		(*rule) += new Sequence();
 		rules->push_back(rule);
 
-		rule = new Rule(gjRule::FProperties);
+		rule = new Rule(gjRule::FProperties, "FProperties");
 		(*rule) += &((*(new Sequence()))
 			<< new ForwardNode(gjRule::FProperty)
 			<< new ForwardNode(gjRule::FPropertiesTail));
 		rules->push_back(rule);
 
-		rule = new Rule(gjRule::FPropertiesTail);
+		rule = new Rule(gjRule::FPropertiesTail, "FPropertiesTail");
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(gjToken::COMMA)
 			<< new ForwardNode(gjRule::FProperty)
@@ -186,7 +186,7 @@ namespace nsGeoJSON {
 		(*rule) += new Sequence();
 		rules->push_back(rule);
 
-		rule = new Rule(gjRule::FProperty);
+		rule = new Rule(gjRule::FProperty, "FProperty");
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(gjToken::STRING, "type")
 			<< new ConsumeNode(gjToken::COLON)
@@ -207,13 +207,13 @@ namespace nsGeoJSON {
 			<< new ForwardNode(gjRule::GenericProperty));
 		rules->push_back(rule);
 
-		rule = new Rule(gjRule::GProperties);
+		rule = new Rule(gjRule::GProperties, "GProperties");
 		(*rule) += &((*(new Sequence()))
 			<< new ForwardNode(gjRule::GProperty)
 			<< new ForwardNode(gjRule::GPropertiesTail));
 		rules->push_back(rule);
 
-		rule = new Rule(gjRule::GPropertiesTail);
+		rule = new Rule(gjRule::GPropertiesTail, "GPropertiesTail");
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(gjToken::COMMA)
 			<< new ForwardNode(gjRule::GProperty)
@@ -221,7 +221,7 @@ namespace nsGeoJSON {
 		(*rule) += new Sequence();
 		rules->push_back(rule);
 
-		rule = new Rule(gjRule::GProperty);
+		rule = new Rule(gjRule::GProperty, "GProperty");
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(gjToken::STRING, "type")
 			<< new ConsumeNode(gjToken::COLON)
@@ -236,7 +236,7 @@ namespace nsGeoJSON {
 			<< new ForwardNode(gjRule::GenericProperty));
 		rules->push_back(rule);
 
-		rule = new Rule(gjRule::CoordinatesRoot);
+		rule = new Rule(gjRule::CoordinatesRoot, "CoordinatesRoot");
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(gjToken::LBRACKET)
 			<< new ForwardNode(gjRule::CoordinatesRoot)
@@ -245,14 +245,14 @@ namespace nsGeoJSON {
 			<< new ForwardNode(gjRule::Coordinates));
 		rules->push_back(rule);
 
-		rule = new Rule(gjRule::Coordinates);
+		rule = new Rule(gjRule::Coordinates, "Coordinates");
 		(*rule) += &((*(new Sequence()))
 			<< new ExtractNode()
 			<< new ForwardNode(gjRule::CoordinatesTail));
 		(*rule) += new Sequence();
 		rules->push_back(rule);
 
-		rule = new Rule(gjRule::CoordinatesTail);
+		rule = new Rule(gjRule::CoordinatesTail, "CoordinatesTail");
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(gjToken::COMMA)
 			<< new ExtractNode()
@@ -260,7 +260,7 @@ namespace nsGeoJSON {
 		(*rule) += new Sequence();
 		rules->push_back(rule);
 
-		rule = new Rule(gjRule::Value);
+		rule = new Rule(gjRule::Value, "Value");
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(gjToken::TRUE));
 		(*rule) += &((*(new Sequence()))
@@ -281,13 +281,13 @@ namespace nsGeoJSON {
 			<< new ConsumeNode(gjToken::NUMBER));
 		rules->push_back(rule);
 
-		rule = new Rule(gjRule::GenericArrayValues);
+		rule = new Rule(gjRule::GenericArrayValues, "GenericArrayValues");
 		(*rule) += &((*(new Sequence()))
 			<< new ForwardNode(gjRule::Value)
 			<< new ForwardNode(gjRule::GenericArrayValuesTail));
 		rules->push_back(rule);
 
-		rule = new Rule(gjRule::GenericArrayValuesTail);
+		rule = new Rule(gjRule::GenericArrayValuesTail, "GenericArrayValuesTail");
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(gjToken::COMMA)
 			<< new ForwardNode(gjRule::Value)

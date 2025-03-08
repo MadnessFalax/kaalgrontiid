@@ -16,11 +16,11 @@ namespace nspLexer {
 		}
 
 		void print() {
-			printf("%s, %s\n", _prototype ? reinterpret_cast<const char*>(_prototype->name().c_str()) : "UNNAMED_TOKEN", _value.c_str());
+			printf("%s, %s\n", _prototype ? reinterpret_cast<const char*>(_prototype->get_name().c_str()) : "UNNAMED_TOKEN", _value.c_str());
 		}
 
-		size_t position() const { return _position; }	
-		String value() const { return _value; }	
-		pTokenPrototype<enum_t, proto_t>* prototype() const { return _prototype; }
+		const size_t& get_position() const { return _position; }	
+		const String& get_value() const { return _value; }	
+		pTokenPrototype<enum_t, proto_t>* get_prototype() const { return _prototype; }
 	};
 }

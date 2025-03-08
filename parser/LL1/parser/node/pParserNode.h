@@ -12,8 +12,20 @@ namespace nspParser {
 	
 	template<class enum_t, class enum_r, typename = std::enable_if_t<std::is_enum_v<enum_t>>>
 	class pParserNode {
-		using Visitor = pBaseVisitor<pParserNode<enum_t, enum_r>>;
 
 	public:
+		template<class visitor_t>
+		using Visitor = pBaseVisitor<visitor_t>;
+
+		template<class visitor_t>
+		void accept(Visitor<visitor_t>* visitor) {
+			visitor->visit(*this);
+		}
+
+		template<class visitor_t>
+		void accept(Visitor<visitor_t>& visitor) {
+			visitor.visit(*this);
+		}
+
 	};
 }

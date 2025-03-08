@@ -44,7 +44,7 @@ static void helper() {
 	l->open(path);
 	auto t = l->get_token();
 	t.print();
-	while (t.prototype()) {
+	while (t.get_prototype()) {
 		t = l->get_token();
 		t.print();
 	}

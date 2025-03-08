@@ -53,7 +53,7 @@ namespace nspLexer {
 
 		enum_t get_id() const override { return _type_id; }
 		// for id printing
-		String name() const { return _name; }
+		String get_name() const { return _name; }
 
 		~pTokenPrototype() {
 			delete _regex;

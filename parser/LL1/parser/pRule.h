@@ -14,9 +14,10 @@ namespace nspParser {
 		using Sequence = nspParser::pSequence<enum_t, enum_r>;
 		enum_r _lhs = "";
 		Array<Sequence*> _rhs = Array<Sequence*>();
+		String _name = "";					// for printing purposes
 
 	public:
-		pRule(enum_r rule_id) : _lhs(rule_id) {}
+		pRule(enum_r rule_id, String name) : _lhs(rule_id), _name(name) {}
 
 		~pRule() {
 			auto rhs_size = _rhs.size();
