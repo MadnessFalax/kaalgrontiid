@@ -10,9 +10,9 @@ namespace nspParser {
 	template<class enum_t>
 	using TokenPrototype = nspLexer::pTokenPrototype<enum_t, nspLexer::pPrototypeKind::REGEX>;
 	
-	template<class enum_t, typename = std::enable_if_t<std::is_enum_v<enum_t>>>
+	template<class enum_t, class enum_r, typename = std::enable_if_t<std::is_enum_v<enum_t>>>
 	class pParserNode {
-		using Visitor = pBaseVisitor<pParserNode<enum_t>>;
+		using Visitor = pBaseVisitor<pParserNode<enum_t, enum_r>>;
 
 	public:
 	};

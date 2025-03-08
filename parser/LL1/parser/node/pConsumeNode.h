@@ -2,16 +2,20 @@
 #include "pParserNode.h"
 
 namespace nspParser {
-	template<typename enum_t>
-	class pConsumeNode : public pParserNode<enum_t> {
-		using Visitor = pBaseVisitor<pParserNode<enum_t>>;
+	template<typename enum_t, typename enum_r>
+	class pConsumeNode : public pParserNode<enum_t, enum_r> {
+		using Visitor = pBaseVisitor<pParserNode<enum_t, enum_r>>;
 		
-		TokenPrototype<enum_t>* _proto = nullptr;
+		enum_t _proto;
+		bool _check_value = false;
+		String _value = "";
 		
 	public:
-		pConsumeNode(TokenPrototype<enum_t>* proto) : _proto(proto) {
+		pConsumeNode(enum_t proto) : _proto(proto) {
 
 		}
+
+		pConsumeNode(enum_t proto, String value) : _proto(proto), _value(value), _check_value(true) {}
 
 		~pConsumeNode() {
 			_proto = nullptr;

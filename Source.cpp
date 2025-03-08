@@ -11,7 +11,7 @@
 #include "parser/regex/pRegex.h"
 #include "utils/match.h"
 #include "parser/LL1/lexer/pLexer.h"
-#include "parser/GeoJSON/gjLexer.h"
+#include "parser/GeoJSON/gjParser.h"
 #include "parser/LL1/parser/node/pConsumeNode.h"
 
 template <class T>
@@ -40,12 +40,12 @@ static void helper() {
 	//regex = nullptr;
 
 	String path = "C:\\Users\\Petr\\Downloads\\src\\test\\kaalgrontiid\\test\\h9gi-nx95.geojson";
-	auto l = nsGeoJSON::setup_lexer();
-	l.open(path);
-	auto t = l.get_token();
+	auto* l = nsGeoJSON::setup_lexer();
+	l->open(path);
+	auto t = l->get_token();
 	t.print();
 	while (t.prototype()) {
-		t = l.get_token();
+		t = l->get_token();
 		t.print();
 	}
 	//enum a {

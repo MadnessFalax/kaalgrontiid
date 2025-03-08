@@ -2,7 +2,18 @@
 #include "pParserNode.h"
 
 namespace nspParser {
-	class pForwardNode : public pParserNode {
+	template<typename enum_t, typename enum_r>
+	class pForwardNode : public pParserNode<enum_t, enum_r> {
+		using Visitor = pBaseVisitor<pParserNode<enum_t, enum_r>>;
+		enum_r _forward_to = enum_r{};
+
+	public:
+		pForwardNode(enum_r forward_to) : _forward_to(forward_to) {}
+
+		template<class visitor_t>
+		void accept(Visitor* visitor) {
+
+		}
 
 	};
 }

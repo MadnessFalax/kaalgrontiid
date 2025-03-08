@@ -1,5 +1,6 @@
 #pragma once
 #include "../../../container/pString.h"
+#include "../../../container/pMap.h"
 #include "../../regex/pRegex.h"
 #include "pTokenInstance.h"
 #include "../../buffer/pFileHandler.h"
@@ -10,6 +11,8 @@ namespace nspLexer {
 	template<class t>
 	using Array = nspArray::pArray<t>;
 	using FileHandler = nspFile::pFileHandler;
+	template<class t, class u, class v = unsigned short> 
+	using Map = nspMap::pMap<t, u, v>;
 
 	template<class enum_t>
 	class pLexer {
@@ -17,6 +20,7 @@ namespace nspLexer {
 		using Instance = pTokenInstance<enum_t, PrototypeKind::REGEX>;
 
 		Array<Token*> _tokens = Array<Token*>();
+		Map<enum_t, Token*, unsigned char> _token_map = Map<enum_t, Token*, unsigned char>(29);
 		FileHandler* _file = nullptr;
 		String _path = "";
 		bool _discard_whitespace = true;
@@ -48,9 +52,9 @@ namespace nspLexer {
 
 		~pLexer() {
 			size_t size = _tokens.size();
-			for (size_t i = 0; i < size; i++) {
-				delete _tokens[i];
-				_tokens[i] = nullptr;
+			for (nspPair::pPair<enum_t, Token*>& pair : _tokens) {
+				delete pair.second();
+				pair.second() = nullptr;
 			}
 			delete _file;
 			_file = nullptr;
@@ -67,6 +71,7 @@ namespace nspLexer {
 		void add_token_definition(enum_t type, String pattern, String name, bool is_whitespace = false) {
 			Token* t = new Token(type, pattern, name, _utf8);
 			_tokens.push_back(t);
+			_token_map[t->get_id()] = t;
 			if (is_whitespace) {
 				_whitespace_token = t;
 			}

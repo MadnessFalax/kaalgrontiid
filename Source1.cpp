@@ -1,6 +1,3 @@
-#include "GeoJSONConverter.h"
-#include "JSONParser.h"
-
 #include "common/cNumber.h"
 #include "common/utils/cTimer.h"
 #include "common/stream/cStream.h"
@@ -256,12 +253,6 @@ bool open()
 }
 
 int main() {
-	GeoJSONConverter* conv = new GeoJSONConverter("sample_geo.json");
-	conv->convert();
-	if (!conv->made_error()) {
-		conv->vectorize();
-	}
-
 	prepare();
 
 	bool ok = create();
@@ -276,8 +267,6 @@ int main() {
 	{
 		printf("cSequentialArray: Error during the test!\n");
 	}
-
-	delete conv;
 	
 	return 0;
 }

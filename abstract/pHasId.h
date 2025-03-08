@@ -6,7 +6,7 @@ namespace nspHasId {
 	template<class id_type = unsigned int>
 	class pHasId {
 	public:
-		virtual std::enable_if_t<std::is_integral_v<id_type> && std::is_unsigned_v<id_type>, id_type> get_id() const = 0;
+		virtual std::enable_if_t<(std::is_integral_v<id_type> && std::is_unsigned_v<id_type>) || std::is_enum_v<id_type>, id_type> get_id() const = 0;
 	};
 
 }

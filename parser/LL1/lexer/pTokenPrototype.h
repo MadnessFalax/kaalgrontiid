@@ -3,6 +3,7 @@
 #include "../../../container/pString.h"
 #include "../../regex/pRegex.h"
 #include "../../../utils/match.h"
+#include "../../../abstract/pHasId.h"
 #include "pPrototypeKind.h"
 
 namespace nspLexer {
@@ -12,7 +13,7 @@ namespace nspLexer {
 	using PrototypeKind = pPrototypeKind;
 
 	template<typename enum_t, PrototypeKind t = PrototypeKind::DEFAULT, typename = std::enable_if_t<std::is_enum_v<enum_t>>>
-	class pTokenPrototype {
+	class pTokenPrototype : public nspHasId::pHasId<enum_t> {
 		String _pattern = "";
 		Regex* _regex = nullptr;
 		enum_t _type_id = enum_t{};
@@ -50,7 +51,8 @@ namespace nspLexer {
 			return nspMatch::boundary_match(input, _pattern);
 		}
 
-		enum_t type_id() const { return _type_id; }
+		enum_t get_id() const override { return _type_id; }
+		// for id printing
 		String name() const { return _name; }
 
 		~pTokenPrototype() {

@@ -24,9 +24,8 @@ GenericProperties     -> GenericProperty GenericPropertiesTail
 GenericPropertiesTail -> , GenericProperty GenericPropertiesTail | null
 GenericProperty       -> STRING : Value
 
-FeatureValues         -> FeatureValue FeatureValuesTail | null
-FeatureValuesTail     -> , FeatureValue FeatureValuesTail | null
-FeatureValue          -> { FProperties }
+FeatureValues         -> { FProperties } FeatureValuesTail | null
+FeatureValuesTail     -> , { FProperties } FeatureValuesTail | null
 
 FProperties           -> FProperty FPropertiesTail
 FPropertiesTail       -> , FProperty FPropertiesTail | null
@@ -42,9 +41,8 @@ GProperty             -> "type" : GeometryType
                       | GenericProperty
 
 CoordinatesRoot       -> [ CoordinatesRoot ] | Coordinates
-Coordinates           -> Coordinate CoordinatesTail | null
-CoordinatesTail       -> , Coordinate CoordinatesTail | null
-Coordinate            -> NUMBER
+Coordinates           -> NUMBER CoordinatesTail | null
+CoordinatesTail       -> , NUMBER CoordinatesTail | null
 
 Value                 -> "true" 
                       | "false" 

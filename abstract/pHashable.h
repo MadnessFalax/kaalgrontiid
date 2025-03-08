@@ -50,7 +50,7 @@ namespace nspHashable {
 		works with inp_T being primitive type, other types cause UB
 	*/
 	template<typename ret_T, typename inp_T>
-	static ret_T hash(typename std::enable_if<std::is_arithmetic_v<inp_T>, inp_T>::type& val, unsigned long long bucket_count_override = 0) {
+	static ret_T hash(typename std::enable_if<std::is_arithmetic_v<inp_T> || std::is_enum_v<inp_T>, inp_T>::type& val, unsigned long long bucket_count_override = 0) {
 		unsigned long long modulo = hash_max_val<ret_T>();
 		if (bucket_count_override > 0 && bucket_count_override < hash_max_val<ret_T>()) {
 			modulo = bucket_count_override;
@@ -69,7 +69,7 @@ namespace nspHashable {
 	}
 	
 	template<typename ret_T, typename inp_T>
-	static ret_T hash(const typename std::enable_if<std::is_arithmetic_v<inp_T>, inp_T>::type& val, unsigned long long bucket_count_override = 0) {
+	static ret_T hash(const typename std::enable_if<std::is_arithmetic_v<inp_T> || std::is_enum_v<inp_T>, inp_T>::type& val, unsigned long long bucket_count_override = 0) {
 		unsigned long long modulo = hash_max_val<ret_T>();
 		if (bucket_count_override > 0 && bucket_count_override < hash_max_val<ret_T>()) {
 			modulo = bucket_count_override;

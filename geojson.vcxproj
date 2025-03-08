@@ -137,8 +137,8 @@
     <ClInclude Include="container\pMap.h" />
     <ClInclude Include="container\pPair.h" />
     <ClInclude Include="parser\buffer\pFileHandler.h" />
-    <ClInclude Include="parser\GeoJSON\gjLexer.h" />
-    <ClInclude Include="parser\GeoJSON\gjTokenEnum.h" />
+    <ClInclude Include="parser\GeoJSON\gjParser.h" />
+    <ClInclude Include="parser\GeoJSON\gjEnums.h" />
     <ClInclude Include="parser\GeoJSON\gjVisitor.h" />
     <ClInclude Include="parser\LL1\lexer\pLexer.h" />
     <ClInclude Include="parser\LL1\lexer\pPrototypeKind.h" />
@@ -151,6 +151,7 @@
     <ClInclude Include="parser\LL1\parser\node\pParserNode.h" />
     <ClInclude Include="parser\LL1\parser\pErrorReporter.h" />
     <ClInclude Include="parser\LL1\parser\pParser.h" />
+    <ClInclude Include="parser\LL1\parser\pParserVisitor.h" />
     <ClInclude Include="parser\LL1\parser\pRule.h" />
     <ClInclude Include="parser\LL1\parser\pSequence.h" />
     <ClInclude Include="parser\regex\AST\node\abstract\pLiteralListNode.h" />

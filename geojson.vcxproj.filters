@@ -141,10 +141,10 @@
     <ClInclude Include="..\..\common\stream\cStream.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="parser\GeoJSON\gjLexer.h">
+    <ClInclude Include="parser\GeoJSON\gjParser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="parser\GeoJSON\gjTokenEnum.h">
+    <ClInclude Include="parser\GeoJSON\gjEnums.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="parser\LL1\parser\pRule.h">
@@ -180,11 +180,11 @@
     <ClInclude Include="parser\GeoJSON\gjVisitor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="parser\LL1\parser\pParserVisitor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="parser\regex\NFA\pState.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -195,6 +195,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\common\stream\cFileStream.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
