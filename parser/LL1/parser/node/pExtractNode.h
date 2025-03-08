@@ -6,6 +6,13 @@ namespace nspParser {
 	class pExtractNode : public pParserNode<enum_t, enum_r> {
 		using Visitor = pBaseVisitor<pParserNode<enum_t, enum_r>>;
 
+	public:
+		enum ExtractType {
+			NUMBER,
+			ENUM,
+			STRING
+		};
+
 		pExtractNode() {
 
 		}
