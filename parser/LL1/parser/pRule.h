@@ -36,7 +36,7 @@ namespace nspParser {
 			_rhs.push_back(seq);
 		}
 
-		const Array<Sequence*>& get_rhs() const {
+		Array<Sequence*>& get_rhs() {
 			return _rhs;
 		}
 

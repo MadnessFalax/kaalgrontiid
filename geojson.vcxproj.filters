@@ -183,6 +183,9 @@
     <ClInclude Include="parser\LL1\parser\pParserVisitor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="parser\LL1\parser\node\pEntryNode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="parser\regex\NFA\pState.cpp">

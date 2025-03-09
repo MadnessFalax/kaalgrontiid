@@ -17,6 +17,8 @@ namespace nspParser {
 		template<class visitor_t>
 		using Visitor = pBaseVisitor<visitor_t>;
 
+		virtual ~pParserNode() {};
+
 		template<class visitor_t>
 		void accept(Visitor<visitor_t>* visitor) {
 			visitor->visit(*this);
@@ -27,5 +29,8 @@ namespace nspParser {
 			visitor.visit(*this);
 		}
 
+		virtual char get_type() {
+			return 'p';
+		}
 	};
 }

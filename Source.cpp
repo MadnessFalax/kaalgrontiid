@@ -29,37 +29,24 @@ using Token = nspLexer::pTokenPrototype<enum_t, t>;
 
 // used for out of scope stack disposal check so that _CrtDumpMemoryLeaks doesnt show false positive leaks on stack allocated memory
 static void helper() {
-	//auto pattern = String(R"(\-?(0|[1-9]\d*)(\.\d+)?([eE][\+\-]?\d+)?)");
 
-	//auto* regex = new Regex(pattern);
-	//if (regex->compile()) {
-	//	printf("result: %s\n", regex->match(String(".5")) ? "True" : "False");    
-	//}
-
-	//delete regex;
-	//regex = nullptr;
-
-	String path = "C:\\Users\\Petr\\Downloads\\src\\test\\kaalgrontiid\\test\\h9gi-nx95.geojson";
-	auto* l = nsGeoJSON::setup_lexer();
+	String path = "C:\\Users\\Petr\\Downloads\\src\\test\\kaalgrontiid\\test\\sample_geo.json";
+	/*auto* l = nsGeoJSON::setup_lexer();
 	l->open(path);
 	auto t = l->get_token();
-	t.print();
+	t->print();
 	while (t.get_prototype()) {
 		t = l->get_token();
 		t.print();
 	}
-	//enum a {
-	//	A,
-	//	B,
-	//	C
-	//};
 
-	//Token<a> token = Token<a>(a::A, String(R"(\-?(0|[1-9]\d*)(\.\d+)?([eE][\+\-]?\d+)?)"));
+	delete l;*/
 
-	//auto tmp = String("12.35d");
+	auto* p = nsGeoJSON::setup_parser();
+	p->open(path);
+	p->parse();
 
-	//auto res = token.match(tmp);
-	//printf("%s", res ? "True" : "False");
+	delete p;
 
 	return;
 }

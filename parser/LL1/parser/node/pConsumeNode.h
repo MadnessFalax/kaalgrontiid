@@ -40,5 +40,9 @@ namespace nspParser {
 		const enum_t& get_proto() {
 			return _token_type;
 		}
+
+		char get_type() override {
+			return 'c';
+		}
 	};
 }

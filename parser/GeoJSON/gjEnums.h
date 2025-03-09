@@ -23,6 +23,7 @@ namespace nsGeoJSON {
 	};
 
 	enum gjRule {
+		EntryRule,
 		GeoJSON,
 		GJProperties,
 		GJPropertiesTail,

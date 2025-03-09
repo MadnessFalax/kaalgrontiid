@@ -20,5 +20,13 @@ namespace nspParser {
 			visitor.visit(*this);
 		}
 
+		enum_r get_rule_id() {
+			return _forward_to;
+		}
+
+		char get_type() override {
+			return 'f';
+		}
+
 	};
 }

@@ -8,6 +8,7 @@
 #include "../LL1/parser/node/pCustomNode.h"
 #include "../LL1/parser/node/pExtractNode.h"
 #include "../LL1/parser/node/pForwardNode.h"
+#include "../LL1/parser/node/pEntryNode.h"
 
 namespace nsGeoJSON {
 
@@ -21,6 +22,7 @@ namespace nsGeoJSON {
 	using CustomNode = nspParser::pCustomNode<gjToken, gjRule>;
 	using ExtractNode = nspParser::pExtractNode<gjToken, gjRule>;
 	using ForwardNode = nspParser::pForwardNode<gjToken, gjRule>;
+	using EntryNode = nspParser::pEntryNode<gjToken, gjRule>;
 
 	Lexer* setup_lexer() {
 		Lexer* l = new Lexer();
@@ -59,11 +61,13 @@ namespace nsGeoJSON {
 		l->add_token_definition(gjToken::NUMBER, R"(\-?(0|[1-9]\d*)(\.\d+)?([eE][\+\-]?\d+)?)", "NUMBER");
 
 		auto* rules = new Array<Rule*>();
-		auto* visitor = new gjVisitor(l);	
-		
 
 		// Thanks god for Github Copilot!!!!!!!!!!!!
-		auto* rule = new Rule(gjRule::GeoJSON, "GeoJSON");
+		auto* first_rule = new Rule(gjRule::EntryRule, "EntryRule");
+		(*first_rule) += &((*(new Sequence())) << new EntryNode(gjRule::GeoJSON, gjRule::EntryRule));
+		rules->push_back(first_rule);
+
+		auto rule = new Rule(gjRule::GeoJSON, "GeoJSON");
 		(*rule) += &((*(new Sequence())) << new ConsumeNode(gjToken::LBRACE) << new ForwardNode(gjRule::GJProperties) << new ConsumeNode(gjToken::RBRACE));
 		rules->push_back(rule);
 		
@@ -78,29 +82,29 @@ namespace nsGeoJSON {
 
 		rule = new Rule(gjRule::GJProperty, "GJProperty");
 		(*rule) += &((*(new Sequence())) 
-			<< new ConsumeNode(gjToken::STRING, "type") 
+			<< new ConsumeNode(gjToken::STRING, "\"type\"") 
 			<< new ConsumeNode(gjToken::COLON) 
 			<< new ForwardNode(gjRule::TypeVal));
 		(*rule) += &((*(new Sequence())) 
-			<< new ConsumeNode(gjToken::STRING, "features") 
+			<< new ConsumeNode(gjToken::STRING, "\"features\"") 
 			<< new ConsumeNode(gjToken::COLON) 
 			<< new ConsumeNode(gjToken::LBRACKET) 
 			<< new ForwardNode(gjRule::FeatureValues) 
 			<< new ConsumeNode(gjToken::RBRACKET));
 		(*rule) += &((*(new Sequence())) 
-			<< new ConsumeNode(gjToken::STRING, "properties") 
+			<< new ConsumeNode(gjToken::STRING, "\"properties\"") 
 			<< new ConsumeNode(gjToken::COLON) 
 			<< new ConsumeNode(gjToken::LBRACE) 
 			<< new ForwardNode(gjRule::GenericProperties) 
 			<< new ConsumeNode(gjToken::RBRACE));
 		(*rule) += &((*(new Sequence())) 
-			<< new ConsumeNode(gjToken::STRING, "geometry") 
+			<< new ConsumeNode(gjToken::STRING, "\"geometry\"") 
 			<< new ConsumeNode(gjToken::COLON) 
 			<< new ConsumeNode(gjToken::LBRACE) 
 			<< new ForwardNode(gjRule::GProperties) 
 			<< new ConsumeNode(gjToken::RBRACE));
 		(*rule) += &((*(new Sequence())) 
-			<< new ConsumeNode(gjToken::STRING, "coordinates") 
+			<< new ConsumeNode(gjToken::STRING, "\"coordinates\"") 
 			<< new ConsumeNode(gjToken::COLON) 
 			<< new ConsumeNode(gjToken::LBRACKET) 
 			<< new ForwardNode(gjRule::CoordinatesRoot) 
@@ -111,24 +115,24 @@ namespace nsGeoJSON {
 
 		rule = new Rule(gjRule::GeometryType, "GeometryType");
 		(*rule) += &((*(new Sequence())) 
-			<< new ConsumeNode(gjToken::STRING, "Point"));
+			<< new ConsumeNode(gjToken::STRING, "\"Point\""));
 		(*rule) += &((*(new Sequence()))
-			<< new ConsumeNode(gjToken::STRING, "LineString"));
+			<< new ConsumeNode(gjToken::STRING, "\"LineString\""));
 		(*rule) += &((*(new Sequence()))
-			<< new ConsumeNode(gjToken::STRING, "Polygon"));
+			<< new ConsumeNode(gjToken::STRING, "\"Polygon\""));
 		(*rule) += &((*(new Sequence()))
-			<< new ConsumeNode(gjToken::STRING, "MultiPoint"));
+			<< new ConsumeNode(gjToken::STRING, "\"MultiPoint\""));
 		(*rule) += &((*(new Sequence()))
-			<< new ConsumeNode(gjToken::STRING, "MultiLineString"));
+			<< new ConsumeNode(gjToken::STRING, "\"MultiLineString\""));
 		(*rule) += &((*(new Sequence()))
-			<< new ConsumeNode(gjToken::STRING, "MultiPolygon"));
+			<< new ConsumeNode(gjToken::STRING, "\"MultiPolygon\""));
 		(*rule) += &((*(new Sequence()))
-			<< new ConsumeNode(gjToken::STRING, "GeometryCollection"));
+			<< new ConsumeNode(gjToken::STRING, "\"GeometryCollection\""));
 		rules->push_back(rule);
 
 		rule = new Rule(gjRule::TypeVal, "TypeVal");
-		(*rule) += &((*(new Sequence())) << new ConsumeNode(gjToken::STRING, "FeatureCollection"));
-		(*rule) += &((*(new Sequence())) << new ConsumeNode(gjToken::STRING, "Feature"));
+		(*rule) += &((*(new Sequence())) << new ConsumeNode(gjToken::STRING, "\"FeatureCollection\""));
+		(*rule) += &((*(new Sequence())) << new ConsumeNode(gjToken::STRING, "\"Feature\""));
 		(*rule) += &((*(new Sequence())) << new ForwardNode(gjRule::GeometryType));
 		rules->push_back(rule);
 
@@ -188,17 +192,17 @@ namespace nsGeoJSON {
 
 		rule = new Rule(gjRule::FProperty, "FProperty");
 		(*rule) += &((*(new Sequence()))
-			<< new ConsumeNode(gjToken::STRING, "type")
+			<< new ConsumeNode(gjToken::STRING, "\"type\"")
 			<< new ConsumeNode(gjToken::COLON)
-			<< new ConsumeNode(gjToken::STRING, "feature"));
+			<< new ConsumeNode(gjToken::STRING, "\"feature\""));
 		(*rule) += &((*(new Sequence()))
-			<< new ConsumeNode(gjToken::STRING, "geometry")
+			<< new ConsumeNode(gjToken::STRING, "\"geometry\"")
 			<< new ConsumeNode(gjToken::COLON)
 			<< new ConsumeNode(gjToken::LBRACE)
 			<< new ForwardNode(gjRule::GProperties)
 			<< new ConsumeNode(gjToken::RBRACE));
 		(*rule) += &((*(new Sequence()))
-			<< new ConsumeNode(gjToken::STRING, "properties")
+			<< new ConsumeNode(gjToken::STRING, "\"properties\"")
 			<< new ConsumeNode(gjToken::COLON)
 			<< new ConsumeNode(gjToken::LBRACE)
 			<< new ForwardNode(gjRule::GenericProperties)
@@ -223,7 +227,7 @@ namespace nsGeoJSON {
 
 		rule = new Rule(gjRule::GProperty, "GProperty");
 		(*rule) += &((*(new Sequence()))
-			<< new ConsumeNode(gjToken::STRING, "type")
+			<< new ConsumeNode(gjToken::STRING, "\"type\"")
 			<< new ConsumeNode(gjToken::COLON)
 			<< new ForwardNode(gjRule::GeometryType));
 		(*rule) += &((*(new Sequence()))
@@ -295,8 +299,9 @@ namespace nsGeoJSON {
 		(*rule) += new Sequence();
 		rules->push_back(rule);
 
+		auto* visitor = new gjVisitor<gjToken, gjRule>(l, rules);	
 
-		Parser* p = new Parser(rules, rule, visitor, l);
+		Parser* p = new Parser(rules, first_rule, visitor, l);
 
 		return p;
 	}

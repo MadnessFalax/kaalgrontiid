@@ -5,7 +5,12 @@ namespace nspParser {
 	template<typename enum_t, typename enum_r>
 	class pCustomNode : public pParserNode<enum_t, enum_r> {
 
+	public:
 		pCustomNode() {
+
+		}
+
+		~pCustomNode() {
 
 		}
 
@@ -17,6 +22,10 @@ namespace nspParser {
 		template<class visitor_t>
 		void accept(pParserNode<enum_t, enum_r>::Visitor<visitor_t>& visitor) {
 			visitor.visit(*this);
+		}
+
+		char get_type() override {
+			return 'u';
 		}
 	};
 }

@@ -32,7 +32,7 @@ namespace nspParser {
 			_is_empty = false;
 		}
 
-		const Array<pParserNode<enum_t, enum_r>*>& get_nodes() const {
+		Array<pParserNode<enum_t, enum_r>*>& get_nodes() {
 			return _nodes;
 		}
 

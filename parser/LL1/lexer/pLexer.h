@@ -51,10 +51,11 @@ namespace nspLexer {
 		pLexer(bool discard_whitespace = true, bool utf8 = true) : _discard_whitespace(discard_whitespace), _utf8(utf8) {}
 
 		~pLexer() {
-			size_t size = _tokens.size();
-			for (nspPair::pPair<enum_t, Token*>& pair : _tokens) {
-				delete pair.second();
-				pair.second() = nullptr;
+			_whitespace_token = nullptr;
+			auto t_count = _tokens.size();
+			for (size_t i = 0; i < t_count; i++) {
+				delete _tokens[i];
+				_tokens[i] = nullptr;
 			}
 			delete _file;
 			_file = nullptr;
@@ -82,7 +83,7 @@ namespace nspLexer {
 			return _token_map[token_id]->get_name();
 		}
 		
-		Instance get_token(size_t lookahead_limit = 1) {
+		Instance* get_token(size_t lookahead_limit = 1) {
 			if (_file) {
 				String tmp = String();
 				auto f_size = _file->size();
@@ -121,14 +122,14 @@ namespace nspLexer {
 									return get_token(lookahead_limit);
 								}
 								else {
-									return Instance(selected_token, tmp, _file->position());
+									return new Instance(selected_token, tmp, _file->position());
 								}
 							}
 						}
 					}
 				}
 			}
-			return Instance(nullptr, "err_token", 0);			// either error or eof
+			return new Instance(nullptr, "err_token", 0);			// either error or eof
 		}
 	};
 }

@@ -4,11 +4,11 @@
 namespace nspLexer {
 	template<class enum_t, pPrototypeKind proto_t = pPrototypeKind::DEFAULT>
 	class pTokenInstance {
-		pTokenPrototype<enum_t, proto_t>* _prototype;
-		String _value;
-		size_t _position;
+		pTokenPrototype<enum_t, proto_t>* _prototype = nullptr;
+		String _value = "";
+		size_t _position = 0;
 	public:
-
+		pTokenInstance() {};
 		// doesn't own prototype
 		pTokenInstance(pTokenPrototype<enum_t, proto_t>* prototype, String value, size_t position) : _prototype(prototype), _value(value), _position(position) {};
 		~pTokenInstance() {
@@ -20,7 +20,7 @@ namespace nspLexer {
 		}
 
 		const size_t& get_position() const { return _position; }	
-		const String& get_value() const { return _value; }	
+		String& get_value() { return _value; }	
 		pTokenPrototype<enum_t, proto_t>* get_prototype() const { return _prototype; }
 	};
 }

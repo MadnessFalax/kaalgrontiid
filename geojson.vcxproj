@@ -146,6 +146,7 @@
     <ClInclude Include="parser\LL1\lexer\pTokenPrototype.h" />
     <ClInclude Include="parser\LL1\parser\node\pConsumeNode.h" />
     <ClInclude Include="parser\LL1\parser\node\pCustomNode.h" />
+    <ClInclude Include="parser\LL1\parser\node\pEntryNode.h" />
     <ClInclude Include="parser\LL1\parser\node\pExtractNode.h" />
     <ClInclude Include="parser\LL1\parser\node\pForwardNode.h" />
     <ClInclude Include="parser\LL1\parser\node\pParserNode.h" />
