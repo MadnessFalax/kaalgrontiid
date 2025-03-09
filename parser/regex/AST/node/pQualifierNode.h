@@ -50,6 +50,8 @@ namespace nspRegexAST {
 						}
 					}
 				}
+				delete qualified_characters;
+				qualified_characters = nullptr;
 			}
 			else {
 				if (qualified_characters == nullptr) {
