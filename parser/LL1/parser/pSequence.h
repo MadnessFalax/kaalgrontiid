@@ -40,5 +40,9 @@ namespace nspParser {
 			add_node(node);
 			return *this;
 		}
+
+		bool is_empty() {
+			return _is_empty;
+		}
 	};
 }

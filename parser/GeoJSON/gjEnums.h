@@ -42,6 +42,7 @@ namespace nsGeoJSON {
 		GPropertiesTail,
 		GProperty,
 		CoordinatesRoot,
+		CoordinatesRootTail,
 		Coordinates,
 		CoordinatesTail,
 		Value,

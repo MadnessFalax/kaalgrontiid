@@ -44,5 +44,9 @@ namespace nspParser {
 			add_sequence(seq);
 			return *this;
 		}
+
+		String get_name() const {
+			return _name;
+		}
 	};
 }

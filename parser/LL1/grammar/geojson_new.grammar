@@ -40,7 +40,8 @@ GProperty             -> "type" : GeometryType
                       | "coordinates" : [ CoordinatesRoot ] 
                       | GenericProperty
 
-CoordinatesRoot       -> [ CoordinatesRoot ] | Coordinates
+CoordinatesRoot       -> [ CoordinatesRoot ] CoordinatesRootTail | Coordinates
+CoordinatesRootTail   -> , [ CoordinatesRoot ] CoordinatesRootTail | null
 Coordinates           -> NUMBER CoordinatesTail | null
 CoordinatesTail       -> , NUMBER CoordinatesTail | null
 

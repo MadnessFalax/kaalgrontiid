@@ -41,6 +41,7 @@ namespace nspParser {
 				OK,
 				FAIL
 			} last_status = LastStatus::FAIL;
+			bool end = false;
 
 			Context() = default;
 
@@ -72,16 +73,38 @@ namespace nspParser {
 			}
 		}
 
+		bool _check_end() {
+			if (_context.end) {
+				printf("Got ERROR or END token. Exiting parser...");
+				return true;
+			}
+			return false;
+		}
+
 		bool _consume() {
 			delete _context.current_instance;
 			if (_context.current_lookahead) {
 				_context.current_instance = _context.current_lookahead;
 				_context.current_lookahead = nullptr;
-				_context.current_token = _context.current_instance->get_prototype()->get_id();
+				if (_context.current_instance->get_prototype() == nullptr) {
+					_context.current_token = enum_t{};
+					_context.end = true;
+					return false;
+				}
+				else {
+					_context.current_token = _context.current_instance->get_prototype()->get_id();
+				}
 			}
 			else {
 				_context.current_instance = _lexer->get_token();
-				_context.current_token = _context.current_instance->get_prototype()->get_id();
+				if (_context.current_instance->get_prototype() == nullptr) {
+					_context.current_token = enum_t{};
+					_context.end = true;
+					return false;
+				}
+				else {
+					_context.current_token = _context.current_instance->get_prototype()->get_id();
+				}
 			}
 			return true;
 		}
@@ -90,22 +113,14 @@ namespace nspParser {
 			if (_context.current_instance->get_prototype()->get_id() == token_type) {
 				return _consume();
 			}
-			else {
-				pErrorReporter::report_rule(_context.current_rule, _context.current_instance->get_prototype()->get_name());
-				pErrorReporter::report_token(_context.current_instance->get_position(), _context.current_instance->get_value(), _context.current_instance->get_prototype()->get_name(), "Got unexpected token. Expected: %s\n");
-				return false;
-			}
+			return false;
 		}
 
 		bool _consume(enum_t token_type, const String& value) {
 			if (_context.current_instance->get_prototype()->get_id() == token_type && _context.current_instance->get_value() == value) {
 				return _consume();
 			}
-			else {
-				pErrorReporter::report_rule(_context.current_rule, _context.current_instance->get_prototype()->get_name());
-				pErrorReporter::report_token(_context.current_instance->get_position(), _context.current_instance->get_value(), _context.current_instance->get_prototype()->get_name(), "Got unexpected token. Expected: %s\n");
-				return false;
-			}
+			return false;
 		}
 
 		// how many tokens to look ahead, 0 returns current token
@@ -149,6 +164,10 @@ namespace nspParser {
 		void resolve_visit(EntryNode& node) {
 			// load first token into _context
 			_consume();
+			if (_check_end()) {
+				return;
+			}
+			
 
 			// now behave like ForwardNode
 			auto my_rule = node.get_this_node_rule_id();
@@ -176,7 +195,7 @@ namespace nspParser {
 						custom_node = dynamic_cast<CustomNode*>(sub_node);
 					}
 					else {
-						pErrorReporter::report_rule(_context.current_rule, _context.current_instance->get_prototype()->get_name(), "Error when determining which node to forward to.");
+						pErrorReporter::report_rule(_rule_map[_context.current_rule]->get_name(), _context.current_instance->get_prototype()->get_name(), "Error when determining which node to forward to.");
 						_context.last_status = Context::LastStatus::FAIL;
 						return;
 					}
@@ -203,7 +222,7 @@ namespace nspParser {
 						_context.current_rule = my_rule;
 					}
 					else {
-						pErrorReporter::report_rule(_context.current_rule, _context.current_instance->get_prototype()->get_name(), "Cannot forward to selected node. Node was probably determined as node base pParserNode.");
+						pErrorReporter::report_rule(_rule_map[_context.current_rule]->get_name(), _context.current_instance->get_prototype()->get_name(), "Cannot forward to selected node. Node was probably determined as node base pParserNode.");
 						_context.last_status = Context::LastStatus::FAIL;
 						return;
 					}
@@ -213,7 +232,7 @@ namespace nspParser {
 						break;
 					}
 					else if (node_index > 0 && _context.last_status == Context::LastStatus::FAIL) {
-						pErrorReporter::report_rule(_context.current_rule, _context.current_instance->get_prototype()->get_name(), "Either wrong sequence was determined, or there was unexpected token after the first sequence node.");
+						pErrorReporter::report_rule(_rule_map[_context.current_rule]->get_name(), _context.current_instance->get_prototype()->get_name(), "Either wrong sequence was determined, or there was unexpected token after the first sequence node.");
 						return;
 					}
 					node_index++;
@@ -221,7 +240,7 @@ namespace nspParser {
 			}
 
 			if (_context.last_status == Context::LastStatus::FAIL) {
-				pErrorReporter::report_rule(_context.current_rule, _context.current_instance->get_prototype()->get_name(), "Failed to parse input.");
+				pErrorReporter::report_rule(_rule_map[_context.current_rule]->get_name(), _context.current_instance->get_prototype()->get_name(), "Failed to parse input.");
 			}
 			return;
 		}
@@ -247,8 +266,13 @@ namespace nspParser {
 			auto my_rule = _context.current_rule;
 			auto* rule = _rule_map[node.get_rule_id()];
 			auto& rhs = rule->get_rhs();
+			bool has_epsilon_sequence = false;
 			for (auto* sequence : rhs) {
 				auto& nodes = sequence->get_nodes();
+				if (sequence->is_empty()) {
+					has_epsilon_sequence = true;
+					continue;
+				}
 				size_t node_index = 0;
 				for (auto* sub_node : nodes) {
 					// determine node type
@@ -269,7 +293,7 @@ namespace nspParser {
 						custom_node = dynamic_cast<CustomNode*>(sub_node);
 					}
 					else {
-						pErrorReporter::report_rule(_context.current_rule, _context.current_instance->get_prototype()->get_name(), "Error when determining which node to forward to.");
+						pErrorReporter::report_rule(_rule_map[_context.current_rule]->get_name(), _context.current_instance->get_prototype()->get_name(), "Error when determining which node to forward to.");
 						_context.last_status = Context::LastStatus::FAIL;
 						return;
 					}
@@ -296,7 +320,7 @@ namespace nspParser {
 						_context.current_rule = my_rule;
 					}
 					else {
-						pErrorReporter::report_rule(_context.current_rule, _context.current_instance->get_prototype()->get_name(), "Cannot forward to selected node. Node was probably determined as node base pParserNode.");
+						pErrorReporter::report_rule(_rule_map[_context.current_rule]->get_name(), _context.current_instance->get_prototype()->get_name(), "Cannot forward to selected node. Node was probably determined as node base pParserNode.");
 						_context.last_status = Context::LastStatus::FAIL;
 						return;
 					}
@@ -306,11 +330,17 @@ namespace nspParser {
 						break;
 					}
 					else if (node_index > 0 && _context.last_status == Context::LastStatus::FAIL) {
-						pErrorReporter::report_rule(_context.current_rule, _context.current_instance->get_prototype()->get_name(), "Either wrong sequence was determined, or there was unexpected token after the first sequence node.");
+						pErrorReporter::report_rule(_rule_map[_context.current_rule]->get_name(), _context.current_instance->get_prototype()->get_name(), "Either wrong sequence was determined, or there was unexpected token after the first sequence node.");
 						return;
 					}
 					node_index++;
 				}
+				if (_context.last_status == Context::LastStatus::OK) {
+					break;
+				}
+			}
+			if (has_epsilon_sequence) {
+				_context.last_status = Context::LastStatus::OK;
 			}
 			return;
 		}
@@ -318,15 +348,15 @@ namespace nspParser {
 		void resolve_visit(ExtractNode& node) {
 			if (node.is_restricted_type()) {
 				if (_context.current_instance->get_prototype()->get_id() != node.get_token_type()) {
-					pErrorReporter::report_rule(_context.current_rule, _context.current_instance->get_prototype()->get_name());
-					pErrorReporter::report_token(_context.current_instance->get_position(), _context.current_instance->get_value(), _context.current_instance->get_prototype()->get_name(), "Got unexpected token.Expected: % s\n");
+					pErrorReporter::report_rule(_rule_map[_context.current_rule]->get_name(), _context.current_instance->get_prototype()->get_name());
+					pErrorReporter::report_token(_context.current_instance->get_position(), _context.current_instance->get_value(), _context.current_instance->get_prototype()->get_name(), "Got unexpected token.\n");
 					_context.last_status = Context::LastStatus::FAIL;
 					return;
 				}
 			}
 			if (node.is_restricted_pattern()) {
 				if (!node.get_pattern()->match(_context.current_instance->get_value())) {
-					pErrorReporter::report_rule(_context.current_rule, _context.current_instance->get_prototype()->get_name());
+					pErrorReporter::report_rule(_rule_map[_context.current_rule]->get_name(), _context.current_instance->get_prototype()->get_name());
 					pErrorReporter::report_token(_context.current_instance->get_position(), _context.current_instance->get_value(), _context.current_instance->get_prototype()->get_name(), "Got unexpected value.\n");
 					_context.last_status = Context::LastStatus::FAIL;
 					return;
@@ -340,7 +370,7 @@ namespace nspParser {
 					_consume();
 				}
 				else {
-					pErrorReporter::report_rule(_context.current_rule, _context.current_instance->get_prototype()->get_name());
+					pErrorReporter::report_rule(_rule_map[_context.current_rule]->get_name(), _context.current_instance->get_prototype()->get_name());
 					pErrorReporter::report_token(_context.current_instance->get_position(), _context.current_instance->get_value(), _context.current_instance->get_prototype()->get_name(), "Failed to extract number.\n");
 					_context.last_status = Context::LastStatus::FAIL;
 				}
