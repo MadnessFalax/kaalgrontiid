@@ -89,6 +89,7 @@ namespace nspLexer {
 				auto f_size = _file->size();
 				auto t_count = _tokens.size();
 				Token* selected_token = nullptr;
+				bool matched = false;
 				for (; _file->position() < f_size;) {
 					tmp += _file->get_char();
 					if (!selected_token) {
@@ -100,7 +101,7 @@ namespace nspLexer {
 						}
 					}
 					if (selected_token) {
-						bool matched = selected_token->match(tmp);
+						matched = selected_token->match(tmp);
 						if (!matched) {
 							// match failed, resolve lookaheads
 							size_t cur_lookahead = 1;
@@ -127,6 +128,9 @@ namespace nspLexer {
 							}
 						}
 					}
+				}
+				if (selected_token && matched) {
+					return new Instance(selected_token, tmp, _file->position());
 				}
 			}
 			return new Instance(nullptr, "err_token", 0);			// either error or eof

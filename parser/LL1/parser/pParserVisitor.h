@@ -227,6 +227,11 @@ namespace nspParser {
 						return;
 					}
 
+					if (_context.end) {
+						_context.last_status = Context::LastStatus::OK;
+						return;
+					}
+
 					if (node_index == 0 && _context.last_status == Context::LastStatus::FAIL) {
 						// try another sequence
 						break;
@@ -246,6 +251,11 @@ namespace nspParser {
 		}
 
 		void resolve_visit(ConsumeNode& node) {
+			if (_context.end) {
+				_context.last_status = Context::LastStatus::OK;
+				return;
+			}
+
 			if (node.check_value()) {
 				if (_consume(node.get_proto(), node.get_value())) {
 					_context.last_status = Context::LastStatus::OK;
@@ -263,6 +273,10 @@ namespace nspParser {
 		}
 
 		void resolve_visit(ForwardNode& node) {
+			if (_context.end) {
+				_context.last_status = Context::LastStatus::OK;
+				return;
+			}
 			auto my_rule = _context.current_rule;
 			auto* rule = _rule_map[node.get_rule_id()];
 			auto& rhs = rule->get_rhs();
@@ -346,6 +360,10 @@ namespace nspParser {
 		}
 
 		void resolve_visit(ExtractNode& node) {
+			if (_context.end) {
+				_context.last_status = Context::LastStatus::OK;
+				return;
+			}
 			if (node.is_restricted_type()) {
 				if (_context.current_instance->get_prototype()->get_id() != node.get_token_type()) {
 					pErrorReporter::report_rule(_rule_map[_context.current_rule]->get_name(), _context.current_instance->get_prototype()->get_name());
