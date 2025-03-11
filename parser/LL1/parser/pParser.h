@@ -5,10 +5,10 @@
 
 namespace nspParser {
 
-	template<class enum_t, class enum_r>	
+	template<class enum_t, class enum_r, class enum_c, class custom_visitor_t>	
 	class pParser {
 		using Rule = nspParser::pRule<enum_t, enum_r>;
-		using Visitor = pParserVisitor<enum_t, enum_r>;
+		using Visitor = pParserVisitor<enum_t, enum_r, enum_c, custom_visitor_t>;
 		template<class T, class U, class V = unsigned char> 
 		using Map = nspMap::pMap<T, U, V>;
 		using Lexer = nspLexer::pLexer<enum_t>;

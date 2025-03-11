@@ -13,13 +13,13 @@
 namespace nsGeoJSON {
 
 	using Lexer = nspLexer::pLexer<gjToken>;
-	using Parser = nspParser::pParser<gjToken, gjRule>;
+	using Parser = nspParser::pParser<gjToken, gjRule, gjHandler, gjVisitor>;
 	using Rule = nspParser::pRule<gjToken, gjRule>;
 	template<class T>
 	using Array = nspArray::pArray<T>;
 	using Sequence = nspParser::pSequence<gjToken, gjRule>;
 	using ConsumeNode = nspParser::pConsumeNode<gjToken, gjRule>;
-	using CustomNode = nspParser::pCustomNode<gjToken, gjRule>;
+	using CustomNode = nspParser::pCustomNode<gjToken, gjRule, gjHandler>;
 	using ExtractNode = nspParser::pExtractNode<gjToken, gjRule>;
 	using ForwardNode = nspParser::pForwardNode<gjToken, gjRule>;
 	using EntryNode = nspParser::pEntryNode<gjToken, gjRule>;
@@ -310,7 +310,7 @@ namespace nsGeoJSON {
 		(*rule) += new Sequence();
 		rules->push_back(rule);
 
-		auto* visitor = new gjVisitor<gjToken, gjRule>(l, rules);	
+		auto* visitor = new gjVisitor(l, rules);	
 
 		Parser* p = new Parser(rules, first_rule, visitor, l);
 

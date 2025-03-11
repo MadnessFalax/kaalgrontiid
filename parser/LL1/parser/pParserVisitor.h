@@ -13,8 +13,8 @@
 #include <cstdlib>
 
 namespace nspParser {
-	template<typename enum_t, typename enum_r>
-	class pParserVisitor : public pBaseVisitor<pParserVisitor<enum_t, enum_r>> {
+	template<typename enum_t, typename enum_r, typename enum_c, typename derived>
+	class pParserVisitor : public pBaseVisitor<pParserVisitor<enum_t, enum_r, enum_c, derived>> {
 	protected:
 		using TokenInstance = nspLexer::pTokenInstance<enum_t, nspLexer::PrototypeKind::REGEX>;
 		using Lexer = nspLexer::pLexer<enum_t>;
@@ -22,7 +22,7 @@ namespace nspParser {
 		using ExtractNode = pExtractNode<enum_t, enum_r>;
 		using ConsumeNode = pConsumeNode<enum_t, enum_r>;
 		using ForwardNode = pForwardNode<enum_t, enum_r>;
-		using CustomNode = pCustomNode<enum_t, enum_r>;
+		using CustomNode = pCustomNode<enum_t, enum_r, enum_c>;
 		using ParserNode = pParserNode<enum_t, enum_r>;
 		using EntryNode = pEntryNode<enum_t, enum_r>;
 		using Rule = pRule<enum_t, enum_r>;
@@ -53,6 +53,9 @@ namespace nspParser {
 			}
 		};
 
+		unsigned char dimension = 0;
+		Array<double>* _point = nullptr;
+		Array<Array<double>*>* _points = nullptr;
 		Context _context;
 		Lexer* _lexer = nullptr;
 		// Array of rules, rules are not owned by this class
@@ -151,6 +154,15 @@ namespace nspParser {
 
 		virtual ~pParserVisitor() {
 			_lexer = nullptr;
+			delete _point;
+			_point = nullptr;
+			auto pts_size = _points->size();
+			for (size_t i = 0; i < pts_size; i++) {
+				delete (*_points)[i];
+				(*_points)[i] = nullptr;
+			}
+			delete _points;
+			_points = nullptr;
 		}
 
 		Context& get_context() {
@@ -404,8 +416,9 @@ namespace nspParser {
 		}
 
 		void resolve_visit(CustomNode& node) {
-			printf("CustomNode not implemented yet.\n");
-			return;
+			static_cast<derived*>(this)->custom_visit_root(node);
 		}
+
+		virtual void custom_visit_root(CustomNode& node) = 0;
 	};
 }
