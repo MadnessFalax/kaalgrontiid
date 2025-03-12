@@ -30,7 +30,7 @@ using Token = nspLexer::pTokenPrototype<enum_t, t>;
 // used for out of scope stack disposal check so that _CrtDumpMemoryLeaks doesnt show false positive leaks on stack allocated memory
 static void helper() {
 
-	String path = "C:\\Users\\Petr\\Downloads\\src\\test\\kaalgrontiid\\test\\utf8_test.json";
+	String path = "C:\\Users\\Petr\\Downloads\\src\\test\\kaalgrontiid\\test\\sample_geo.json";
 	/*auto* l = nsGeoJSON::setup_lexer();
 	l->open(path);
 	auto t = l->get_token();

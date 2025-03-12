@@ -52,9 +52,9 @@ namespace nsGeoJSON {
 
 	enum gjHandler {
 		CoordinatesHandler,
-		CoordinatesTailHandler,
-		CoordinatesRootHandler,
-		CoordinatesRootTailHandler,
-		GPropertyHandler
+		CoordinatesExit,
+		DepthInHandler,
+		DepthOutHandler,
+		GeoObjectHandler
 	};
 }

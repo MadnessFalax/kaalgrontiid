@@ -154,15 +154,6 @@ namespace nspParser {
 
 		virtual ~pParserVisitor() {
 			_lexer = nullptr;
-			delete _point;
-			_point = nullptr;
-			auto pts_size = _points->size();
-			for (size_t i = 0; i < pts_size; i++) {
-				delete (*_points)[i];
-				(*_points)[i] = nullptr;
-			}
-			delete _points;
-			_points = nullptr;
 		}
 
 		Context& get_context() {
@@ -180,7 +171,6 @@ namespace nspParser {
 				return;
 			}
 			
-
 			// now behave like ForwardNode
 			auto my_rule = node.get_this_node_rule_id();
 			auto* rule = _rule_map[node.get_entry_rule_id()];
@@ -378,16 +368,20 @@ namespace nspParser {
 			}
 			if (node.is_restricted_type()) {
 				if (_context.current_instance->get_prototype()->get_id() != node.get_token_type()) {
+#ifdef _DEBUG
 					pErrorReporter::report_rule(_rule_map[_context.current_rule]->get_name(), _context.current_instance->get_prototype()->get_name());
 					pErrorReporter::report_token(_context.current_instance->get_position(), _context.current_instance->get_value(), _context.current_instance->get_prototype()->get_name(), "Got unexpected token.\n");
+#endif
 					_context.last_status = Context::LastStatus::FAIL;
 					return;
 				}
 			}
 			if (node.is_restricted_pattern()) {
 				if (!node.get_pattern()->match(_context.current_instance->get_value())) {
+#ifdef _DEBUG
 					pErrorReporter::report_rule(_rule_map[_context.current_rule]->get_name(), _context.current_instance->get_prototype()->get_name());
 					pErrorReporter::report_token(_context.current_instance->get_position(), _context.current_instance->get_value(), _context.current_instance->get_prototype()->get_name(), "Got unexpected value.\n");
+#endif
 					_context.last_status = Context::LastStatus::FAIL;
 					return;
 				}
