@@ -15,15 +15,19 @@ namespace nsKML {
 		WS,
 		DOUBLEQUOTE,
 		SLASH,
+		COMMA,
+		ATTRIBUTE,
 		NUMBER,
 		STRING
 	};
 
 	enum kmlRule {
+		EntryRule,
 		KML,
 		AnyTagContent,
-		InstructionTag,
+		PostInstruction,
 		CommentTag,
+		CommentContent,
 		OptionalTextContent,
 		NormalTag,
 		OptionalAttr,

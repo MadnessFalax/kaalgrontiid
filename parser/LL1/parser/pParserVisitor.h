@@ -390,7 +390,9 @@ namespace nspParser {
 			case ExtractNode::ExtractType::NUMBER:
 				if (_try_extract_number()) {
 					_context.last_status = Context::LastStatus::OK;
+#ifdef _DEBUG
 					printf("Extracted number: %f\n", _context.last_extracted_number);
+#endif
 					_consume();
 				}
 				else {
@@ -403,7 +405,9 @@ namespace nspParser {
 				_context.last_extract_type = ExtractNode::ExtractType::STRING;
 				_context.last_extracted_string = _context.current_instance->get_value();
 				_context.last_status = Context::LastStatus::OK;
+#ifdef _DEBUG
 				printf("Extracted string: %s\n", reinterpret_cast<const char*>(_context.last_extracted_string.c_str()));
+#endif
 				_consume();
 				return;
 			}

@@ -1,28 +1,46 @@
 KML									-> '<' any_tag_content
 
-any_tag_content						-> '?' instruction_tag
+any_tag_content						-> '?' STRING optional_attr '?' '>' post_instruction
 									| '!' '-' '-' comment_tag
 									| normal_tag
 
-instruction_tag						-> STRING optional_attr '?' '>'
+post_instruction					-> '<' any_tag_content
+									| null
 
-comment_tag							-> optional_text_content '-' '-' '>'
+comment_tag							-> comment_content '-' '-' '>'
 
-optional_text_content				-> STRING optional_text_content | WS optional_text_content | null
+comment_content						-> '!' comment_content					
+									| WS comment_content
+									| '?' comment_content
+									| '=' comment_content
+									| ',' comment_content
+									| '/' comment_content
+									| NUMBER comment_content
+									| STRING comment_content
+									| null
+
+optional_text_content				-> '!' optional_text_content					
+									| WS optional_text_content
+									| '?' optional_text_content
+									| '=' optional_text_content
+									| ',' optional_text_content
+									| '/' optional_text_content
+									| NUMBER optional_text_content
+									| STRING optional_text_content
+									| null
 
 normal_tag							-> 'Point' optional_attr geometry_single_or_pair_tag
 									| 'LineString' optional_attr geometry_single_or_pair_tag
 									| 'LinearRing' optional_attr geometry_single_or_pair_tag
-									| 'Polygon' optional_attr geometry_single_or_pair_tag
 									|  STRING optional_attr generic_single_or_pair_tag
 
-optional_attr						-> WS STRING '=' '"' STRING '"' attr_sep_optional
+optional_attr						-> WS STRING '=' ATTRIBUTE attr_sep_optional
 									| null
 
 attr_sep_optional					-> WS next_attr_possible 
 									| null
 
-next_attr_possible					-> STRING '=' '"' STRING '"' attr_sep_optional
+next_attr_possible					-> STRING '=' ATTRIBUTE attr_sep_optional
 									| null
 
 generic_single_or_pair_tag			-> '/''>'
@@ -41,7 +59,7 @@ optional_pair_tag_geometry_content 	-> '<' geometry_nested_or_ending_tag
 									| optional_text_content optional_pair_tag_geometry_content
 
 geometry_nested_or_ending_tag		-> '/' STRING '>'
-									| geometry_nested_tag_content optional_pair_tag_geometry_content
+									| any_geometry_nested_tag_content optional_pair_tag_geometry_content
 
 any_geometry_nested_tag_content		-> '?' instruction_tag
 									| '!' '-' '-' comment_tag
@@ -58,10 +76,11 @@ optional_pair_tag_coordinates_content	-> '<' coordinates_ending_tag
 
 coordinates_ending_tag				->	'/' 'coordinates' '>'
 
-coord_tuple 						-> NUMBER coord_tail
+coord_tuple 						-> WS NUMBER coord_tuple_tail
+									| NUMBER coord_tuple_tail
 
-coord__tuple_tail					-> ',' NUMBER coord_tail 
+coord_tuple_tail					-> ',' NUMBER coord_tuple_tail 
 									| next_tuple
 
-next_tuple							-> WS coord_tuple
+next_tuple							-> WS coord_tuple_tail
 									| null

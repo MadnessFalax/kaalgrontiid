@@ -36,7 +36,7 @@ static void helper() {
 
 	//auto* l = nsKML::setup_lexer();
 	//l->open(path);
-	//auto t = l->get_token();
+	//auto* t = l->get_token();
 	//t->print();
 
 	//while (t->get_prototype()) {
@@ -44,18 +44,27 @@ static void helper() {
 	//	t = l->get_token();
 	//	t->print();
 	//}
+	//delete t;
+	//delete l;
 	// ------------------------------------
 	
-
-
-
 	// GeoJSON Parser test ----------------
-	String path = R"(C:\Users\Petr\Downloads\src\test\kaalgrontiid\test\sample_geo.json)";
-	auto* p = nsGeoJSON::setup_parser();
+	String path = R"(C:\Users\Petr\Downloads\src\test\kaalgrontiid\test\Sample-KML-File-3.kml)";
+	auto* p = nsKML::setup_parser();
 	p->open(path);
 	p->parse();
 
 	delete p;
+	// ------------------------------------
+
+
+	// GeoJSON Parser test ----------------
+	//String path = R"(C:\Users\Petr\Downloads\src\test\kaalgrontiid\test\sample_geo.json)";
+	//auto* p = nsGeoJSON::setup_parser();
+	//p->open(path);
+	//p->parse();
+
+	//delete p;
 	// ------------------------------------
 
 	return;
