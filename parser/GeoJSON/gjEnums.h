@@ -49,4 +49,12 @@ namespace nsGeoJSON {
 		GenericArrayValues,
 		GenericArrayValuesTail
 	};
+
+	enum gjHandler {
+		CoordinatesHandler,
+		CoordinatesExit,
+		DepthInHandler,
+		DepthOutHandler,
+		GeoObjectHandler
+	};
 }

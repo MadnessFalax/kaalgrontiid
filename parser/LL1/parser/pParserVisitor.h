@@ -13,8 +13,8 @@
 #include <cstdlib>
 
 namespace nspParser {
-	template<typename enum_t, typename enum_r>
-	class pParserVisitor : public pBaseVisitor<pParserVisitor<enum_t, enum_r>> {
+	template<typename enum_t, typename enum_r, typename enum_c, typename derived>
+	class pParserVisitor : public pBaseVisitor<pParserVisitor<enum_t, enum_r, enum_c, derived>> {
 	protected:
 		using TokenInstance = nspLexer::pTokenInstance<enum_t, nspLexer::PrototypeKind::REGEX>;
 		using Lexer = nspLexer::pLexer<enum_t>;
@@ -22,7 +22,7 @@ namespace nspParser {
 		using ExtractNode = pExtractNode<enum_t, enum_r>;
 		using ConsumeNode = pConsumeNode<enum_t, enum_r>;
 		using ForwardNode = pForwardNode<enum_t, enum_r>;
-		using CustomNode = pCustomNode<enum_t, enum_r>;
+		using CustomNode = pCustomNode<enum_t, enum_r, enum_c>;
 		using ParserNode = pParserNode<enum_t, enum_r>;
 		using EntryNode = pEntryNode<enum_t, enum_r>;
 		using Rule = pRule<enum_t, enum_r>;
@@ -53,6 +53,9 @@ namespace nspParser {
 			}
 		};
 
+		unsigned char dimension = 0;
+		Array<double>* _point = nullptr;
+		Array<Array<double>*>* _points = nullptr;
 		Context _context;
 		Lexer* _lexer = nullptr;
 		// Array of rules, rules are not owned by this class
@@ -168,7 +171,6 @@ namespace nspParser {
 				return;
 			}
 			
-
 			// now behave like ForwardNode
 			auto my_rule = node.get_this_node_rule_id();
 			auto* rule = _rule_map[node.get_entry_rule_id()];
@@ -366,16 +368,20 @@ namespace nspParser {
 			}
 			if (node.is_restricted_type()) {
 				if (_context.current_instance->get_prototype()->get_id() != node.get_token_type()) {
+#ifdef _DEBUG
 					pErrorReporter::report_rule(_rule_map[_context.current_rule]->get_name(), _context.current_instance->get_prototype()->get_name());
 					pErrorReporter::report_token(_context.current_instance->get_position(), _context.current_instance->get_value(), _context.current_instance->get_prototype()->get_name(), "Got unexpected token.\n");
+#endif
 					_context.last_status = Context::LastStatus::FAIL;
 					return;
 				}
 			}
 			if (node.is_restricted_pattern()) {
 				if (!node.get_pattern()->match(_context.current_instance->get_value())) {
+#ifdef _DEBUG
 					pErrorReporter::report_rule(_rule_map[_context.current_rule]->get_name(), _context.current_instance->get_prototype()->get_name());
 					pErrorReporter::report_token(_context.current_instance->get_position(), _context.current_instance->get_value(), _context.current_instance->get_prototype()->get_name(), "Got unexpected value.\n");
+#endif
 					_context.last_status = Context::LastStatus::FAIL;
 					return;
 				}
@@ -404,8 +410,9 @@ namespace nspParser {
 		}
 
 		void resolve_visit(CustomNode& node) {
-			printf("CustomNode not implemented yet.\n");
-			return;
+			static_cast<derived*>(this)->custom_visit_root(node);
 		}
+
+		virtual void custom_visit_root(CustomNode& node) = 0;
 	};
 }

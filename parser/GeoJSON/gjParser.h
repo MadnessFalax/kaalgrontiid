@@ -13,13 +13,13 @@
 namespace nsGeoJSON {
 
 	using Lexer = nspLexer::pLexer<gjToken>;
-	using Parser = nspParser::pParser<gjToken, gjRule>;
+	using Parser = nspParser::pParser<gjToken, gjRule, gjHandler, gjVisitor>;
 	using Rule = nspParser::pRule<gjToken, gjRule>;
 	template<class T>
 	using Array = nspArray::pArray<T>;
 	using Sequence = nspParser::pSequence<gjToken, gjRule>;
 	using ConsumeNode = nspParser::pConsumeNode<gjToken, gjRule>;
-	using CustomNode = nspParser::pCustomNode<gjToken, gjRule>;
+	using CustomNode = nspParser::pCustomNode<gjToken, gjRule, gjHandler>;
 	using ExtractNode = nspParser::pExtractNode<gjToken, gjRule>;
 	using ForwardNode = nspParser::pForwardNode<gjToken, gjRule>;
 	using EntryNode = nspParser::pEntryNode<gjToken, gjRule>;
@@ -200,7 +200,8 @@ namespace nsGeoJSON {
 			<< new ConsumeNode(gjToken::COLON)
 			<< new ConsumeNode(gjToken::LBRACE)
 			<< new ForwardNode(gjRule::GProperties)
-			<< new ConsumeNode(gjToken::RBRACE));
+			<< new ConsumeNode(gjToken::RBRACE)
+			<< new CustomNode(gjHandler::GeoObjectHandler));
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(gjToken::STRING, "\"properties\"")
 			<< new ConsumeNode(gjToken::COLON)
@@ -234,7 +235,9 @@ namespace nsGeoJSON {
 			<< new ConsumeNode(gjToken::STRING, "\"coordinates\"")
 			<< new ConsumeNode(gjToken::COLON)
 			<< new ConsumeNode(gjToken::LBRACKET)
+			<< new CustomNode(gjHandler::DepthInHandler)
 			<< new ForwardNode(gjRule::CoordinatesRoot)
+			<< new CustomNode(gjHandler::DepthOutHandler)
 			<< new ConsumeNode(gjToken::RBRACKET));
 		(*rule) += &((*(new Sequence()))
 			<< new ForwardNode(gjRule::GenericProperty));
@@ -243,18 +246,23 @@ namespace nsGeoJSON {
 		rule = new Rule(gjRule::CoordinatesRoot, "CoordinatesRoot");
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(gjToken::LBRACKET)
+			<< new CustomNode(gjHandler::DepthInHandler)
 			<< new ForwardNode(gjRule::CoordinatesRoot)
+			<< new CustomNode(gjHandler::DepthOutHandler)
 			<< new ConsumeNode(gjToken::RBRACKET)
 			<< new ForwardNode(gjRule::CoordinatesRootTail));
 		(*rule) += &((*(new Sequence()))
-			<< new ForwardNode(gjRule::Coordinates));
+			<< new ForwardNode(gjRule::Coordinates)
+			<< new CustomNode(gjHandler::CoordinatesExit));
 		rules->push_back(rule);
 
 		rule = new Rule(gjRule::CoordinatesRootTail, "CoordinatesRootTail");
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(gjToken::COMMA)
 			<< new ConsumeNode(gjToken::LBRACKET)
+			<< new CustomNode(gjHandler::DepthInHandler)
 			<< new ForwardNode(gjRule::CoordinatesRoot)
+			<< new CustomNode(gjHandler::DepthOutHandler)
 			<< new ConsumeNode(gjToken::RBRACKET)
 			<< new ForwardNode(gjRule::CoordinatesRootTail));
 		(*rule) += new Sequence();
@@ -262,7 +270,8 @@ namespace nsGeoJSON {
 
 		rule = new Rule(gjRule::Coordinates, "Coordinates");
 		(*rule) += &((*(new Sequence()))
-			<< new ExtractNode(gjToken::NUMBER, ExtractNode::ExtractType::NUMBER)
+			<< new CustomNode(gjHandler::CoordinatesHandler)
+			// << new ExtractNode(gjToken::NUMBER, ExtractNode::ExtractType::NUMBER)
 			<< new ForwardNode(gjRule::CoordinatesTail));
 		(*rule) += new Sequence();
 		rules->push_back(rule);
@@ -270,7 +279,8 @@ namespace nsGeoJSON {
 		rule = new Rule(gjRule::CoordinatesTail, "CoordinatesTail");
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(gjToken::COMMA)
-			<< new ExtractNode(gjToken::NUMBER, ExtractNode::ExtractType::NUMBER)
+			<< new CustomNode(gjHandler::CoordinatesHandler)
+			// << new ExtractNode(gjToken::NUMBER, ExtractNode::ExtractType::NUMBER)
 			<< new ForwardNode(gjRule::CoordinatesTail));
 		(*rule) += new Sequence();
 		rules->push_back(rule);
@@ -310,7 +320,7 @@ namespace nsGeoJSON {
 		(*rule) += new Sequence();
 		rules->push_back(rule);
 
-		auto* visitor = new gjVisitor<gjToken, gjRule>(l, rules);	
+		auto* visitor = new gjVisitor(l, rules);	
 
 		Parser* p = new Parser(rules, first_rule, visitor, l);
 
