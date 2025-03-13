@@ -13,6 +13,7 @@
 #include "parser/LL1/lexer/pLexer.h"
 #include "parser/GeoJSON/gjParser.h"
 #include "parser/LL1/parser/node/pConsumeNode.h"
+#include "parser/KML/kmlParser.h"
 
 template <class T>
 using Array = nspArray::pArray<T>;
@@ -30,7 +31,8 @@ using Token = nspLexer::pTokenPrototype<enum_t, t>;
 // used for out of scope stack disposal check so that _CrtDumpMemoryLeaks doesnt show false positive leaks on stack allocated memory
 static void helper() {
 
-	String path = "C:\\Users\\Petr\\Downloads\\src\\test\\kaalgrontiid\\test\\sample_geo.json";
+	//String path = "C:\\Users\\uiv56391\\source\\repos\\framework-back-up\\test\\kaalgrontiid\\test\\sample_geo.json";
+	String path = "C:\\Users\\uiv56391\\source\\repos\\framework-back-up\\test\\kaalgrontiid\\test\\Sample-KML-File-3.kml.json";
 	/*auto* l = nsGeoJSON::setup_lexer();
 	l->open(path);
 	auto t = l->get_token();
@@ -42,11 +44,24 @@ static void helper() {
 
 	delete l;*/
 
-	auto* p = nsGeoJSON::setup_parser();
-	p->open(path);
-	p->parse();
+	auto* l = nsKML::setup_lexer();
 
-	delete p;
+	l->open(path);
+	auto t = l->get_token();
+	t->print();
+
+	while (t->get_prototype()) {
+		t = l->get_token();
+		t->print();
+	}
+
+	delete l;
+	l = nullptr;
+	//auto* p = nsGeoJSON::setup_parser();
+	//p->open(path);
+	//p->parse();
+
+	//delete p;
 
 	return;
 }
