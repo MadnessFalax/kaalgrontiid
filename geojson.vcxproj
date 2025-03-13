@@ -141,6 +141,9 @@
     <ClInclude Include="parser\GeoJSON\gjParser.h" />
     <ClInclude Include="parser\GeoJSON\gjEnums.h" />
     <ClInclude Include="parser\GeoJSON\gjVisitor.h" />
+    <ClInclude Include="parser\KML\kmlEnums.h" />
+    <ClInclude Include="parser\KML\kmlParser.h" />
+    <ClInclude Include="parser\KML\kmlVisitor.h" />
     <ClInclude Include="parser\LL1\lexer\pLexer.h" />
     <ClInclude Include="parser\LL1\lexer\pPrototypeKind.h" />
     <ClInclude Include="parser\LL1\lexer\pTokenInstance.h" />
@@ -156,6 +159,9 @@
     <ClInclude Include="parser\LL1\parser\pParserVisitor.h" />
     <ClInclude Include="parser\LL1\parser\pRule.h" />
     <ClInclude Include="parser\LL1\parser\pSequence.h" />
+    <ClInclude Include="parser\OSM\osmEnums.h" />
+    <ClInclude Include="parser\OSM\osmParser.h" />
+    <ClInclude Include="parser\OSM\osmVisitor.h" />
     <ClInclude Include="parser\regex\AST\node\abstract\pLiteralListNode.h" />
     <ClInclude Include="parser\regex\AST\node\pConcatNode.h" />
     <ClInclude Include="parser\regex\AST\node\pQualifierNode.h" />
@@ -198,6 +204,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />
+    <None Include="parser\LL1\grammar\kml.grammar" />
     <None Include="parser\LL1\grammar\regex.grammar" />
     <None Include="test\sample_geo.json">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
