@@ -31,37 +31,32 @@ using Token = nspLexer::pTokenPrototype<enum_t, t>;
 // used for out of scope stack disposal check so that _CrtDumpMemoryLeaks doesnt show false positive leaks on stack allocated memory
 static void helper() {
 
-	//String path = "C:\\Users\\uiv56391\\source\\repos\\framework-back-up\\test\\kaalgrontiid\\test\\sample_geo.json";
-	String path = "C:\\Users\\uiv56391\\source\\repos\\framework-back-up\\test\\kaalgrontiid\\test\\Sample-KML-File-3.kml.json";
-	/*auto* l = nsGeoJSON::setup_lexer();
-	l->open(path);
-	auto t = l->get_token();
-	t->print();
-	while (t.get_prototype()) {
-		t = l->get_token();
-		t.print();
-	}
+	// KML Lexer test --------------------
+	//String path = R"(C:\Users\Petr\Downloads\src\test\kaalgrontiid\test\Sample-KML-File-3.kml)";
 
-	delete l;*/
+	//auto* l = nsKML::setup_lexer();
+	//l->open(path);
+	//auto t = l->get_token();
+	//t->print();
 
-	auto* l = nsKML::setup_lexer();
+	//while (t->get_prototype()) {
+	//	delete t;
+	//	t = l->get_token();
+	//	t->print();
+	//}
+	// ------------------------------------
+	
 
-	l->open(path);
-	auto t = l->get_token();
-	t->print();
 
-	while (t->get_prototype()) {
-		t = l->get_token();
-		t->print();
-	}
 
-	delete l;
-	l = nullptr;
-	//auto* p = nsGeoJSON::setup_parser();
-	//p->open(path);
-	//p->parse();
+	// GeoJSON Parser test ----------------
+	String path = R"(C:\Users\Petr\Downloads\src\test\kaalgrontiid\test\sample_geo.json)";
+	auto* p = nsGeoJSON::setup_parser();
+	p->open(path);
+	p->parse();
 
-	//delete p;
+	delete p;
+	// ------------------------------------
 
 	return;
 }

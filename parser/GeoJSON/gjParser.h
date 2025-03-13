@@ -247,21 +247,19 @@ namespace nsGeoJSON {
 		rule = new Rule(gjRule::CoordinatesRoot, "CoordinatesRoot");
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(gjToken::LBRACKET)
-			<< new CustomNode(gjHandler::DepthInHandler)
 			<< new ForwardNode(gjRule::CoordinatesRoot)
 			<< new CustomNode(gjHandler::DepthOutHandler)
 			<< new ConsumeNode(gjToken::RBRACKET)
 			<< new ForwardNode(gjRule::CoordinatesRootTail));
 		(*rule) += &((*(new Sequence()))
 			<< new ForwardNode(gjRule::Coordinates)
-			<< new CustomNode(gjHandler::CoordinatesExit));
+			<< new CustomNode(gjHandler::CommitPointHandler));
 		rules->push_back(rule);
 
 		rule = new Rule(gjRule::CoordinatesRootTail, "CoordinatesRootTail");
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(gjToken::COMMA)
 			<< new ConsumeNode(gjToken::LBRACKET)
-			<< new CustomNode(gjHandler::DepthInHandler)
 			<< new ForwardNode(gjRule::CoordinatesRoot)
 			<< new CustomNode(gjHandler::DepthOutHandler)
 			<< new ConsumeNode(gjToken::RBRACKET)

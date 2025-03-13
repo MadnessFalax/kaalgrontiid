@@ -29,14 +29,14 @@ namespace nsKML {
 		lexer->add_token_definition(kmlToken::ERROR, "ERR", "ERROR");
 		lexer->add_token_definition(kmlToken::LANGLEBRACKET, "<", "LANGLEBRACKET");
 		lexer->add_token_definition(kmlToken::RANGLEBRACKET, ">", "RANGLEBRACKET");
-		lexer->add_token_definition(kmlToken::DASH, "-", "DASH");
-		lexer->add_token_definition(kmlToken::QMARK, "?", "QMARK");
+		lexer->add_token_definition(kmlToken::DASH, R"(\-)", "DASH");
+		lexer->add_token_definition(kmlToken::QMARK, R"(\?)", "QMARK");
 		lexer->add_token_definition(kmlToken::EXCLAMATION, "!", "EXCLAMATION");
 		lexer->add_token_definition(kmlToken::EQUALS, "=", "EQUALS");
 		lexer->add_token_definition(kmlToken::WS, R"(\s+)", "WS");
 		lexer->add_token_definition(kmlToken::DOUBLEQUOTE, R"(")", "DOUBLEQUOTE");
 		lexer->add_token_definition(kmlToken::SLASH, "/", "SLASH");
-		lexer->add_token_definition(kmlToken::NUMBER, R"(-?\d+(\.\d+)?,-?\d+(\.\d+)?(,-?\d+(\.\d+)?)?( \s*-?\d+(\.\d+)?,-?\d+(\.\d+)?(,-?\d+(\.\d+)?)?)*)", "NUMBER");
+		lexer->add_token_definition(kmlToken::NUMBER, R"(\-?\d+(\.\d+)?,\-?\d+(\.\d+)?(,\-?\d+(\.\d+)?)?( \s*\-?\d+(\.\d+)?,\-?\d+(\.\d+)?(,\-?\d+(\.\d+)?)?)*)", "NUMBER");
 		lexer->add_token_definition(kmlToken::STRING, R"([^<>"&']+)", "STRING");
 		return lexer;
 	}

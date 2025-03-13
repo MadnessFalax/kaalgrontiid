@@ -10,25 +10,35 @@ namespace nsGeoJSON {
 		using Array = nspArray::pArray<T>;
 		using pErrorReporter = nspParser::pErrorReporter;
 
-		size_t _depth = 0;
-		size_t _point_depth = 0;
-		bool _point_depth_set = false;
+		enum depth {
+			ISPOINT,
+			ISLINE,
+			WASLINE,
+			NOTIMPORTANT
+		};
+
+
+		depth _depth = NOTIMPORTANT;
 		size_t _dimension = 0;
-		Array<size_t>* _line_indices = nullptr;
-		Array<double>* _coordinates = nullptr;
+		Array<double>* _temp_coords = nullptr;
+		Array<Array<double>*>* _coordinates = nullptr;
 
 	public:
 		gjVisitor(Lexer* lexer, Array<Rule*>* rules) : nspParser::pParserVisitor<gjToken, gjRule, gjHandler, gjVisitor>(lexer, rules) {
-			_line_indices = new Array<size_t>();
-			_line_indices->push_back(0);
-			_coordinates = new Array<double>();
+			_temp_coords = new Array<double>();
+			_coordinates = new Array<Array<double>*>();
 		}
 
 		~gjVisitor() {
-			delete _line_indices;
-			_line_indices = nullptr;
+			delete _temp_coords;
+			_temp_coords = nullptr;
+			auto _c_size = _coordinates->size();
+			for (size_t i = 0; i < _c_size; i++) {
+				delete (*_coordinates)[i];
+			}
 			delete _coordinates;
 			_coordinates = nullptr;
+
 		}
 
 		void custom_visit_root(CustomNode& node) override {
@@ -36,17 +46,14 @@ namespace nsGeoJSON {
 			case gjHandler::CoordinatesHandler:
 				resolve_custom_visit<gjHandler::CoordinatesHandler>(node);
 				break;
-			case gjHandler::CoordinatesExit:
-				resolve_custom_visit<gjHandler::CoordinatesExit>(node);
-				break;
-			case gjHandler::DepthInHandler:
-				resolve_custom_visit<gjHandler::DepthInHandler>(node);
-				break;
 			case gjHandler::DepthOutHandler:
 				resolve_custom_visit<gjHandler::DepthOutHandler>(node);
 				break;
 			case gjHandler::GeoObjectHandler:
 				resolve_custom_visit<gjHandler::GeoObjectHandler>(node);
+				break;
+			case gjHandler::CommitPointHandler:
+				resolve_custom_visit<gjHandler::CommitPointHandler>(node);
 				break;
 			}
 		}
@@ -73,7 +80,7 @@ namespace nsGeoJSON {
 
 			if (_try_extract_number()) {
 				_context.last_status = Context::LastStatus::OK;
-				_coordinates->push_back(double{ _context.last_extracted_number });
+				_temp_coords->push_back(double{ _context.last_extracted_number });
 				_consume();
 			}
 			else {
@@ -85,55 +92,75 @@ namespace nsGeoJSON {
 		}
 
 		template<>
-		void resolve_custom_visit<gjHandler::CoordinatesExit>(CustomNode& node) {
-			_dimension = _coordinates->size();
-		}
-
-		template<>
-		void resolve_custom_visit<gjHandler::DepthInHandler>(CustomNode& node) {
-			_depth++;
-		}
-
-		template<>
 		void resolve_custom_visit<gjHandler::DepthOutHandler>(CustomNode& node) {
-			if (!_point_depth_set) {
-				_point_depth = _depth;
-				_point_depth_set = true;
+			size_t c_size = 0;
+			size_t sub_c_size = 0;
+			switch (_depth) {
+			case depth::ISPOINT:
+				if (_context.last_extracted_string == "\"Point\"") {
+					printf("Point\n");
+					printf("[");
+					sub_c_size = (*_coordinates)[0]->size();
+					for (size_t i = 0; i < sub_c_size; i++) {
+						printf("%f", (*(*_coordinates)[0])[i]);
+						if (i < sub_c_size - 1) {
+							printf(",");
+						}
+					}
+					printf("]\n");
+				}
+				_depth = depth::ISLINE;
+				break;
+			case depth::ISLINE:
+				_depth = depth::WASLINE;
+				printf("%s\n", reinterpret_cast<const char*>(_context.last_extracted_string.c_str()));
+				printf("[");
+				c_size = _coordinates->size();
+				for (size_t i = 0; i < c_size; i++) {
+					printf("[");
+					sub_c_size = (*_coordinates)[i]->size();
+					for (size_t j = 0; j < sub_c_size; j++) {
+						printf("%f", (*(*_coordinates)[i])[j]);
+						if (j < sub_c_size - 1) {
+							printf(",");
+						}
+					}
+					printf("]");
+					if (i < c_size - 1) {
+						printf(",");
+					}
+				}
+				printf("]\n");
+				for (size_t i = 0; i < c_size; i++) {
+					delete (*_coordinates)[i];
+				}
+				delete _coordinates;
+				_coordinates = new Array<Array<double>*>();
+				break;
+			case depth::WASLINE:
+				_depth = depth::NOTIMPORTANT;
+				break;
+			case depth::NOTIMPORTANT:
+				break;
 			}
-			if (_point_depth - 1 == _depth) {
-				_line_indices->push_back(_coordinates->size());
-			}
-			_depth--;
 		}
 
 		template<>
 		void resolve_custom_visit<gjHandler::GeoObjectHandler>(CustomNode& node) {
-			auto _li_size = _line_indices->size();
-			for (size_t i = 1; i < _li_size; i++) {
-				printf("%s:\n", reinterpret_cast<const char*>(_context.last_extracted_string.c_str()));
-				printf("[");
-				for (size_t j = (*_line_indices)[i - 1]; j < (*_line_indices)[i]; j++) {
-					printf("%f ", (*_coordinates)[j]);
-					printf(", ");
-				}
-				printf("]\n");
+			auto c_size = _coordinates->size();
+			for (size_t i = 0; i < c_size; i++) {
+				delete (*_coordinates)[i];
 			}
-
-			_depth = 0;
-			_point_depth = 0;
-			_point_depth_set = false;
-			_dimension = 0;
-			delete _line_indices;
-			_line_indices = new Array<size_t>();
-			_line_indices->push_back(0);
 			delete _coordinates;
-			_coordinates = new Array<double>();
+			_coordinates = new Array<Array<double>*>();
 		}
 
-		void print_result() {
-			for (auto& c : *_coordinates) {
-				printf("%f ", c);
-			}
+		template<>
+		void resolve_custom_visit<gjHandler::CommitPointHandler>(CustomNode& node) {
+			_coordinates->push_back(_temp_coords);
+			_dimension = _temp_coords->size();
+			_temp_coords = new Array<double>();
+			_depth = depth::ISPOINT;
 		}
 	};
 }
