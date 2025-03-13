@@ -197,6 +197,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />
+    <None Include="parser\LL1\grammar\kml.grammar" />
     <None Include="parser\LL1\grammar\regex.grammar" />
     <None Include="test\sample_geo.json">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
