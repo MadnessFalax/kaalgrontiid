@@ -26,6 +26,7 @@ namespace nsKML {
 		KML,
 		AnyTagContent,
 		PostInstruction,
+		ConsumeWS,
 		CommentTag,
 		CommentContent,
 		OptionalTextContent,

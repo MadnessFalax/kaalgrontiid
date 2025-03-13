@@ -1,10 +1,13 @@
 KML									-> '<' any_tag_content
 
-any_tag_content						-> '?' STRING optional_attr '?' '>' post_instruction
+any_tag_content						-> '?' STRING optional_attr '?' '>' consume_ws post_instruction
 									| '!' '-' '-' comment_tag
 									| normal_tag
 
 post_instruction					-> '<' any_tag_content
+									| null
+
+consume_ws							-> WS
 									| null
 
 comment_tag							-> comment_content '-' '-' '>'
@@ -82,5 +85,5 @@ coord_tuple 						-> WS NUMBER coord_tuple_tail
 coord_tuple_tail					-> ',' NUMBER coord_tuple_tail 
 									| next_tuple
 
-next_tuple							-> WS coord_tuple_tail
+next_tuple							-> WS coord_tuple
 									| null

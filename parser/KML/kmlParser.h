@@ -77,6 +77,7 @@ namespace nsKML {
 			<< new ForwardNode(kmlRule::OptionalAttr)
 			<< new ConsumeNode(kmlToken::QMARK)
 			<< new ConsumeNode(kmlToken::RANGLEBRACKET)
+			<< new ForwardNode(kmlRule::ConsumeWS)
 			<< new ForwardNode(kmlRule::PostInstruction));
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(kmlToken::EXCLAMATION)
@@ -91,6 +92,12 @@ namespace nsKML {
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(kmlToken::LANGLEBRACKET)
 			<< new ForwardNode(kmlRule::AnyTagContent));
+		(*rule) += new Sequence();
+		rules->push_back(rule);
+
+		rule = new Rule(kmlRule::ConsumeWS, "ConsumeWS");
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(kmlToken::WS));
 		(*rule) += new Sequence();
 		rules->push_back(rule);
 
@@ -333,7 +340,7 @@ namespace nsKML {
 		rule = new Rule(kmlRule::NextTuple, "NextTuple");
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(kmlToken::WS)
-			<< new ForwardNode(kmlRule::CoordTupleTail));
+			<< new ForwardNode(kmlRule::CoordTuple));
 		(*rule) += new Sequence();
 		rules->push_back(rule);
 
