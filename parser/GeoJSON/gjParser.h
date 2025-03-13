@@ -102,7 +102,8 @@ namespace nsGeoJSON {
 			<< new ConsumeNode(gjToken::COLON) 
 			<< new ConsumeNode(gjToken::LBRACE) 
 			<< new ForwardNode(gjRule::GProperties) 
-			<< new ConsumeNode(gjToken::RBRACE));
+			<< new ConsumeNode(gjToken::RBRACE)
+			<< new CustomNode(gjHandler::GeoObjectHandler));
 		(*rule) += &((*(new Sequence())) 
 			<< new ConsumeNode(gjToken::STRING, "\"coordinates\"") 
 			<< new ConsumeNode(gjToken::COLON) 
