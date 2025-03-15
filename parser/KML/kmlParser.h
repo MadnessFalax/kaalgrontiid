@@ -319,21 +319,25 @@ namespace nsKML {
 			<< new ForwardNode(kmlRule::CoordinatesNestedOrEndingTag));
 		(*rule) += &((*(new Sequence()))
 			<< new ExtractNode(kmlToken::NUMBER, ExtractNode::ExtractType::NUMBER)
+			<< new CustomNode(kmlHandler::BufferNumber)
 			<< new ForwardNode(kmlRule::CoordTupleTail)
 			<< new ForwardNode(kmlRule::OptionalPairTagCoordinatesContent));
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(kmlToken::DASH)
 			<< new ExtractNode(kmlToken::NUMBER, ExtractNode::ExtractType::NUMBER)
+			<< new CustomNode(kmlHandler::MakeNegative)
+			<< new CustomNode(kmlHandler::BufferNumber)
 			<< new ForwardNode(kmlRule::CoordTupleTail)
 			<< new ForwardNode(kmlRule::OptionalPairTagCoordinatesContent));
 		(*rule) += new Sequence();
 		rules->push_back(rule);
 
-		rule = new Rule(kmlRule::CoordinatesNestedOrEndingTag, "CoordinatesEndingTag");
+		rule = new Rule(kmlRule::CoordinatesNestedOrEndingTag, "CoordinatesNestedOrEndingTag");
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(kmlToken::SLASH)
 			<< new ConsumeNode(kmlToken::STRING, "coordinates")
 			<< new ConsumeNode(kmlToken::RANGLEBRACKET)
+			<< new CustomNode(kmlHandler::CommitShape)
 			<< new ForwardNode(kmlRule::ConsumeWS));
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(kmlToken::EXCLAMATION)
@@ -345,10 +349,13 @@ namespace nsKML {
 
 		rule = new Rule(kmlRule::Coord, "Coord");
 		(*rule) += &((*(new Sequence()))
-			<< new ExtractNode(kmlToken::NUMBER, ExtractNode::ExtractType::NUMBER));
+			<< new ExtractNode(kmlToken::NUMBER, ExtractNode::ExtractType::NUMBER)
+			<< new CustomNode(kmlHandler::BufferNumber));
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(kmlToken::DASH)
-			<< new ExtractNode(kmlToken::NUMBER, ExtractNode::ExtractType::NUMBER));
+			<< new ExtractNode(kmlToken::NUMBER, ExtractNode::ExtractType::NUMBER)
+			<< new CustomNode(kmlHandler::MakeNegative)
+			<< new CustomNode(kmlHandler::BufferNumber));
 		rules->push_back(rule);
 		
 		rule = new Rule(kmlRule::CoordTupleTail, "CoordTupleTail");
@@ -357,7 +364,8 @@ namespace nsKML {
 			<< new ForwardNode(kmlRule::Coord)
 			<< new ForwardNode(kmlRule::CoordTupleTail));
 		(*rule) += &((*(new Sequence()))
-			<< new ForwardNode(kmlRule::ConsumeWS));
+			<< new ForwardNode(kmlRule::ConsumeWS)
+			<< new CustomNode(kmlHandler::BufferPoint));
 		rules->push_back(rule);
 
 		auto* visitor = new kmlVisitor(lexer, rules);

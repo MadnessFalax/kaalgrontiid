@@ -51,7 +51,10 @@ namespace nsKML {
 	};
 
 	enum kmlHandler {
-
+		MakeNegative,
+		BufferNumber,
+		BufferPoint,
+		CommitShape
 	};
 
 }
