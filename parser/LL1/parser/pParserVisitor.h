@@ -345,6 +345,9 @@ namespace nspParser {
 						// try another sequence
 						break;
 					}
+					if (_context.end) {
+						break;
+					}
 					else if (node_index > 0 && _context.last_status == Context::LastStatus::FAIL) {
 						pErrorReporter::report_rule(_rule_map[_context.current_rule]->get_name(), _context.current_instance->get_prototype()->get_name(), "Either wrong sequence was determined, or there was unexpected token after the first sequence node.");
 						return;

@@ -44,8 +44,8 @@ namespace nsKML {
 		NormalGeometryNestedTag,
 		CoordinatesSingleOrPairTag,
 		OptionalPairTagCoordinatesContent,
-		CoordinatesEndingTag,
-		CoordTuple,
+		CoordinatesNestedOrEndingTag,
+		Coord,
 		CoordTupleTail,
 		NextTuple
 	};

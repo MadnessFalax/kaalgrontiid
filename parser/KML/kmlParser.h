@@ -106,7 +106,8 @@ namespace nsKML {
 			<< new ForwardNode(kmlRule::CommentContent)
 			<< new ConsumeNode(kmlToken::DASH)
 			<< new ConsumeNode(kmlToken::DASH)
-			<< new ConsumeNode(kmlToken::RANGLEBRACKET));
+			<< new ConsumeNode(kmlToken::RANGLEBRACKET)
+			<< new ForwardNode(kmlRule::ConsumeWS));
 		rules->push_back(rule);
 
 		rule = new Rule(kmlRule::CommentContent, "CommentContent");
@@ -213,9 +214,11 @@ namespace nsKML {
 		rule = new Rule(kmlRule::GenericSingleOrPairTag, "GenericSingleOrPairTag");
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(kmlToken::SLASH)
-			<< new ConsumeNode(kmlToken::RANGLEBRACKET));
+			<< new ConsumeNode(kmlToken::RANGLEBRACKET)
+			<< new ForwardNode(kmlRule::ConsumeWS));
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(kmlToken::RANGLEBRACKET)
+			<< new ForwardNode(kmlRule::ConsumeWS)
 			<< new ForwardNode(kmlRule::OptionalPairTagAnyContent));
 		rules->push_back(rule);
 
@@ -232,7 +235,8 @@ namespace nsKML {
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(kmlToken::SLASH)
 			<< new ConsumeNode(kmlToken::STRING)
-			<< new ConsumeNode(kmlToken::RANGLEBRACKET));
+			<< new ConsumeNode(kmlToken::RANGLEBRACKET)
+			<< new ForwardNode(kmlRule::ConsumeWS));
 		(*rule) += &((*(new Sequence()))
 			<< new ForwardNode(kmlRule::AnyTagContent)
 			<< new ForwardNode(kmlRule::OptionalPairTagAnyContent));
@@ -241,9 +245,11 @@ namespace nsKML {
 		rule = new Rule(kmlRule::GeometrySingleOrPairTag, "GeometrySingleOrPairTag");
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(kmlToken::SLASH)
-			<< new ConsumeNode(kmlToken::RANGLEBRACKET));
+			<< new ConsumeNode(kmlToken::RANGLEBRACKET)
+			<< new ForwardNode(kmlRule::ConsumeWS));
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(kmlToken::RANGLEBRACKET)
+			<< new ForwardNode(kmlRule::ConsumeWS)
 			<< new ForwardNode(kmlRule::OptionalPairTagGeometryContent));
 		rules->push_back(rule);
 
@@ -260,7 +266,8 @@ namespace nsKML {
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(kmlToken::SLASH)
 			<< new ConsumeNode(kmlToken::STRING)
-			<< new ConsumeNode(kmlToken::RANGLEBRACKET));
+			<< new ConsumeNode(kmlToken::RANGLEBRACKET)
+			<< new ForwardNode(kmlRule::ConsumeWS));
 		(*rule) += &((*(new Sequence()))
 			<< new ForwardNode(kmlRule::AnyGeometryNestedTagContent)
 			<< new ForwardNode(kmlRule::OptionalPairTagGeometryContent));
@@ -273,6 +280,7 @@ namespace nsKML {
 			<< new ForwardNode(kmlRule::OptionalAttr)
 			<< new ConsumeNode(kmlToken::QMARK)
 			<< new ConsumeNode(kmlToken::RANGLEBRACKET)
+			<< new ForwardNode(kmlRule::ConsumeWS)
 			<< new ForwardNode(kmlRule::PostInstruction));
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(kmlToken::EXCLAMATION)
@@ -297,51 +305,59 @@ namespace nsKML {
 		rule = new Rule(kmlRule::CoordinatesSingleOrPairTag, "CoordinatesSingleOrPairTag");
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(kmlToken::SLASH)
-			<< new ConsumeNode(kmlToken::RANGLEBRACKET));
+			<< new ConsumeNode(kmlToken::RANGLEBRACKET)
+			<< new ForwardNode(kmlRule::ConsumeWS));
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(kmlToken::RANGLEBRACKET)
+			<< new ForwardNode(kmlRule::ConsumeWS)
 			<< new ForwardNode(kmlRule::OptionalPairTagCoordinatesContent));
 		rules->push_back(rule);
 
 		rule = new Rule(kmlRule::OptionalPairTagCoordinatesContent, "OptionalPairTagCoordinatesContent");
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(kmlToken::LANGLEBRACKET)
-			<< new ForwardNode(kmlRule::CoordinatesEndingTag));
+			<< new ForwardNode(kmlRule::CoordinatesNestedOrEndingTag));
 		(*rule) += &((*(new Sequence()))
-			<< new ForwardNode(kmlRule::CoordTuple));
+			<< new ExtractNode(kmlToken::NUMBER, ExtractNode::ExtractType::NUMBER)
+			<< new ForwardNode(kmlRule::CoordTupleTail)
+			<< new ForwardNode(kmlRule::OptionalPairTagCoordinatesContent));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(kmlToken::DASH)
+			<< new ExtractNode(kmlToken::NUMBER, ExtractNode::ExtractType::NUMBER)
+			<< new ForwardNode(kmlRule::CoordTupleTail)
+			<< new ForwardNode(kmlRule::OptionalPairTagCoordinatesContent));
+		(*rule) += new Sequence();
 		rules->push_back(rule);
 
-		rule = new Rule(kmlRule::CoordinatesEndingTag, "CoordinatesEndingTag");
+		rule = new Rule(kmlRule::CoordinatesNestedOrEndingTag, "CoordinatesEndingTag");
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(kmlToken::SLASH)
 			<< new ConsumeNode(kmlToken::STRING, "coordinates")
-			<< new ConsumeNode(kmlToken::RANGLEBRACKET));
+			<< new ConsumeNode(kmlToken::RANGLEBRACKET)
+			<< new ForwardNode(kmlRule::ConsumeWS));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(kmlToken::EXCLAMATION)
+			<< new ConsumeNode(kmlToken::DASH)
+			<< new ConsumeNode(kmlToken::DASH)
+			<< new ForwardNode(kmlRule::CommentTag)
+			<< new ForwardNode(kmlRule::OptionalPairTagCoordinatesContent));
 		rules->push_back(rule);
 
-		rule = new Rule(kmlRule::CoordTuple, "CoordTuple");
+		rule = new Rule(kmlRule::Coord, "Coord");
 		(*rule) += &((*(new Sequence()))
-			<< new ConsumeNode(kmlToken::WS)
-			<< new ExtractNode(kmlToken::NUMBER, ExtractNode::ExtractType::NUMBER)
-			<< new ForwardNode(kmlRule::CoordTupleTail));	
+			<< new ExtractNode(kmlToken::NUMBER, ExtractNode::ExtractType::NUMBER));
 		(*rule) += &((*(new Sequence()))
-			<< new ExtractNode(kmlToken::NUMBER, ExtractNode::ExtractType::NUMBER)
-			<< new ForwardNode(kmlRule::CoordTupleTail));
+			<< new ConsumeNode(kmlToken::DASH)
+			<< new ExtractNode(kmlToken::NUMBER, ExtractNode::ExtractType::NUMBER));
 		rules->push_back(rule);
-
+		
 		rule = new Rule(kmlRule::CoordTupleTail, "CoordTupleTail");
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(kmlToken::COMMA)
-			<< new ExtractNode(kmlToken::NUMBER, ExtractNode::ExtractType::NUMBER)
+			<< new ForwardNode(kmlRule::Coord)
 			<< new ForwardNode(kmlRule::CoordTupleTail));
 		(*rule) += &((*(new Sequence()))
-			<< new ForwardNode(kmlRule::NextTuple));
-		rules->push_back(rule);
-
-		rule = new Rule(kmlRule::NextTuple, "NextTuple");
-		(*rule) += &((*(new Sequence()))
-			<< new ConsumeNode(kmlToken::WS)
-			<< new ForwardNode(kmlRule::CoordTuple));
-		(*rule) += new Sequence();
+			<< new ForwardNode(kmlRule::ConsumeWS));
 		rules->push_back(rule);
 
 		auto* visitor = new kmlVisitor(lexer, rules);
