@@ -128,6 +128,8 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <StackReserveSize>
+      </StackReserveSize>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -156,6 +158,7 @@
     <ClInclude Include="parser\LL1\parser\node\pParserNode.h" />
     <ClInclude Include="parser\LL1\parser\pErrorReporter.h" />
     <ClInclude Include="parser\LL1\parser\pParser.h" />
+    <ClInclude Include="parser\LL1\parser\pParserStack.h" />
     <ClInclude Include="parser\LL1\parser\pParserVisitor.h" />
     <ClInclude Include="parser\LL1\parser\pRule.h" />
     <ClInclude Include="parser\LL1\parser\pSequence.h" />

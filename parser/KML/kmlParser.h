@@ -29,6 +29,8 @@ namespace nsKML {
 		lexer->add_token_definition(kmlToken::ERROR, "ERR", "ERROR");
 		lexer->add_token_definition(kmlToken::LANGLEBRACKET, "<", "LANGLEBRACKET");
 		lexer->add_token_definition(kmlToken::RANGLEBRACKET, ">", "RANGLEBRACKET");
+		lexer->add_token_definition(kmlToken::RBRACKET, "]", "RBRACKET");
+		lexer->add_token_definition(kmlToken::LBRACKET, "[", "LBRACKET");
 		lexer->add_token_definition(kmlToken::DASH, R"(\-)", "DASH");
 		lexer->add_token_definition(kmlToken::QMARK, R"(\?)", "QMARK");
 		lexer->add_token_definition(kmlToken::EXCLAMATION, "!", "EXCLAMATION");
@@ -47,6 +49,8 @@ namespace nsKML {
 		lexer->add_token_definition(kmlToken::ERROR, "ERR", "ERROR");
 		lexer->add_token_definition(kmlToken::LANGLEBRACKET, "<", "LANGLEBRACKET");
 		lexer->add_token_definition(kmlToken::RANGLEBRACKET, ">", "RANGLEBRACKET");
+		lexer->add_token_definition(kmlToken::RBRACKET, R"(\])", "RBRACKET");
+		lexer->add_token_definition(kmlToken::LBRACKET, R"(\[)", "LBRACKET");
 		lexer->add_token_definition(kmlToken::DASH, R"(\-)", "DASH");
 		lexer->add_token_definition(kmlToken::QMARK, R"(\?)", "QMARK");
 		lexer->add_token_definition(kmlToken::EXCLAMATION, "!", "EXCLAMATION");
@@ -56,7 +60,7 @@ namespace nsKML {
 		lexer->add_token_definition(kmlToken::COMMA, R"(\,)", "COMMA");
 		lexer->add_token_definition(kmlToken::ATTRIBUTE, R"("[^"]+")", "ATTRIBUTE");
 		lexer->add_token_definition(kmlToken::NUMBER, R"(\-?\d+(\.\d+)?,\-?\d+(\.\d+)?(,\-?\d+(\.\d+)?)?( \s*\-?\d+(\.\d+)?,\-?\d+(\.\d+)?(,\-?\d+(\.\d+)?)?)*)", "NUMBER");
-		lexer->add_token_definition(kmlToken::STRING, R"([^<>"&' =]+)", "STRING");
+		lexer->add_token_definition(kmlToken::STRING, R"([^\[\]<>"&' =]+)", "STRING");
 
 		auto* rules = new Array<Rule*>();
 
@@ -81,11 +85,84 @@ namespace nsKML {
 			<< new ForwardNode(kmlRule::PostInstruction));
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(kmlToken::EXCLAMATION)
-			<< new ConsumeNode(kmlToken::DASH)
-			<< new ConsumeNode(kmlToken::DASH)
-			<< new ForwardNode(kmlRule::CommentTag));
+			<< new ForwardNode(kmlRule::CommentOrCDATA));
 		(*rule) += &((*(new Sequence()))
 			<< new ForwardNode(kmlRule::NormalTag));
+		rules->push_back(rule);
+
+		rule = new Rule(kmlRule::CommentOrCDATA, "CommentOrCDATA");
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(kmlToken::DASH)
+			<< new ConsumeNode(kmlToken::DASH)
+			<< new ForwardNode(kmlRule::CommentContent));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(kmlToken::LBRACKET)
+			<< new ConsumeNode(kmlToken::STRING, "CDATA")
+			<< new ConsumeNode(kmlToken::LBRACKET)
+			<< new ForwardNode(kmlRule::CDATAContent)
+			<< new ConsumeNode(kmlToken::RANGLEBRACKET)
+			<< new ForwardNode(kmlRule::ConsumeWS));
+		rules->push_back(rule);
+
+		rule = new Rule(kmlRule::CDATAContent, "CDATAContent");
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(kmlToken::RBRACKET)
+			<< new ForwardNode(kmlRule::CDATAFirstRBracket));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode()
+			<< new ForwardNode(kmlRule::CDATAContent));
+		rules->push_back(rule);
+
+		rule = new Rule(kmlRule::CDATAFirstRBracket, "CDATAFirstRBracket");
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(kmlToken::RBRACKET)
+			<< new ForwardNode(kmlRule::CDATASecondRBracket));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode()
+			<< new ForwardNode(kmlRule::CDATAContent));
+		rules->push_back(rule);
+
+		rule = new Rule(kmlRule::CDATASecondRBracket, "CDATASecondRBracket");
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(kmlToken::EXCLAMATION)
+			<< new ForwardNode(kmlRule::CDATAContent));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(kmlToken::QMARK)
+			<< new ForwardNode(kmlRule::CDATAContent));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(kmlToken::LANGLEBRACKET)
+			<< new ForwardNode(kmlRule::CDATAContent));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(kmlToken::DASH)
+			<< new ForwardNode(kmlRule::CDATAContent));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(kmlToken::LBRACKET)
+			<< new ForwardNode(kmlRule::CDATAContent));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(kmlToken::RBRACKET)
+			<< new ForwardNode(kmlRule::CDATASecondRBracket));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(kmlToken::EQUALS)
+			<< new ForwardNode(kmlRule::CDATAContent));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(kmlToken::WS)
+			<< new ForwardNode(kmlRule::CDATAContent));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(kmlToken::SLASH)
+			<< new ForwardNode(kmlRule::CDATAContent));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(kmlToken::COMMA)
+			<< new ForwardNode(kmlRule::CDATAContent));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(kmlToken::ATTRIBUTE)
+			<< new ForwardNode(kmlRule::CDATAContent));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(kmlToken::NUMBER)
+			<< new ForwardNode(kmlRule::CDATAContent));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(kmlToken::STRING)
+			<< new ForwardNode(kmlRule::CDATAContent));
+		(*rule) += new Sequence();
 		rules->push_back(rule);
 
 		rule = new Rule(kmlRule::PostInstruction, "PostInstruction");

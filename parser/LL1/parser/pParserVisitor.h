@@ -53,9 +53,6 @@ namespace nspParser {
 			}
 		};
 
-		unsigned char dimension = 0;
-		Array<double>* _point = nullptr;
-		Array<Array<double>*>* _points = nullptr;
 		Context _context;
 		Lexer* _lexer = nullptr;
 		// Array of rules, rules are not owned by this class
@@ -254,6 +251,12 @@ namespace nspParser {
 
 		void resolve_visit(ConsumeNode& node) {
 			if (_context.end) {
+				_context.last_status = Context::LastStatus::OK;
+				return;
+			}
+
+			if (node.consume_any()) {
+				_consume();
 				_context.last_status = Context::LastStatus::OK;
 				return;
 			}

@@ -186,6 +186,27 @@
     <ClInclude Include="parser\LL1\parser\node\pEntryNode.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="parser\KML\kmlEnums.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="parser\KML\kmlParser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="parser\KML\kmlVisitor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="parser\OSM\osmEnums.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="parser\OSM\osmParser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="parser\OSM\osmVisitor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="parser\LL1\parser\pParserStack.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="parser\regex\NFA\pState.cpp">
@@ -224,6 +245,7 @@
     </None>
     <None Include="test\sample_geo.json" />
     <None Include="parser\LL1\grammar\regex.grammar" />
+    <None Include="parser\LL1\grammar\kml.grammar" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="parser\LL1\grammar\geojson.grammar" />

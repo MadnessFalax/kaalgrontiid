@@ -1,8 +1,56 @@
 KML									-> '<' any_tag_content
 
 any_tag_content						-> '?' STRING optional_attr '?' '>' consume_ws post_instruction
-									| '!' '-' '-' comment_tag
+									| '!' comment_or_cdata
 									| normal_tag
+
+comment_or_cdata					-> '-' '-' comment_tag
+									| '[' 'CDATA' '[' cdata_content '>' consume_ws
+
+cdata_content						-> '!' cdata_content					
+									| '?' cdata_content
+									| '<' cdata_content
+									| '>' cdata_content
+									| '-' cdata_content
+									| '[' cdata_content
+									| ']' cdata_first_rbracket
+									| '=' cdata_content
+									| WS cdata_content
+									| '/' cdata_content
+									| ',' cdata_content
+									| ATTRIBUTE cdata_content
+									| NUMBER cdata_content
+									| STRING cdata_content
+
+cdata_first_rbracket				-> '!' cdata_content					
+									| '?' cdata_content
+									| '<' cdata_content
+									| '>' cdata_content
+									| '-' cdata_content
+									| '[' cdata_content
+									| ']' cdata_second_rbracket
+									| '=' cdata_content
+									| WS cdata_content
+									| '/' cdata_content
+									| ',' cdata_content
+									| ATTRIBUTE cdata_content
+									| NUMBER cdata_content
+									| STRING cdata_content
+
+cdata_second_rbracket				-> '!' cdata_content					
+									| '?' cdata_content
+									| '<' cdata_content
+									| '-' cdata_content
+									| '[' cdata_content
+									| ']' cdata_second_rbracket
+									| '=' cdata_content
+									| WS cdata_content
+									| '/' cdata_content
+									| ',' cdata_content
+									| ATTRIBUTE cdata_content
+									| NUMBER cdata_content
+									| STRING cdata_content
+									| null
 
 post_instruction					-> '<' any_tag_content
 									| null

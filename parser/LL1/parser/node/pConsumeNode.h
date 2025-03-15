@@ -8,8 +8,11 @@ namespace nspParser {
 		enum_t _token_type;
 		bool _check_value = false;
 		String _value = "";
-		
+		bool _consume_any = false;
+
 	public:
+		pConsumeNode() : _consume_any(true) { }
+
 		pConsumeNode(enum_t token_type) : _token_type(token_type) {
 
 		}
@@ -39,6 +42,10 @@ namespace nspParser {
 
 		const enum_t& get_proto() {
 			return _token_type;
+		}
+
+		const bool& consume_any() {
+			return _consume_any;
 		}
 
 		char get_type() override {

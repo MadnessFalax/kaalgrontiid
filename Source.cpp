@@ -32,7 +32,7 @@ using Token = nspLexer::pTokenPrototype<enum_t, t>;
 static void helper() {
 	
 	// KML Parser test ----------------
-	String path = R"(C:\Users\Petr\Downloads\src\test\kaalgrontiid\test\example.kml)";
+	String path = R"(C:\Users\Petr\Downloads\src\test\kaalgrontiid\test\KML_Samples.kml)";
 	auto* p = nsKML::setup_parser();
 	p->open(path);
 	p->parse();
