@@ -214,17 +214,6 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
     </None>
-    <None Include="test\sample_geo_feature.json">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
-      <FileType>Document</FileType>
-    </None>
-    <None Include="test\sample_json.json">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
-      <FileType>Document</FileType>
-    </None>
-    <None Include="test\sample_json2.json" />
-    <None Include="test\sample_json3.json" />
-    <None Include="test\type_sample.json" />
     <None Include="test\utf8_test.json" />
   </ItemGroup>
   <ItemGroup>

@@ -229,23 +229,8 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="test\type_sample.json">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="test\sample_json2.json">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="test\sample_json3.json">
-      <Filter>Resource Files</Filter>
-    </None>
     <None Include="test\utf8_test.json" />
     <None Include=".gitignore" />
-    <None Include="test\sample_json.json">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="test\sample_geo_feature.json">
-      <Filter>Resource Files</Filter>
-    </None>
     <None Include="test\sample_geo.json" />
     <None Include="parser\LL1\grammar\regex.grammar" />
     <None Include="parser\LL1\grammar\kml.grammar" />

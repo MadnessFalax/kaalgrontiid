@@ -59,11 +59,15 @@ namespace nsKML {
 		template<>
 		void resolve_custom_visit<kmlHandler::MakeNegative>(CustomNode& node) {
 			_context.last_extracted_number = -_context.last_extracted_number;
+
+			_context.last_status = Context::LastStatus::OK;
 		}
 
 		template<>
 		void resolve_custom_visit<kmlHandler::BufferNumber>(CustomNode& node) {
 			_point->push_back(_context.last_extracted_number);
+
+			_context.last_status = Context::LastStatus::OK;
 		}
 
 		template<>
@@ -71,6 +75,8 @@ namespace nsKML {
 			_dimension = _point->size();
 			_points->push_back(_point);
 			_point = new Array<double>();
+
+			_context.last_status = Context::LastStatus::OK;
 		}
 
 		template<>
@@ -95,6 +101,10 @@ namespace nsKML {
 			}
 			delete _points;
 			_points = new Array<Array<double>*>();
+
+			_context.has_item = true;
+
+			_context.last_status = Context::LastStatus::OK;
 		}
 	};
 }
