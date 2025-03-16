@@ -15,7 +15,7 @@ namespace nsKML {
 		Array<Array<double>*>* _points = nullptr;
 
 	public:
-		kmlVisitor(Lexer* lexer, Array<Rule*>* rules) : nspParser::pParserVisitor<kmlToken, kmlRule, kmlHandler, kmlVisitor>(lexer, rules) {
+		kmlVisitor(Lexer* lexer, Array<Rule*>* rules, Stack* stack) : nspParser::pParserVisitor<kmlToken, kmlRule, kmlHandler, kmlVisitor>(lexer, rules, stack) {
 			_point = new Array<double>();
 			_points = new Array<Array<double>*>();
 		}

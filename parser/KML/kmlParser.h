@@ -15,6 +15,7 @@ namespace nsKML {
 	using Lexer = nspLexer::pLexer<kmlToken>;
 	using Parser = nspParser::pParser<kmlToken, kmlRule, kmlHandler, kmlVisitor>;
 	using Rule = nspParser::pRule<kmlToken, kmlRule>;
+	using Stack = nspParser::pParserStack<kmlToken, kmlRule, kmlHandler>;
 	template<class T>
 	using Array = nspArray::pArray<T>;
 	using Sequence = nspParser::pSequence<kmlToken, kmlRule>;
@@ -40,7 +41,7 @@ namespace nsKML {
 		lexer->add_token_definition(kmlToken::COMMA, R"(\,)", "COMMA");
 		lexer->add_token_definition(kmlToken::ATTRIBUTE, R"("[^"]+")", "ATTRIBUTE");
 		lexer->add_token_definition(kmlToken::NUMBER, R"(\-?\d+(\.\d+)?,\-?\d+(\.\d+)?(,\-?\d+(\.\d+)?)?( \s*\-?\d+(\.\d+)?,\-?\d+(\.\d+)?(,\-?\d+(\.\d+)?)?)*)", "NUMBER");
-		lexer->add_token_definition(kmlToken::STRING, R"([^<>"&' =]+)", "STRING");
+		lexer->add_token_definition(kmlToken::STRING, R"([^<>" =]+)", "STRING");
 		return lexer;
 	}
 
@@ -60,7 +61,7 @@ namespace nsKML {
 		lexer->add_token_definition(kmlToken::COMMA, R"(\,)", "COMMA");
 		lexer->add_token_definition(kmlToken::ATTRIBUTE, R"("[^"]+")", "ATTRIBUTE");
 		lexer->add_token_definition(kmlToken::NUMBER, R"(\-?\d+(\.\d+)?,\-?\d+(\.\d+)?(,\-?\d+(\.\d+)?)?( \s*\-?\d+(\.\d+)?,\-?\d+(\.\d+)?(,\-?\d+(\.\d+)?)?)*)", "NUMBER");
-		lexer->add_token_definition(kmlToken::STRING, R"([^\[\]<>"&' =]+)", "STRING");
+		lexer->add_token_definition(kmlToken::STRING, R"([^\[\]<>" =]+)", "STRING");
 
 		auto* rules = new Array<Rule*>();
 
@@ -106,19 +107,91 @@ namespace nsKML {
 
 		rule = new Rule(kmlRule::CDATAContent, "CDATAContent");
 		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(kmlToken::EXCLAMATION)
+			<< new ForwardNode(kmlRule::CDATAContent));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(kmlToken::QMARK)
+			<< new ForwardNode(kmlRule::CDATAContent));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(kmlToken::LANGLEBRACKET)
+			<< new ForwardNode(kmlRule::CDATAContent));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(kmlToken::RANGLEBRACKET)
+			<< new ForwardNode(kmlRule::CDATAContent));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(kmlToken::DASH)
+			<< new ForwardNode(kmlRule::CDATAContent));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(kmlToken::LBRACKET)
+			<< new ForwardNode(kmlRule::CDATAContent));
+		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(kmlToken::RBRACKET)
 			<< new ForwardNode(kmlRule::CDATAFirstRBracket));
 		(*rule) += &((*(new Sequence()))
-			<< new ConsumeNode()
+			<< new ConsumeNode(kmlToken::EQUALS)
+			<< new ForwardNode(kmlRule::CDATAContent));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(kmlToken::WS)
+			<< new ForwardNode(kmlRule::CDATAContent));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(kmlToken::SLASH)
+			<< new ForwardNode(kmlRule::CDATAContent));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(kmlToken::COMMA)
+			<< new ForwardNode(kmlRule::CDATAContent));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(kmlToken::ATTRIBUTE)
+			<< new ForwardNode(kmlRule::CDATAContent));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(kmlToken::NUMBER)
+			<< new ForwardNode(kmlRule::CDATAContent));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(kmlToken::STRING)
 			<< new ForwardNode(kmlRule::CDATAContent));
 		rules->push_back(rule);
 
 		rule = new Rule(kmlRule::CDATAFirstRBracket, "CDATAFirstRBracket");
 		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(kmlToken::EXCLAMATION)
+			<< new ForwardNode(kmlRule::CDATAContent));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(kmlToken::QMARK)
+			<< new ForwardNode(kmlRule::CDATAContent));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(kmlToken::LANGLEBRACKET)
+			<< new ForwardNode(kmlRule::CDATAContent));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(kmlToken::RANGLEBRACKET)
+			<< new ForwardNode(kmlRule::CDATAContent));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(kmlToken::DASH)
+			<< new ForwardNode(kmlRule::CDATAContent));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(kmlToken::LBRACKET)
+			<< new ForwardNode(kmlRule::CDATAContent));
+		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(kmlToken::RBRACKET)
 			<< new ForwardNode(kmlRule::CDATASecondRBracket));
 		(*rule) += &((*(new Sequence()))
-			<< new ConsumeNode()
+			<< new ConsumeNode(kmlToken::EQUALS)
+			<< new ForwardNode(kmlRule::CDATAContent));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(kmlToken::WS)
+			<< new ForwardNode(kmlRule::CDATAContent));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(kmlToken::SLASH)
+			<< new ForwardNode(kmlRule::CDATAContent));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(kmlToken::COMMA)
+			<< new ForwardNode(kmlRule::CDATAContent));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(kmlToken::ATTRIBUTE)
+			<< new ForwardNode(kmlRule::CDATAContent));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(kmlToken::NUMBER)
+			<< new ForwardNode(kmlRule::CDATAContent));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(kmlToken::STRING)
 			<< new ForwardNode(kmlRule::CDATAContent));
 		rules->push_back(rule);
 
@@ -233,6 +306,9 @@ namespace nsKML {
 			<< new ForwardNode(kmlRule::CommentContent));
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(kmlToken::SLASH)
+			<< new ForwardNode(kmlRule::CommentContent));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(kmlToken::DASH)
 			<< new ForwardNode(kmlRule::CommentContent));
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(kmlToken::NUMBER)
@@ -445,9 +521,11 @@ namespace nsKML {
 			<< new CustomNode(kmlHandler::BufferPoint));
 		rules->push_back(rule);
 
-		auto* visitor = new kmlVisitor(lexer, rules);
+		auto* stack = new Stack(first_rule);
 
-		Parser* parser = new Parser(rules, first_rule, visitor, lexer);
+		auto* visitor = new kmlVisitor(lexer, rules, stack);
+
+		Parser* parser = new Parser(rules, first_rule, visitor, lexer, stack);
 
 		return parser;
 	};

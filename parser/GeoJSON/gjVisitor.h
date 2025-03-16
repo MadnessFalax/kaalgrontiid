@@ -21,7 +21,7 @@ namespace nsGeoJSON {
 		} _depth = OutsideLevel;
 
 	public:
-		gjVisitor(Lexer* lexer, Array<Rule*>* rules) : nspParser::pParserVisitor<gjToken, gjRule, gjHandler, gjVisitor>(lexer, rules) {
+		gjVisitor(Lexer* lexer, Array<Rule*>* rules, Stack* stack) : nspParser::pParserVisitor<gjToken, gjRule, gjHandler, gjVisitor>(lexer, rules, stack) {
 			_point = new Array<double>();
 			_points = new Array<Array<double>*>();
 		}

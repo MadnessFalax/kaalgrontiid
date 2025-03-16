@@ -27,9 +27,11 @@ namespace nspParser {
 		using ParserNode = pParserNode<enum_t, enum_r>;
 		using EntryNode = pEntryNode<enum_t, enum_r>;
 		using Rule = pRule<enum_t, enum_r>;
+		using Stack = pParserStack<enum_t, enum_r, enum_c>;
 		template<class T, class U, class V = unsigned char>
 		using Map = nspMap::pMap<T, U, V>;
 
+	public:
 		struct Context {
 			enum_r current_rule = enum_r{};
 			enum_t current_token = enum_t{};
@@ -55,10 +57,12 @@ namespace nspParser {
 			}
 		};
 
+	protected:
 		Context _context;
 		Lexer* _lexer = nullptr;
 		// Array of rules, rules are not owned by this class
 		Map<enum_r, Rule*, unsigned char> _rule_map = Map<enum_r, Rule*, unsigned char>();
+		Stack* _stack = nullptr;									// Stack is owned by pParser class
 		
 
 		bool _try_extract_number() {
@@ -141,22 +145,21 @@ namespace nspParser {
 		}
 
 	public:
-		// Does not take ownership of lexer or rules
-		pParserVisitor(Lexer* lexer, Array<Rule*>* rules) : _lexer(lexer) {
+		// Does not take ownership of lexer, rules or stack
+		pParserVisitor(Lexer* lexer, Array<Rule*>* rules, Stack* stack) : _lexer(lexer), _stack(stack) {
 			for (Rule* rule : *rules) {
 				_rule_map[rule->get_id()] = rule;
 			}
-
-			rules = nullptr;
-
 		}
 
 		virtual ~pParserVisitor() {
+			// no ownership of lexer or rules
 			_lexer = nullptr;
+			_stack = nullptr;
 		}
 
-		Context& get_context() {
-			return _context;
+		Context* get_context() {
+			return &_context;
 		}
 
 		void resolve_visit(ParserNode& node) {
@@ -171,83 +174,8 @@ namespace nspParser {
 			}
 			
 			// now behave like ForwardNode
-			auto my_rule = node.get_this_node_rule_id();
-			auto* rule = _rule_map[node.get_entry_rule_id()];
-			auto& rhs = rule->get_rhs();
-			for (auto* sequence : rhs) {
-				auto& nodes = sequence->get_nodes();
-				size_t node_index = 0;
-				for (auto* sub_node : nodes) {
-					// determine node type
-					ConsumeNode* consume_node = nullptr;
-					CustomNode* custom_node = nullptr;
-					ExtractNode* extract_node = nullptr;
-					ForwardNode* forward_node = nullptr;
-					if (sub_node->get_type() == 'c') {
-						consume_node = dynamic_cast<ConsumeNode*>(sub_node);
-					}
-					else if (sub_node->get_type() == 'e') {
-						extract_node = dynamic_cast<ExtractNode*>(sub_node);
-					}
-					else if (sub_node->get_type() == 'f') {
-						forward_node = dynamic_cast<ForwardNode*>(sub_node);
-					}
-					else if (sub_node->get_type() == 'u') {
-						custom_node = dynamic_cast<CustomNode*>(sub_node);
-					}
-					else {
-						pErrorReporter::report_rule(_rule_map[_context.current_rule]->get_name(), _context.current_instance->get_prototype()->get_name(), "Error when determining which node to forward to.");
-						_context.last_status = Context::LastStatus::FAIL;
-						return;
-					}
-
-					// visit correct node type
-					if (consume_node) {
-						_context.current_rule = rule->get_id();
-						consume_node->accept(*this);
-						_context.current_rule = my_rule;
-					}
-					else if (extract_node) {
-						_context.current_rule = rule->get_id();
-						extract_node->accept(*this);
-						_context.current_rule = my_rule;
-					}
-					else if (forward_node) {
-						_context.current_rule = rule->get_id();
-						forward_node->accept(*this);
-						_context.current_rule = my_rule;
-					}
-					else if (custom_node) {
-						_context.current_rule = rule->get_id();
-						custom_node->accept(*this);
-						_context.current_rule = my_rule;
-					}
-					else {
-						pErrorReporter::report_rule(_rule_map[_context.current_rule]->get_name(), _context.current_instance->get_prototype()->get_name(), "Cannot forward to selected node. Node was probably determined as node base pParserNode.");
-						_context.last_status = Context::LastStatus::FAIL;
-						return;
-					}
-
-					if (_context.end) {
-						_context.last_status = Context::LastStatus::OK;
-						return;
-					}
-
-					if (node_index == 0 && _context.last_status == Context::LastStatus::FAIL) {
-						// try another sequence
-						break;
-					}
-					else if (node_index > 0 && _context.last_status == Context::LastStatus::FAIL) {
-						pErrorReporter::report_rule(_rule_map[_context.current_rule]->get_name(), _context.current_instance->get_prototype()->get_name(), "Either wrong sequence was determined, or there was unexpected token after the first sequence node.");
-						return;
-					}
-					node_index++;
-				}
-			}
-
-			if (_context.last_status == Context::LastStatus::FAIL) {
-				pErrorReporter::report_rule(_rule_map[_context.current_rule]->get_name(), _context.current_instance->get_prototype()->get_name(), "Failed to parse input.");
-			}
+			_stack->register_rule(_rule_map[node.get_entry_rule_id()]);
+			_context.last_status = Context::LastStatus::OK;
 			return;
 		}
 
@@ -284,88 +212,8 @@ namespace nspParser {
 				_context.last_status = Context::LastStatus::OK;
 				return;
 			}
-			auto my_rule = _context.current_rule;
-			auto* rule = _rule_map[node.get_rule_id()];
-			auto& rhs = rule->get_rhs();
-			bool has_epsilon_sequence = false;
-			for (auto* sequence : rhs) {
-				auto& nodes = sequence->get_nodes();
-				if (sequence->is_empty()) {
-					has_epsilon_sequence = true;
-					continue;
-				}
-				size_t node_index = 0;
-				for (auto* sub_node : nodes) {
-					// determine node type
-					ConsumeNode* consume_node = nullptr;
-					CustomNode* custom_node = nullptr;
-					ExtractNode* extract_node = nullptr;
-					ForwardNode* forward_node = nullptr;
-					if (sub_node->get_type() == 'c') {
-						consume_node = dynamic_cast<ConsumeNode*>(sub_node);
-					}
-					else if (sub_node->get_type() == 'e') {
-						extract_node = dynamic_cast<ExtractNode*>(sub_node);
-					}
-					else if (sub_node->get_type() == 'f') {
-						forward_node = dynamic_cast<ForwardNode*>(sub_node);
-					}
-					else if (sub_node->get_type() == 'u') {
-						custom_node = dynamic_cast<CustomNode*>(sub_node);
-					}
-					else {
-						pErrorReporter::report_rule(_rule_map[_context.current_rule]->get_name(), _context.current_instance->get_prototype()->get_name(), "Error when determining which node to forward to.");
-						_context.last_status = Context::LastStatus::FAIL;
-						return;
-					}
-
-					// visit correct node type
-					if (consume_node) {
-						_context.current_rule = rule->get_id();
-						consume_node->accept(*this);
-						_context.current_rule = my_rule;
-					}
-					else if (extract_node) {
-						_context.current_rule = rule->get_id();
-						extract_node->accept(*this);
-						_context.current_rule = my_rule;
-					}
-					else if (forward_node) {
-						_context.current_rule = rule->get_id();
-						forward_node->accept(*this);
-						_context.current_rule = my_rule;
-					}
-					else if (custom_node) {
-						_context.current_rule = rule->get_id();
-						custom_node->accept(*this);
-						_context.current_rule = my_rule;
-					}
-					else {
-						pErrorReporter::report_rule(_rule_map[_context.current_rule]->get_name(), _context.current_instance->get_prototype()->get_name(), "Cannot forward to selected node. Node was probably determined as node base pParserNode.");
-						_context.last_status = Context::LastStatus::FAIL;
-						return;
-					}
-
-					if (node_index == 0 && _context.last_status == Context::LastStatus::FAIL) {
-						// try another sequence
-						break;
-					}
-					if (_context.end) {
-						break;
-					}
-					else if (node_index > 0 && _context.last_status == Context::LastStatus::FAIL) {
-						pErrorReporter::report_rule(_rule_map[_context.current_rule]->get_name(), _context.current_instance->get_prototype()->get_name(), "Either wrong sequence was determined, or there was unexpected token after the first sequence node.");
-						return;
-					}
-					node_index++;
-				}
-				if (_context.last_status == Context::LastStatus::OK) {
-					break;
-				}
-			}
-			if (has_epsilon_sequence) {
-				_context.last_status = Context::LastStatus::OK;
-			}
+			_stack->register_rule(_rule_map[node.get_rule_id()]);
+			_context.last_status = Context::LastStatus::OK;
 			return;
 		}
 
@@ -423,6 +271,18 @@ namespace nspParser {
 
 		void resolve_visit(CustomNode& node) {
 			static_cast<derived*>(this)->custom_visit_root(node);
+		}
+
+		bool get_status() {
+			return _context.last_status == Context::LastStatus::OK;
+		}
+
+		bool has_item() {
+			return _context.has_item;
+		}
+
+		void get_item() {
+			return;
 		}
 
 		virtual void custom_visit_root(CustomNode& node) = 0;

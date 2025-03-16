@@ -42,6 +42,7 @@ namespace nspParser {
 				qualified_sequences = &(rule->get_rhs());
 				sequence_count = qualified_sequences->size();
 				has_epsilon_sequence = rule->has_epsilon();
+				node_count = (*qualified_sequences)[selected_sequence]->get_nodes().size();
 			}
 
 			~StackBlock() {
@@ -61,15 +62,21 @@ namespace nspParser {
 					return false;
 				}
 				selected_sequence++;
+				if (selected_sequence >= sequence_count) {
+					return false;
+				}
 				if ((*qualified_sequences)[selected_sequence]->is_empty()) {
 					selected_sequence++;
+				}
+				if (selected_sequence >= sequence_count) {
+					return false;
 				}
 				node_count = (*qualified_sequences)[selected_sequence]->get_nodes().size();
 				return selected_sequence < sequence_count && selected_node < node_count;
 			}
 
 			ParserNode* get_node() {
-				pParserNode* retval = nullptr;
+				ParserNode* retval = nullptr;
 				if (selected_sequence < sequence_count && selected_node < node_count) {
 					retval = (*qualified_sequences)[selected_sequence]->get_nodes()[selected_node];
 				}
@@ -79,7 +86,7 @@ namespace nspParser {
 		};
 		
 	private:
-		Array<StackBlock*> _node_stack = Array<ParserNode*>();
+		Array<StackBlock*> _node_stack = Array<StackBlock*>();
 		Rule* _rule_buffer = nullptr;
 
 		void _push() {

@@ -19,27 +19,7 @@ namespace nspParser {
 		bool _has_epsilon = false;
 
 	public:
-		pRule(enum_r rule_id, String name) : _lhs(rule_id), _name(name) {
-			size_t empty_count = 0;
-			auto rhs_size = _rhs.size();
-			for (size_t i = 0; i < rhs_size; i++) {
-				if (_rhs[i]->is_empty()) {
-					if (i == 0) {
-						// it is not allowed to pass empty sequence as the first sequence
-						throw pEpsilonException();
-					}
-
-					empty_count++;
-				}
-			}
-			if (empty_count > 0) {
-				_has_epsilon = true;
-				if (empty_count > 1) {
-					// it is not allowed to pass more than one empty sequence
-					throw pEpsilonException();
-				}
-			}
-		}
+		pRule(enum_r rule_id, String name) : _lhs(rule_id), _name(name) {}
 
 		~pRule() {
 			auto rhs_size = _rhs.size();
@@ -55,6 +35,17 @@ namespace nspParser {
 
 		// takes ownership of seq
 		void add_sequence(Sequence* seq) {
+			if (seq->is_empty()) {
+				if (_rhs.size() == 0) {
+					// cannot start with empty sequence
+					throw pEpsilonException();
+				}
+				if (_has_epsilon) {
+					// cannot have multiple empty sequences
+					throw pEpsilonException();
+				}
+				_has_epsilon = true;
+			}
 			_rhs.push_back(seq);
 		}
 
