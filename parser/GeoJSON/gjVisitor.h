@@ -154,9 +154,5 @@ namespace nsGeoJSON {
 
 			_context.last_status = Context::LastStatus::OK;
 		}	
-
-
-
-
 	};
 }

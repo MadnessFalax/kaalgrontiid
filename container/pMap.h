@@ -126,18 +126,19 @@ namespace nspMap {
 
 		~pMap() {
 			// pMap owns both Nodes, Pairs are owned by Nodes
-			for (size_t i = 0; i < _capacity; i++) {
-				if (_table[i] != nullptr) {
-					_table[i]->delete_bucket();
-					delete _table[i];
-					_table[i] = nullptr;
+			if (_table != nullptr) {
+				for (size_t i = 0; i < _capacity; i++) {
+					if (_table[i] != nullptr) {
+						_table[i]->delete_bucket();
+						delete _table[i];
+						_table[i] = nullptr;
+					}
 				}
+
+				delete[] _table;
+				_first = nullptr;
+				_first_end = nullptr;
 			}
-
-			delete[] _table;
-			_first = nullptr;
-			_first_end = nullptr;
-
 		}
 
 		pMap& operator=(const pMap& other) {

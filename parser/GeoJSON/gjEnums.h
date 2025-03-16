@@ -1,7 +1,6 @@
 #pragma once
 #undef TRUE
 #undef FALSE
-#undef NULL
 #undef ERROR
 
 namespace nsGeoJSON {
@@ -18,7 +17,7 @@ namespace nsGeoJSON {
 		STRING,
 		TRUE,
 		FALSE,
-		NULL,
+		GJNULL,
 		NUMBER
 	};
 

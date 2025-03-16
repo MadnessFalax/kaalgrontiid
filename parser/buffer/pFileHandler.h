@@ -1,6 +1,6 @@
 #pragma once
 #include "common/stream/cFileStream.h"
-#include "common/stream/cStream_win.h"
+#include "common/stream/cStream.h"
 #include "../../container/pString.h"
 
 namespace nspFile {

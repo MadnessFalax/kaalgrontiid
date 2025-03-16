@@ -39,7 +39,7 @@ namespace nsGeoJSON {
 		l->add_token_definition(gjToken::STRING, "\"([^\"\\\\]*(\\\\.[^\"\\\\]*)*)\"", "STRING");
 		l->add_token_definition(gjToken::TRUE, "true", "TRUE");
 		l->add_token_definition(gjToken::FALSE, "false", "FALSE");
-		l->add_token_definition(gjToken::NULL, "null", "NULL");
+		l->add_token_definition(gjToken::GJNULL, "null", "NULL");
 		l->add_token_definition(gjToken::NUMBER, R"(\-?(0|[1-9]\d*)(\.\d+)?([eE][\+\-]?\d+)?)", "NUMBER");
 		return l;
 	}
@@ -58,7 +58,7 @@ namespace nsGeoJSON {
 		l->add_token_definition(gjToken::STRING, "\"([^\"\\\\]*(\\\\.[^\"\\\\]*)*)\"", "STRING");
 		l->add_token_definition(gjToken::TRUE, "true", "TRUE");
 		l->add_token_definition(gjToken::FALSE, "false", "FALSE");
-		l->add_token_definition(gjToken::NULL, "null", "NULL");
+		l->add_token_definition(gjToken::GJNULL, "null", "NULL");
 		l->add_token_definition(gjToken::NUMBER, R"(\-?(0|[1-9]\d*)(\.\d+)?([eE][\+\-]?\d+)?)", "NUMBER");
 
 		auto* rules = new Array<Rule*>();
@@ -143,7 +143,7 @@ namespace nsGeoJSON {
 
 		rule = new Rule(gjRule::OptionalGeometryValue, "OptionalGeometryValue");
 		(*rule) += &((*(new Sequence())) 
-			<< new ConsumeNode(gjToken::NULL));
+			<< new ConsumeNode(gjToken::GJNULL));
 		(*rule) += &((*(new Sequence())) 
 			<< new ConsumeNode(gjToken::LBRACE)
 			<< new ForwardNode(gjRule::GProperties)
@@ -327,7 +327,7 @@ namespace nsGeoJSON {
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(gjToken::FALSE));
 		(*rule) += &((*(new Sequence()))
-			<< new ConsumeNode(gjToken::NULL));
+			<< new ConsumeNode(gjToken::GJNULL));
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(gjToken::LBRACE)
 			<< new ForwardNode(gjRule::GenericProperties)

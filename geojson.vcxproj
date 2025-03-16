@@ -102,10 +102,10 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <SDLCheck>true</SDLCheck>
+      <SDLCheck>false</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\..;..\..\common;..\..\common\stream;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ConformanceMode>false</ConformanceMode>
+      <AdditionalIncludeDirectories>..\..;..\..\common\datatype\geo;..\..\common\datatype\tuple;..\..\common\datatype;..\..\common;..\..\common\stream;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp14</LanguageStandard>
     </ClCompile>
     <Link>
@@ -121,7 +121,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\..;..\..\common;..\..\common\stream;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..;..\..\common;..\..\common\datatype\tuple;..\..\common\datatype;..\..\common\datatype\geo;..\..\common\stream;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -197,11 +197,38 @@
     <ClInclude Include="..\..\common\cCommon.h" />
     <ClInclude Include="..\..\common\stream\cFileStream.h" />
     <ClInclude Include="..\..\common\stream\cStream.h" />
+    <ClInclude Include="..\..\common\cBitString.h" />
+    <ClInclude Include="..\..\common\cMemory.h" />
+    <ClInclude Include="..\..\common\cNumber.h" />
+    <ClInclude Include="..\..\common\datatype\cBasicType.h" />
+    <ClInclude Include="..\..\common\datatype\cDataType.h" />
+    <ClInclude Include="..\..\common\datatype\cDTDescriptor.h" />
+    <ClInclude Include="..\..\common\datatype\geo\cDataShape.h" />
+    <ClInclude Include="..\..\common\datatype\geo\cGeometry.h" />
+    <ClInclude Include="..\..\common\datatype\geo\cLineString.h" />
+    <ClInclude Include="..\..\common\datatype\geo\cPolygon.h" />
+    <ClInclude Include="..\..\common\datatype\geo\cSphere.h" />
+    <ClInclude Include="..\..\common\datatype\tuple\cMBRectangle.h" />
+    <ClInclude Include="..\..\common\datatype\tuple\cSpaceDescriptor.h" />
+    <ClInclude Include="..\..\common\datatype\tuple\cTuple.h" />
     <ClInclude Include="utils\string.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\common\cCommon.cpp" />
     <ClCompile Include="..\..\common\stream\cFileStream.cpp" />
+    <ClCompile Include="..\..\common\cBitString.cpp" />
+    <ClCompile Include="..\..\common\cMemory.cpp" />
+    <ClCompile Include="..\..\common\cNumber.cpp" />
+    <ClCompile Include="..\..\common\datatype\cBasicType.cpp" />
+    <ClCompile Include="..\..\common\datatype\cDataType.cpp" />
+    <ClCompile Include="..\..\common\datatype\cDTDescriptor.cpp" />
+    <ClCompile Include="..\..\common\datatype\geo\cDataShape.cpp" />
+    <ClCompile Include="..\..\common\datatype\geo\cGeometry.cpp" />
+    <ClCompile Include="..\..\common\datatype\geo\cLineString.cpp" />
+    <ClCompile Include="..\..\common\datatype\geo\cPolygon.cpp" />
+    <ClCompile Include="..\..\common\datatype\geo\cSphere.cpp" />
+    <ClCompile Include="..\..\common\datatype\tuple\cSpaceDescriptor.cpp" />
+    <ClCompile Include="..\..\common\datatype\tuple\cTuple.cpp" />
     <ClCompile Include="parser\regex\AST\pRegexNode.cpp" />
     <ClCompile Include="parser\regex\NFA\pState.cpp" />
     <ClCompile Include="Source.cpp" />

@@ -32,13 +32,18 @@ namespace nspArray {
 		using const_reference = const T&;
 
 
-		pArray() : _data(new T*[START_SIZE]) {}
+		pArray() {
+			_data = new pointer[START_SIZE];
+		}
 
 		pArray(size_t initial_size) : _size(initial_size), _data(new pointer[initial_size]) {}
 
 		pArray(const pArray& other) : _size(other._size), _count(other._count) {
-
-			_data = new pointer[other._size];
+			_size = START_SIZE;
+			if (other._size > START_SIZE) {
+				_size = other._size;
+			}
+			_data = new pointer[_size];
 
 			for (size_t i = 0; i < _count; i++) {
 				_data[i] = new value_type{ *(other._data[i]) };
@@ -51,12 +56,14 @@ namespace nspArray {
 		}
 
 		~pArray() {
-			for (size_t i = 0; i < _count; i++) {
-				delete _data[i];
-				_data[i] = nullptr;
+			if (_data != nullptr) {
+				for (size_t i = 0; i < _count; i++) {
+					delete _data[i];
+					_data[i] = nullptr;
+				}
+				delete[] _data;
+				_data = nullptr;
 			}
-			delete[] _data;
-			_data = nullptr;
 		}
 	
 		void operator= (pArray& other) {
