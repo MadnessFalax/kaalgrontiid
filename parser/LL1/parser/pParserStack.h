@@ -38,7 +38,7 @@ namespace nspParser {
 			bool sequence_locked = false;
 			bool has_epsilon_sequence = false;
 
-			StackBlock(pRule* rule) {
+			StackBlock(Rule* rule) {
 				qualified_sequences = &(rule->get_rhs());
 				sequence_count = qualified_sequences->size();
 				has_epsilon_sequence = rule->has_epsilon();
@@ -68,7 +68,7 @@ namespace nspParser {
 				return selected_sequence < sequence_count && selected_node < node_count;
 			}
 
-			pParserNode* get_node() {
+			ParserNode* get_node() {
 				pParserNode* retval = nullptr;
 				if (selected_sequence < sequence_count && selected_node < node_count) {
 					retval = (*qualified_sequences)[selected_sequence]->get_nodes()[selected_node];
@@ -80,15 +80,17 @@ namespace nspParser {
 		
 	private:
 		Array<StackBlock*> _node_stack = Array<ParserNode*>();
-		pRule* _rule_buffer = nullptr;
+		Rule* _rule_buffer = nullptr;
 
-		void _push(pRule* rule) {
-			_node_stack.push_back(new StackBlock(rule));
+		void _push() {
+			_node_stack.push_back(new StackBlock(_rule_buffer));
+			_rule_buffer = nullptr;
 		}
 
 	public:
-		pParserStack(pRule* top_level_rule) {
-			_push(top_level_rule);
+		pParserStack(Rule* top_level_rule) {
+			_rule_buffer = top_level_rule;
+			_push();
 		}
 
 		~pParserStack() {
@@ -99,11 +101,11 @@ namespace nspParser {
 			}
 		}
 
-		void register_rule(pRule* rule) {
+		void register_rule(Rule* rule) {
 			_rule_buffer = rule;
 		}
 
-		pParserNode* get_node() {
+		ParserNode* get_node() {
 			if (_node_stack.size() == 0) {
 				return nullptr;
 			}
@@ -127,7 +129,7 @@ namespace nspParser {
 				status = _remove_stack_block();
 			}
 			if (_rule_buffer) {
-				_push(_rule_buffer);
+				_push();
 				status = true;
 			}
 			return status;
@@ -151,7 +153,7 @@ namespace nspParser {
 					}
 				}
 				if (_rule_buffer) {
-					_push(_rule_buffer);
+					_push();
 					status = true;
 				}
 				return status;
