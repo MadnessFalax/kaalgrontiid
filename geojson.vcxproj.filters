@@ -207,6 +207,9 @@
     <ClInclude Include="parser\LL1\parser\pParserStack.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="parser\LL1\parser\pEpsilonException.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="parser\regex\NFA\pState.cpp">

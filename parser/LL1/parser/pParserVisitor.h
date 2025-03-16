@@ -10,6 +10,7 @@
 #include "node/pCustomNode.h"
 #include "node/pEntryNode.h"
 #include "pErrorReporter.h"
+#include "pParserStack.h"
 #include <cstdlib>
 
 namespace nspParser {

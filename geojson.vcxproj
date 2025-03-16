@@ -150,6 +150,7 @@
     <ClInclude Include="parser\LL1\lexer\pPrototypeKind.h" />
     <ClInclude Include="parser\LL1\lexer\pTokenInstance.h" />
     <ClInclude Include="parser\LL1\lexer\pTokenPrototype.h" />
+    <ClInclude Include="parser\LL1\parser\pEpsilonException.h" />
     <ClInclude Include="parser\LL1\parser\node\pConsumeNode.h" />
     <ClInclude Include="parser\LL1\parser\node\pCustomNode.h" />
     <ClInclude Include="parser\LL1\parser\node\pEntryNode.h" />
