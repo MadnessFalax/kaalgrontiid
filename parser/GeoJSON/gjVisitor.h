@@ -10,50 +10,49 @@ namespace nsGeoJSON {
 		using Array = nspArray::pArray<T>;
 		using pErrorReporter = nspParser::pErrorReporter;
 
-		enum depth {
-			ISPOINT,
-			ISLINE,
-			WASLINE,
-			NOTIMPORTANT
-		};
-
-
-		depth _depth = NOTIMPORTANT;
 		size_t _dimension = 0;
-		Array<double>* _temp_coords = nullptr;
-		Array<Array<double>*>* _coordinates = nullptr;
+		Array<double>* _point = nullptr;
+		Array<Array<double>*>* _points = nullptr;
+		enum depth {
+			CoordsLevel,
+			PointsLevel,
+			ShapeLevel,
+			OutsideLevel
+		} _depth = OutsideLevel;
 
 	public:
 		gjVisitor(Lexer* lexer, Array<Rule*>* rules) : nspParser::pParserVisitor<gjToken, gjRule, gjHandler, gjVisitor>(lexer, rules) {
-			_temp_coords = new Array<double>();
-			_coordinates = new Array<Array<double>*>();
+			_point = new Array<double>();
+			_points = new Array<Array<double>*>();
 		}
 
 		~gjVisitor() {
-			delete _temp_coords;
-			_temp_coords = nullptr;
-			auto _c_size = _coordinates->size();
-			for (size_t i = 0; i < _c_size; i++) {
-				delete (*_coordinates)[i];
+			delete _point;
+			_point = nullptr;
+			if (_points) {
+				size_t p_size = _points->size();
+				for (size_t i = 0; i < p_size; i++) {
+					delete (*_points)[i];
+					(*_points)[i] = nullptr;
+				}
+				delete _points;
+				_points = nullptr;
 			}
-			delete _coordinates;
-			_coordinates = nullptr;
-
 		}
 
 		void custom_visit_root(CustomNode& node) override {
 			switch (node.get_handler_id()) {
-			case gjHandler::CoordinatesHandler:
-				resolve_custom_visit<gjHandler::CoordinatesHandler>(node);
+			case gjHandler::BufferNumber:
+				resolve_custom_visit<gjHandler::BufferNumber>(node);
 				break;
-			case gjHandler::DepthOutHandler:
-				resolve_custom_visit<gjHandler::DepthOutHandler>(node);
+			case gjHandler::BufferPoint:
+				resolve_custom_visit<gjHandler::BufferPoint>(node);
 				break;
-			case gjHandler::GeoObjectHandler:
-				resolve_custom_visit<gjHandler::GeoObjectHandler>(node);
+			case gjHandler::CommitShape:
+				resolve_custom_visit<gjHandler::CommitShape>(node);
 				break;
-			case gjHandler::CommitPointHandler:
-				resolve_custom_visit<gjHandler::CommitPointHandler>(node);
+			case gjHandler::DepthOut:
+				resolve_custom_visit<gjHandler::DepthOut>(node);
 				break;
 			}
 		}
@@ -64,103 +63,100 @@ namespace nsGeoJSON {
 		}
 
 		template<>
-		void resolve_custom_visit<gjHandler::CoordinatesHandler>(CustomNode& node) {
-			if (_context.end) {
-				_context.last_status = Context::LastStatus::OK;
-				return;
-			}
+		void resolve_custom_visit<gjHandler::BufferNumber>(CustomNode& node) {
+			_point->push_back(_context.last_extracted_number);
 
-			// perform type check
-			if (_context.current_instance->get_prototype()->get_id() != gjToken::NUMBER) {
-				pErrorReporter::report_rule(_rule_map[_context.current_rule]->get_name(), _context.current_instance->get_prototype()->get_name());
-				pErrorReporter::report_token(_context.current_instance->get_position(), _context.current_instance->get_value(), _context.current_instance->get_prototype()->get_name(), "Got unexpected token.\n");
-				_context.last_status = Context::LastStatus::FAIL;
-				return;
-			}
-
-			if (_try_extract_number()) {
-				_context.last_status = Context::LastStatus::OK;
-				_temp_coords->push_back(double{ _context.last_extracted_number });
-				_consume();
-			}
-			else {
-				pErrorReporter::report_rule(_rule_map[_context.current_rule]->get_name(), _context.current_instance->get_prototype()->get_name());
-				pErrorReporter::report_token(_context.current_instance->get_position(), _context.current_instance->get_value(), _context.current_instance->get_prototype()->get_name(), "Failed to extract number.\n");
-				_context.last_status = Context::LastStatus::FAIL;
-			}
-			return;
+			_context.last_status = Context::LastStatus::OK;
 		}
 
 		template<>
-		void resolve_custom_visit<gjHandler::DepthOutHandler>(CustomNode& node) {
-			size_t c_size = 0;
-			size_t sub_c_size = 0;
-			switch (_depth) {
-			case depth::ISPOINT:
-				if (_context.last_extracted_string == "\"Point\"") {
-					printf("Point\n");
-					printf("[");
-					sub_c_size = (*_coordinates)[0]->size();
-					for (size_t i = 0; i < sub_c_size; i++) {
-						printf("%f", (*(*_coordinates)[0])[i]);
-						if (i < sub_c_size - 1) {
-							printf(",");
-						}
-					}
-					printf("]\n");
-				}
-				_depth = depth::ISLINE;
-				break;
-			case depth::ISLINE:
-				_depth = depth::WASLINE;
-				printf("%s\n", reinterpret_cast<const char*>(_context.last_extracted_string.c_str()));
+		void resolve_custom_visit<gjHandler::BufferPoint>(CustomNode& node) {
+			_points->push_back(_point);
+			_point = new Array<double>();
+			_depth = depth::CoordsLevel;
+
+			_context.last_status = Context::LastStatus::OK;
+		}
+
+		template<>
+		void resolve_custom_visit<gjHandler::CommitShape>(CustomNode& node) {
+			if (_depth == depth::PointsLevel && (_context.last_extracted_string == "\"Point\"" || _context.last_extracted_string == "\"MultiPoint\"")) {
+				_context.has_item = true;
+				printf("%s:\n", reinterpret_cast<const char*>(_context.last_extracted_string.c_str()));
 				printf("[");
-				c_size = _coordinates->size();
-				for (size_t i = 0; i < c_size; i++) {
+				for (size_t i = 0; i < _points->size(); i++) {
 					printf("[");
-					sub_c_size = (*_coordinates)[i]->size();
-					for (size_t j = 0; j < sub_c_size; j++) {
-						printf("%f", (*(*_coordinates)[i])[j]);
-						if (j < sub_c_size - 1) {
-							printf(",");
+					for (size_t j = 0; j < (*_points)[i]->size(); j++) {
+						printf("%f", (*(*_points)[i])[j]);
+						if (j < (*_points)[i]->size() - 1) {
+							printf(", ");
 						}
 					}
 					printf("]");
-					if (i < c_size - 1) {
-						printf(",");
+					if (i < _points->size() - 1) {
+						printf(", ");
 					}
 				}
 				printf("]\n");
-				for (size_t i = 0; i < c_size; i++) {
-					delete (*_coordinates)[i];
+
+				for (size_t i = 0; i < _points->size(); i++) {
+					delete (*_points)[i];
+					(*_points)[i] = nullptr;
 				}
-				delete _coordinates;
-				_coordinates = new Array<Array<double>*>();
-				break;
-			case depth::WASLINE:
-				_depth = depth::NOTIMPORTANT;
-				break;
-			case depth::NOTIMPORTANT:
-				break;
+				delete _points;
+				_points = new Array<Array<double>*>();
 			}
+			else if (_depth == depth::ShapeLevel && (_context.last_extracted_string == "\"LineString\"" || _context.last_extracted_string == "\"MultiLineString\"" || _context.last_extracted_string == "\"Polygon\"" || _context.last_extracted_string == "\"MultiPolygon\"")) {
+				_context.has_item = true;
+				printf("%s:\n", reinterpret_cast<const char*>(_context.last_extracted_string.c_str()));
+				printf("[");
+				for (size_t i = 0; i < _points->size(); i++) {
+					printf("[");
+					for (size_t j = 0; j < (*_points)[i]->size(); j++) {
+						printf("%f", (*(*_points)[i])[j]);
+						if (j < (*_points)[i]->size() - 1) {
+							printf(", ");
+						}
+					}
+					printf("]");
+					if (i < _points->size() - 1) {
+						printf(", ");
+					}
+				}
+				printf("]\n");
+
+				for (size_t i = 0; i < _points->size(); i++) {
+					delete (*_points)[i];
+					(*_points)[i] = nullptr;
+				}
+				delete _points;
+				_points = new Array<Array<double>*>();
+			}
+
+			_context.last_status = Context::LastStatus::OK;
 		}
 
 		template<>
-		void resolve_custom_visit<gjHandler::GeoObjectHandler>(CustomNode& node) {
-			auto c_size = _coordinates->size();
-			for (size_t i = 0; i < c_size; i++) {
-				delete (*_coordinates)[i];
+		void resolve_custom_visit<gjHandler::DepthOut>(CustomNode& node) {
+			switch (_depth) {
+			case CoordsLevel:
+				_depth = PointsLevel;
+				break;
+			case PointsLevel:
+				_depth = ShapeLevel;
+				break;
+			case ShapeLevel:
+				_depth = OutsideLevel;
+				break;
+			default:
+				break;
 			}
-			delete _coordinates;
-			_coordinates = new Array<Array<double>*>();
-		}
 
-		template<>
-		void resolve_custom_visit<gjHandler::CommitPointHandler>(CustomNode& node) {
-			_coordinates->push_back(_temp_coords);
-			_dimension = _temp_coords->size();
-			_temp_coords = new Array<double>();
-			_depth = depth::ISPOINT;
-		}
+			_context.last_status = Context::LastStatus::OK;
+		}	
+
+
+
+
 	};
 }

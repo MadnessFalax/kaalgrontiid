@@ -43,6 +43,7 @@ namespace nspParser {
 				FAIL
 			} last_status = LastStatus::FAIL;
 			bool end = false;
+			bool has_item = false;
 
 			Context() = default;
 

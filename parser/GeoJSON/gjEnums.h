@@ -47,14 +47,15 @@ namespace nsGeoJSON {
 		CoordinatesTail,
 		Value,
 		GenericArrayValues,
-		GenericArrayValuesTail
+		GenericArrayValuesTail,
+		GeometryValues,
+		GeometryValuesTail
 	};
 
 	enum gjHandler {
-		CoordinatesHandler,
-		DepthInHandler,
-		DepthOutHandler,
-		GeoObjectHandler,
-		CommitPointHandler
+		BufferNumber,
+		BufferPoint,
+		CommitShape,
+		DepthOut,
 	};
 }

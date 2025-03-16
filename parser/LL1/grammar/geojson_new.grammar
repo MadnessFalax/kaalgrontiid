@@ -6,6 +6,7 @@ GJProperty            -> "type" : TypeVal
                       | "geometry" : { GProperties }
                       | "properties" : { GenericProperties }
                       | "coordinates" : [ CoordinatesRoot ]
+                      | "geometries" : [ GeometryValues ]
                       | GenericProperty
 
 GeometryType          -> "Point" 
@@ -27,6 +28,9 @@ GenericProperty       -> STRING : Value
 FeatureValues         -> { FProperties } FeatureValuesTail | null
 FeatureValuesTail     -> , { FProperties } FeatureValuesTail | null
 
+GeometryValues        -> { GProperties } GeometryValuesTail | null
+GeometryValuesTail    -> , { GProperties } GeometryValuesTail | null
+
 FProperties           -> FProperty FPropertiesTail
 FPropertiesTail       -> , FProperty FPropertiesTail | null
 FProperty             -> "type" : "Feature" 
@@ -37,7 +41,8 @@ FProperty             -> "type" : "Feature"
 GProperties           -> GProperty GPropertiesTail
 GPropertiesTail       -> , GProperty GPropertiesTail | null
 GProperty             -> "type" : GeometryType 
-                      | "coordinates" : [ CoordinatesRoot ] 
+                      | "coordinates" : [ CoordinatesRoot ]
+                      | "geometries" : [ GeometryValues ]
                       | GenericProperty
 
 CoordinatesRoot       -> [ CoordinatesRoot ] CoordinatesRootTail | Coordinates
