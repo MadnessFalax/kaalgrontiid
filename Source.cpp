@@ -14,9 +14,17 @@
 #include "parser/GeoJSON/gjParser.h"
 #include "parser/LL1/parser/node/pConsumeNode.h"
 #include "parser/KML/kmlParser.h"
+
 #include "cLineString.h"
 #include "cPolygon.h"
 #include "cSphere.h"
+
+#include "dstruct/paged/core/cNodeCache.h"
+#include "dstruct/paged/core/cDStructConst.h"
+#include "dstruct/paged/sequentialarray/cSequentialArray.h"
+#include "dstruct/paged/sequentialarray/cSequentialArrayContext.h"
+#include "dstruct/paged/sequentialarray/cSequentialArrayHeader.h"
+#include "dstruct/paged/sequentialarray/cSequentialArrayNodeHeader.h"
 
 template <class T>
 using Array = nspArray::pArray<T>;
@@ -29,6 +37,11 @@ using Lexer = nspLexer::pLexer<enum_t>;
 using Regex = nspRegex::pRegex;
 template<class enum_t, nspLexer::PrototypeKind t = nspLexer::PrototypeKind::DEFAULT>
 using Token = nspLexer::pTokenPrototype<enum_t, t>;
+
+using Tkey = cNTuple;
+using SeqArray = dstruct::paged::sqarray::cSequentialArray<Tkey>;
+using SeqArrayContext = dstruct::paged::sqarray::cSequentialArrayContext<Tkey>;
+using SeqArrayHeader = dstruct::paged::sqarray::cSequentialArrayHeader<Tkey>;
 
 
 // used for out of scope stack disposal check so that _CrtDumpMemoryLeaks doesnt show false positive leaks on stack allocated memory

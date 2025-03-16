@@ -105,7 +105,7 @@
       <SDLCheck>false</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>false</ConformanceMode>
-      <AdditionalIncludeDirectories>..\..;..\..\common\datatype\geo;..\..\common\datatype\tuple;..\..\common\datatype;..\..\common;..\..\common\stream;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..;..\..\common\datatype\geo;..\..\common\datatype\tuple;..\..\dstruct\paged\b+tree;..\..\dstruct\paged\core;..\..\dstruct\paged;..\..\dstruct\mmemory;..\..\common\datatype;..\..\common\random;..\..\common;..\..\common\stream;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp14</LanguageStandard>
     </ClCompile>
     <Link>
