@@ -3,7 +3,7 @@ GJProperties          -> GJProperty GJPropertiesTail
 GJPropertiesTail      -> , GJProperty GJPropertiesTail | null
 GJProperty            -> "type" : TypeVal 
                       | "features" : [ FeatureValues ] 
-                      | "geometry" : { GProperties }
+                      | "geometry" : OptionalGeometryValue
                       | "properties" : { GenericProperties }
                       | "coordinates" : [ CoordinatesRoot ]
                       | "geometries" : [ GeometryValues ]
@@ -21,6 +21,9 @@ TypeVal               -> "FeatureCollection"
                       | "Feature" 
                       | GeometryType
 
+OptionalGeometryValue -> null
+                      | { GProperties } 
+
 GenericProperties     -> GenericProperty GenericPropertiesTail
 GenericPropertiesTail -> , GenericProperty GenericPropertiesTail | null
 GenericProperty       -> STRING : Value
@@ -34,7 +37,7 @@ GeometryValuesTail    -> , { GProperties } GeometryValuesTail | null
 FProperties           -> FProperty FPropertiesTail
 FPropertiesTail       -> , FProperty FPropertiesTail | null
 FProperty             -> "type" : "Feature" 
-                      | "geometry" : { GProperties } 
+                      | "geometry" : OptionalGeometryValue 
                       | "properties" : { GenericProperties } 
                       | GenericProperty
 

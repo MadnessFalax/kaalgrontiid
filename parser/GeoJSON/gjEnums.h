@@ -49,7 +49,8 @@ namespace nsGeoJSON {
 		GenericArrayValues,
 		GenericArrayValuesTail,
 		GeometryValues,
-		GeometryValuesTail
+		GeometryValuesTail,
+		OptionalGeometryValue
 	};
 
 	enum gjHandler {

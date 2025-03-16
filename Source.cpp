@@ -32,30 +32,28 @@ using Token = nspLexer::pTokenPrototype<enum_t, t>;
 static void helper() {
 	
 	// KML Parser test ----------------
-	String path = R"(C:\Users\Petr\Downloads\src\test\kaalgrontiid\test\KML_Samples.kml)";
-	auto* p = nsKML::setup_parser();
-	p->open(path);
-	while (p->get_item()) {
-		// do nothing
-		printf("got value \n");
-	}
-	//p->parse();
-
-	delete p;
-	// ------------------------------------
-
-
-	// GeoJSON Parser test ----------------
-	//String path = R"(C:\Users\Petr\Downloads\src\test\kaalgrontiid\test\sample_geo.json)";
-	//auto* p = nsGeoJSON::setup_parser();
+	//String path = R"(C:\Users\Petr\Downloads\src\test\kaalgrontiid\test\KML_Samples.kml)";
+	//auto* p = nsKML::setup_parser();
 	//p->open(path);
 	//while (p->get_item()) {
 	//	// do nothing
 	//	printf("got value \n");
 	//}
-	// p->parse();
 
 	//delete p;
+	// ------------------------------------
+
+
+	// GeoJSON Parser test ----------------
+	String path = R"(C:\Users\Petr\Downloads\src\test\kaalgrontiid\test\h9gi-nx95.geojson)";
+	auto* p = nsGeoJSON::setup_parser();
+	p->open(path);
+	while (p->get_item()) {
+		// do nothing
+		printf("got value \n");
+	}
+
+	delete p;
 	// ------------------------------------
 
 	return;
