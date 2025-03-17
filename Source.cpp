@@ -40,7 +40,7 @@ using SeqArrayContext = dstruct::paged::sqarray::cSequentialArrayContext<Tkey>;
 using SeqArrayHeader = dstruct::paged::sqarray::cSequentialArrayHeader<Tkey>;
 
 #ifndef _WORK
-constexpr auto PATH = R"(C:\Users\Petr\Downloads\src\test\kaalgrontiid\test\short.osm)";
+constexpr auto PATH = R"(C:\Users\Petr\Downloads\src\test\kaalgrontiid\test\example.kml)";
 #endif
 
 #ifdef _WORK
@@ -50,12 +50,18 @@ constexpr auto PATH = R"(C:\Users\uiv56391\source\repos\framework-back-up\test\k
 
 // used for out of scope stack disposal check so that _CrtDumpMemoryLeaks doesnt show false positive leaks on stack allocated memory
 static void helper() {
+
 	//const double vals[3] = {3.1235, 2.8644, 15.4655};
 	//const double vals2[3] = {1.65465, 2.6465, 10.465165};
 	//const double vals3[3] = {12.465, .6646, 5.486};
 
+	//SeqArrayContext* context = new SeqArrayContext();
+
 	//cSpaceDescriptor* space_desc_2d = new cSpaceDescriptor(DIMENSION_2, new cTuple(), new cInt());
 	//cSpaceDescriptor* space_desc_3d = new cSpaceDescriptor(DIMENSION_3, new cTuple(), new cInt());
+
+	//SeqArrayHeader* mHeader = new SeqArrayHeader("seqarray1", 8192, space_desc_2d, cDStructConst::DSMODE_DEFAULT);
+	//mHeader->SetCodeType(ELIAS_DELTA);
 
 	//auto** line_vtcs = new cTuple * [3];
 
@@ -77,20 +83,8 @@ static void helper() {
 
 
 	// OSM Parser test ----------------
-	String path = PATH;
-	auto* p = nsOSM::setup_parser();
-	p->open(path);
-	while (p->get_item()) {
-		// do nothing
-		printf("got value \n");
-	}
-
-	delete p;
-	// ------------------------------------
-
-	// KML Parser test ----------------
 	//String path = PATH;
-	//auto* p = nsKML::setup_parser();
+	//auto* p = nsOSM::setup_parser();
 	//p->open(path);
 	//while (p->get_item()) {
 	//	// do nothing
@@ -98,6 +92,18 @@ static void helper() {
 	//}
 
 	//delete p;
+	// ------------------------------------
+
+	// KML Parser test ----------------
+	String path = PATH;
+	auto* p = nsKML::setup_parser();
+	p->open(path);
+	while (p->get_item()) {
+		// do nothing
+		printf("got value \n");
+	}
+
+	delete p;
 	// ------------------------------------
 
 	// GeoJSON Parser test ----------------

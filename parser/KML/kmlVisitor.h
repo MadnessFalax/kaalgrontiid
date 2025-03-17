@@ -81,19 +81,50 @@ namespace nsKML {
 
 		template<>
 		void resolve_custom_visit<kmlHandler::CommitShape>(CustomNode& node) {
-			printf("%s:\n", reinterpret_cast<const char*>(_context.last_extracted_string.c_str()));
 			size_t p_size = _points->size();
+
+			if (p_size == 1) {
+				_context.item_type = DataShape::DS_POINT;
+			}
+			else {
+				_context.item_type = DataShape::DS_POLYGON;
+				auto* first_point = (*_points)[0];
+				auto* last_point = (*_points)[p_size - 1];
+
+				for (size_t i = 0; i < _context.dimension; i++) {
+					if ((*first_point)[i] != (*last_point)[i]) {
+						_context.item_type = DataShape::DS_LINESTRING;
+						break;
+					}
+				}
+			}
+
+			switch (_context.item_type) {
+			case DataShape::DS_POINT:
+				_context.dimension = _dimension;
+				_context.point = cDataShape<cTuple>::CreateDataShape(_context.item_type, );
+				break;
+			case DataShape::DS_SPHERE:
+				_context.dimension = _dimension;
+				_context.sphere = static_cast<cSphere<cTuple>*>(cDataShape<cTuple>::CreateDataShape());
+				break;
+			case DataShape::DS_LINESTRING:
+				_context.dimension = _dimension;
+				_context.sphere = static_cast<cSphere<cTuple>*>(cDataShape<cTuple>::CreateDataShape());
+				break;
+			case DataShape::DS_POLYGON:
+				_context.dimension = _dimension;
+				_context.sphere = static_cast<cSphere<cTuple>*>(cDataShape<cTuple>::CreateDataShape());
+				break;
+			}
+
+
 			for (size_t i = 0; i < p_size; i++) {
-				printf("[");
 				Array<double>* point = (*_points)[i];
 				size_t point_size = point->size();
 				for (size_t j = 0; j < point_size; j++) {
-					printf("%f ", (*point)[j]);
 				}
-				printf("]");
 			}
-
-			printf("\n");
 			
 			for (size_t i = 0; i < p_size; i++) {
 				delete (*_points)[i];
@@ -102,8 +133,8 @@ namespace nsKML {
 			delete _points;
 			_points = new Array<Array<double>*>();
 
-			_context.has_item = true;
 
+			_context.has_item = true;
 			_context.last_status = Context::LastStatus::OK;
 		}
 	};
