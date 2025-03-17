@@ -13,6 +13,10 @@
 #include "pParserStack.h"
 #include <cstdlib>
 
+#include "cPolygon.h"
+#include "cLineString.h"
+#include "cSphere.h"
+
 namespace nspParser {
 	template<typename enum_t, typename enum_r, typename enum_c, typename derived>
 	class pParserVisitor : public pBaseVisitor<pParserVisitor<enum_t, enum_r, enum_c, derived>> {
@@ -33,6 +37,11 @@ namespace nspParser {
 
 	public:
 		struct Context {
+			enum LastStatus {
+				OK,
+				FAIL
+			} last_status = LastStatus::FAIL;
+			
 			enum_r current_rule = enum_r{};
 			enum_t current_token = enum_t{};
 			TokenInstance* current_instance = nullptr;
@@ -40,16 +49,36 @@ namespace nspParser {
 			typename ExtractNode::ExtractType last_extract_type = ExtractNode::ExtractType::STRING;
 			String last_extracted_string = String();
 			double last_extracted_number = 0.0;
-			enum LastStatus {
-				OK,
-				FAIL
-			} last_status = LastStatus::FAIL;
 			bool end = false;
+			
 			bool has_item = false;
+			DataShape item_type = DataShape::DS_POINT;
+			cLineString<cTuple>* line = nullptr;
+			cPolygon<cTuple>* polygon = nullptr;
+			cSphere<cTuple>* sphere = nullptr;
+			cDataShape<cTuple>* point = nullptr;
+			size_t dimension = 0;
+
 
 			Context() = default;
 
 			~Context() {
+				if (line) {
+					delete line;
+					line = nullptr;
+				}
+				if (polygon) {
+					delete polygon;
+					polygon = nullptr;
+				}
+				if (sphere) {
+					delete sphere;
+					sphere = nullptr;
+				}
+				if (point) {
+					delete point;
+					point = nullptr;
+				}
 				delete current_instance;
 				current_instance = nullptr;
 				delete current_lookahead;
@@ -63,7 +92,9 @@ namespace nspParser {
 		// Array of rules, rules are not owned by this class
 		Map<enum_r, Rule*, unsigned char> _rule_map = Map<enum_r, Rule*, unsigned char>();
 		Stack* _stack = nullptr;									// Stack is owned by pParser class
-		
+		cSpaceDescriptor* _space_desc_2d = nullptr;
+		cSpaceDescriptor* _space_desc_3d = nullptr;
+
 
 		bool _try_extract_number() {
 			char* end = nullptr;
@@ -150,12 +181,19 @@ namespace nspParser {
 			for (Rule* rule : *rules) {
 				_rule_map[rule->get_id()] = rule;
 			}
+
+			_space_desc_2d = new cSpaceDescriptor(DIMENSION_2, new cTuple(), new cInt());
+			_space_desc_3d = new cSpaceDescriptor(DIMENSION_3, new cTuple(), new cInt());
 		}
 
 		virtual ~pParserVisitor() {
 			// no ownership of lexer or rules
 			_lexer = nullptr;
 			_stack = nullptr;
+			delete _space_desc_2d;
+			_space_desc_2d = nullptr;
+			delete _space_desc_3d;
+			_space_desc_3d = nullptr;
 		}
 
 		Context* get_context() {
