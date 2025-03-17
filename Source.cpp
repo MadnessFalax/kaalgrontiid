@@ -77,20 +77,8 @@ static void helper() {
 
 
 	// OSM Parser test ----------------
-	String path = PATH;
-	auto* p = nsOSM::setup_parser();
-	p->open(path);
-	while (p->get_item()) {
-		// do nothing
-		printf("got value \n");
-	}
-
-	delete p;
-	// ------------------------------------
-
-	// KML Parser test ----------------
 	//String path = PATH;
-	//auto* p = nsKML::setup_parser();
+	//auto* p = nsOSM::setup_parser();
 	//p->open(path);
 	//while (p->get_item()) {
 	//	// do nothing
@@ -98,6 +86,18 @@ static void helper() {
 	//}
 
 	//delete p;
+	// ------------------------------------
+
+	// KML Parser test ----------------
+	String path = PATH;
+	auto* p = nsKML::setup_parser();
+	p->open(path);
+	while (p->get_item()) {
+		// do nothing
+		printf("got value \n");
+	}
+
+	delete p;
 	// ------------------------------------
 
 	// GeoJSON Parser test ----------------

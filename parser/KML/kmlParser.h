@@ -35,11 +35,12 @@ namespace nsKML {
 		lexer->add_token_definition(kmlToken::DASH, R"(\-)", "DASH");
 		lexer->add_token_definition(kmlToken::QMARK, R"(\?)", "QMARK");
 		lexer->add_token_definition(kmlToken::EXCLAMATION, "!", "EXCLAMATION");
+		lexer->add_token_definition(kmlToken::QUOTE, "'", "QUOTE");
+		lexer->add_token_definition(kmlToken::DOUBLEQUOTE, "\"", "DOUBLEQUOTE");
 		lexer->add_token_definition(kmlToken::EQUALS, "=", "EQUALS");
 		lexer->add_token_definition(kmlToken::WS, R"(\s+)", "WS");
 		lexer->add_token_definition(kmlToken::SLASH, "/", "SLASH");
 		lexer->add_token_definition(kmlToken::COMMA, R"(\,)", "COMMA");
-		lexer->add_token_definition(kmlToken::ATTRIBUTE, R"("[^"]+")", "ATTRIBUTE");
 		lexer->add_token_definition(kmlToken::NUMBER, R"(\-?\d+(\.\d+)?,\-?\d+(\.\d+)?(,\-?\d+(\.\d+)?)?( \s*\-?\d+(\.\d+)?,\-?\d+(\.\d+)?(,\-?\d+(\.\d+)?)?)*)", "NUMBER");
 		lexer->add_token_definition(kmlToken::STRING, R"([^<>" =]+)", "STRING");
 		return lexer;
@@ -55,13 +56,14 @@ namespace nsKML {
 		lexer->add_token_definition(kmlToken::DASH, R"(\-)", "DASH");
 		lexer->add_token_definition(kmlToken::QMARK, R"(\?)", "QMARK");
 		lexer->add_token_definition(kmlToken::EXCLAMATION, "!", "EXCLAMATION");
+		lexer->add_token_definition(kmlToken::QUOTE, "'", "QUOTE");
+		lexer->add_token_definition(kmlToken::DOUBLEQUOTE, "\"", "DOUBLEQUOTE");
 		lexer->add_token_definition(kmlToken::EQUALS, "=", "EQUALS");
 		lexer->add_token_definition(kmlToken::WS, R"(\s+)", "WS");
 		lexer->add_token_definition(kmlToken::SLASH, "/", "SLASH");
 		lexer->add_token_definition(kmlToken::COMMA, R"(\,)", "COMMA");
-		lexer->add_token_definition(kmlToken::ATTRIBUTE, R"("[^"]+")", "ATTRIBUTE");
 		lexer->add_token_definition(kmlToken::NUMBER, R"(\-?\d+(\.\d+)?,\-?\d+(\.\d+)?(,\-?\d+(\.\d+)?)?( \s*\-?\d+(\.\d+)?,\-?\d+(\.\d+)?(,\-?\d+(\.\d+)?)?)*)", "NUMBER");
-		lexer->add_token_definition(kmlToken::STRING, R"([^\[\]<>" =]+)", "STRING");
+		lexer->add_token_definition(kmlToken::STRING, R"([^\[\]<>"' =]+)", "STRING");
 
 		auto* rules = new Array<Rule*>();
 
@@ -140,7 +142,10 @@ namespace nsKML {
 			<< new ConsumeNode(kmlToken::COMMA)
 			<< new ForwardNode(kmlRule::CDATAContent));
 		(*rule) += &((*(new Sequence()))
-			<< new ConsumeNode(kmlToken::ATTRIBUTE)
+			<< new ConsumeNode(kmlToken::QUOTE)
+			<< new ForwardNode(kmlRule::CDATAContent));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(kmlToken::DOUBLEQUOTE)
 			<< new ForwardNode(kmlRule::CDATAContent));
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(kmlToken::NUMBER)
@@ -185,7 +190,10 @@ namespace nsKML {
 			<< new ConsumeNode(kmlToken::COMMA)
 			<< new ForwardNode(kmlRule::CDATAContent));
 		(*rule) += &((*(new Sequence()))
-			<< new ConsumeNode(kmlToken::ATTRIBUTE)
+			<< new ConsumeNode(kmlToken::QUOTE)
+			<< new ForwardNode(kmlRule::CDATAContent));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(kmlToken::DOUBLEQUOTE)
 			<< new ForwardNode(kmlRule::CDATAContent));
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(kmlToken::NUMBER)
@@ -227,7 +235,10 @@ namespace nsKML {
 			<< new ConsumeNode(kmlToken::COMMA)
 			<< new ForwardNode(kmlRule::CDATAContent));
 		(*rule) += &((*(new Sequence()))
-			<< new ConsumeNode(kmlToken::ATTRIBUTE)
+			<< new ConsumeNode(kmlToken::QUOTE)
+			<< new ForwardNode(kmlRule::CDATAContent));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(kmlToken::DOUBLEQUOTE)
 			<< new ForwardNode(kmlRule::CDATAContent));
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(kmlToken::NUMBER)
@@ -280,6 +291,12 @@ namespace nsKML {
 			<< new ConsumeNode(kmlToken::SLASH)
 			<< new ForwardNode(kmlRule::CommentContent));
 		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(kmlToken::QUOTE)
+			<< new ForwardNode(kmlRule::CDATAContent));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(kmlToken::DOUBLEQUOTE)
+			<< new ForwardNode(kmlRule::CDATAContent));
+		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(kmlToken::NUMBER)
 			<< new ForwardNode(kmlRule::CommentContent));
 		(*rule) += &((*(new Sequence()))
@@ -310,6 +327,12 @@ namespace nsKML {
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(kmlToken::DASH)
 			<< new ForwardNode(kmlRule::CommentContent));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(kmlToken::QUOTE)
+			<< new ForwardNode(kmlRule::CDATAContent));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(kmlToken::DOUBLEQUOTE)
+			<< new ForwardNode(kmlRule::CDATAContent));
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(kmlToken::NUMBER)
 			<< new ForwardNode(kmlRule::CommentContent));
@@ -349,8 +372,99 @@ namespace nsKML {
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(kmlToken::STRING)
 			<< new ConsumeNode(kmlToken::EQUALS)
-			<< new ConsumeNode(kmlToken::ATTRIBUTE)
+			<< new ForwardNode(kmlRule::AttrValue)
 			<< new ForwardNode(kmlRule::OptionalAttr));
+		(*rule) += new Sequence();
+		rules->push_back(rule);
+
+		rule = new Rule(kmlRule::AttrValue, "AttrValue");
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(kmlToken::QUOTE)
+			<< new ForwardNode(kmlRule::AttrValueQuoted)
+			<< new ConsumeNode(kmlToken::QUOTE));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(kmlToken::DOUBLEQUOTE)
+			<< new ForwardNode(kmlRule::AttrValueDoubleQuoted)
+			<< new ConsumeNode(kmlToken::DOUBLEQUOTE));
+		rules->push_back(rule);
+
+		rule = new Rule(kmlRule::AttrValueQuoted, "AttrValueQuoted");
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(kmlToken::EXCLAMATION)
+			<< new ForwardNode(kmlRule::AttrValueQuoted));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(kmlToken::WS)
+			<< new ForwardNode(kmlRule::AttrValueQuoted));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(kmlToken::QMARK)
+			<< new ForwardNode(kmlRule::AttrValueQuoted));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(kmlToken::EQUALS)
+			<< new ForwardNode(kmlRule::AttrValueQuoted));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(kmlToken::LBRACKET)
+			<< new ForwardNode(kmlRule::AttrValueQuoted));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(kmlToken::RBRACKET)
+			<< new ForwardNode(kmlRule::AttrValueQuoted));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(kmlToken::COMMA)
+			<< new ForwardNode(kmlRule::AttrValueQuoted));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(kmlToken::SLASH)
+			<< new ForwardNode(kmlRule::AttrValueQuoted));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(kmlToken::DASH)
+			<< new ForwardNode(kmlRule::AttrValueQuoted));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(kmlToken::DOUBLEQUOTE)
+			<< new ForwardNode(kmlRule::AttrValueQuoted));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(kmlToken::NUMBER)
+			<< new ForwardNode(kmlRule::AttrValueQuoted));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(kmlToken::STRING)
+			<< new ForwardNode(kmlRule::AttrValueQuoted));
+		(*rule) += new Sequence();
+		rules->push_back(rule);
+
+		rule = new Rule(kmlRule::AttrValueDoubleQuoted, "AttrValueDoubleQuoted");
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(kmlToken::EXCLAMATION)
+			<< new ForwardNode(kmlRule::AttrValueDoubleQuoted));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(kmlToken::WS)
+			<< new ForwardNode(kmlRule::AttrValueDoubleQuoted));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(kmlToken::QMARK)
+			<< new ForwardNode(kmlRule::AttrValueDoubleQuoted));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(kmlToken::EQUALS)
+			<< new ForwardNode(kmlRule::AttrValueDoubleQuoted));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(kmlToken::LBRACKET)
+			<< new ForwardNode(kmlRule::AttrValueDoubleQuoted));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(kmlToken::RBRACKET)
+			<< new ForwardNode(kmlRule::AttrValueDoubleQuoted));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(kmlToken::COMMA)
+			<< new ForwardNode(kmlRule::AttrValueDoubleQuoted));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(kmlToken::SLASH)
+			<< new ForwardNode(kmlRule::AttrValueDoubleQuoted));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(kmlToken::DASH)
+			<< new ForwardNode(kmlRule::AttrValueDoubleQuoted));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(kmlToken::QUOTE)
+			<< new ForwardNode(kmlRule::AttrValueDoubleQuoted));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(kmlToken::NUMBER)
+			<< new ForwardNode(kmlRule::AttrValueDoubleQuoted));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(kmlToken::STRING)
+			<< new ForwardNode(kmlRule::AttrValueDoubleQuoted));
 		(*rule) += new Sequence();
 		rules->push_back(rule);
 
