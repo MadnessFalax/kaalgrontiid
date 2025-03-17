@@ -1,0 +1,140 @@
+OSM									-> '<' any_tag_content
+
+any_tag_content						-> '?' STRING optional_attr '?' '>' consume_ws post_instruction
+									| '!' comment_or_cdata
+									| normal_tag
+
+comment_or_cdata					-> '-' '-' comment_tag
+									| '[' 'CDATA' '[' cdata_content '>' consume_ws
+
+cdata_content						-> '!' cdata_content					
+									| '?' cdata_content
+									| '<' cdata_content
+									| '>' cdata_content
+									| '-' cdata_content
+									| '[' cdata_content
+									| ']' cdata_first_rbracket
+									| '=' cdata_content
+									| WS cdata_content
+									| '/' cdata_content
+									| ',' cdata_content
+									| ATTRIBUTE cdata_content
+									| NUMBER cdata_content
+									| STRING cdata_content
+
+cdata_first_rbracket				-> '!' cdata_content					
+									| '?' cdata_content
+									| '<' cdata_content
+									| '>' cdata_content
+									| '-' cdata_content
+									| '[' cdata_content
+									| ']' cdata_second_rbracket
+									| '=' cdata_content
+									| WS cdata_content
+									| '/' cdata_content
+									| ',' cdata_content
+									| ATTRIBUTE cdata_content
+									| NUMBER cdata_content
+									| STRING cdata_content
+
+cdata_second_rbracket				-> '!' cdata_content					
+									| '?' cdata_content
+									| '<' cdata_content
+									| '-' cdata_content
+									| '[' cdata_content
+									| ']' cdata_second_rbracket
+									| '=' cdata_content
+									| WS cdata_content
+									| '/' cdata_content
+									| ',' cdata_content
+									| ATTRIBUTE cdata_content
+									| NUMBER cdata_content
+									| STRING cdata_content
+									| null
+
+post_instruction					-> '<' any_tag_content
+									| null
+
+consume_ws							-> WS
+									| null
+
+comment_tag							-> comment_content '-' '-' '>' consume_ws
+
+comment_content						-> '!' comment_content					
+									| WS comment_content
+									| '?' comment_content
+									| '=' comment_content
+									| ',' comment_content
+									| '/' comment_content
+									| NUMBER comment_content
+									| STRING comment_content
+									| null
+									
+optional_text_content				-> '!' optional_text_content					
+									| WS optional_text_content
+									| '?' optional_text_content
+									| '=' optional_text_content
+									| ',' optional_text_content
+									| '/' optional_text_content
+									| '-' optional_text_content
+									| NUMBER optional_text_content
+									| STRING optional_text_content
+									| null
+									
+normal_tag							-> 'node' node_attr generic_single_or_pair_tag
+									| 'way' way_attr way_single_or_pair_tag
+									|  STRING optional_attr generic_single_or_pair_tag
+
+optional_attr						-> WS attr_possible 
+									| null
+									
+attr_possible						-> STRING '=' ATTRIBUTE optional_attr
+									| null
+
+generic_single_or_pair_tag			-> '/''>' consume_ws
+									| '>' consume_ws optional_pair_tag_any_content
+
+optional_pair_tag_any_content 		-> '<' nested_or_ending_tag
+									| optional_text_content optional_pair_tag_any_content
+
+nested_or_ending_tag				-> '/' STRING '>' consume_ws
+									| any_tag_content optional_pair_tag_any_content
+
+node_attr							-> WS node_attr_possible
+									| null
+
+node_attr_possible					-> 'id' '=' ATTRIBUTE node_attr
+									| 'lat' '=' ATTRIBUTE node_attr
+									| 'lon' '=' ATTRIBUTE node_attr
+									| STRING '=' ATTRIBUTE node_attr
+									| null
+
+way_attr							-> WS way_attr_possible
+									| null
+
+way_attr_possible					-> 'id' '=' ATTRIBUTE way_attr
+									| STRING '=' ATTRIBUTE way_attr
+									| null
+
+way_single_or_pair_tag				-> '/''>' consume_ws
+									| '>' consume_ws optional_pair_tag_way_content
+
+optional_pair_tag_way_content		-> '<' way_nested_or_ending_tag
+									| optional_text_content optional_pair_tag_way_content
+
+way_nested_or_ending_tag			-> '/' STRING '>' consume_ws
+									| any_way_nested_tag_content optional_pair_tag_way_content
+
+any_way_nested_tag_content			-> '?' instruction_tag
+									| '!' comment_or_cdata
+									| normal_way_nested_tag
+
+normal_way_nested_tag				-> 'nd' nd_attr generic_single_or_pair_tag
+									| STRING optional_attr generic_single_or_pair_tag
+
+nd_attr								-> WS nd_attr_possible
+									| null
+
+nd_attr_possible					-> 'ref' '=' ATTRIBUTE nd_attr
+									| STRING '=' ATTRIBUTE nd_attr
+									| null	
