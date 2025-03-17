@@ -10,6 +10,7 @@ namespace nsOSM {
 		using Array = nspArray::pArray<T>;
 		using pErrorReporter = nspParser::pErrorReporter;
 
+		Map<size_t, Array<double>*, unsigned short> _nodes;
 		size_t _dimension = 0;
 		Array<double>* _point = nullptr;
 		Array<Array<double>*>* _points = nullptr;

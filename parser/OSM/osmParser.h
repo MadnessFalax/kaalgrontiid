@@ -392,7 +392,7 @@ namespace nsOSM {
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(osmToken::STRING, "id")
 			<< new ConsumeNode(osmToken::EQUALS)
-			<< new ConsumeNode(osmToken::ATTRIBUTE)
+			<< new ExtractNode(osmToken::ATTRIBUTE, ExtractNode::ExtractType::STRING)
 			<< new ForwardNode(osmRule::NodeAttr));
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(osmToken::STRING, "lat")
@@ -402,7 +402,7 @@ namespace nsOSM {
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(osmToken::STRING, "lon")
 			<< new ConsumeNode(osmToken::EQUALS)
-			<< new ConsumeNode(osmToken::ATTRIBUTE, ExtractNode::ExtractType::STRING)
+			<< new ExtractNode(osmToken::ATTRIBUTE, ExtractNode::ExtractType::STRING)
 			<< new ForwardNode(osmRule::NodeAttr));
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(osmToken::STRING)
@@ -502,7 +502,7 @@ namespace nsOSM {
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(osmToken::STRING, "ref")
 			<< new ConsumeNode(osmToken::EQUALS)
-			<< new ConsumeNode(osmToken::ATTRIBUTE)
+			<< new ExtractNode(osmToken::ATTRIBUTE, ExtractNode::ExtractType::STRING)
 			<< new ForwardNode(osmRule::NdAttr));
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(osmToken::STRING)

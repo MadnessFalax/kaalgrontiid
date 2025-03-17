@@ -25,7 +25,7 @@
 template <class T>
 using Array = nspArray::pArray<T>;
 using String = nspString::pString;
-template <class T, class U, class V = unsigned short>
+template <class T, class U, class V = unsigned char>
 using Map = nspMap::pMap<T, U, V>;
 template<class enum_t>
 using Lexer = nspLexer::pLexer<enum_t>;
@@ -44,7 +44,7 @@ constexpr auto PATH = R"(C:\Users\Petr\Downloads\src\test\kaalgrontiid\test\exam
 #endif
 
 #ifdef _WORK
-constexpr auto PATH = R"(C:\Users\uiv56391\source\repos\framework-back-up\test\kaalgrontiid\test\map.osm)";
+constexpr auto PATH = R"(C:\Users\uiv56391\source\repos\framework-back-up\test\kaalgrontiid\test\frenstat.osm)";
 #endif
 
 

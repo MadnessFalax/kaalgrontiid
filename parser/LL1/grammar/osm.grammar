@@ -91,6 +91,7 @@ optional_attr						-> WS attr_possible
 attr_possible						-> STRING '=' ATTRIBUTE optional_attr
 									| null
 
+
 generic_single_or_pair_tag			-> '/''>' consume_ws
 									| '>' consume_ws optional_pair_tag_any_content
 
