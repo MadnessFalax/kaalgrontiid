@@ -341,26 +341,16 @@ namespace nsKML {
 		rule = new Rule(kmlRule::OptionalAttr, "OptionalAttr");
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(kmlToken::WS)
-			<< new ConsumeNode(kmlToken::STRING)
-			<< new ConsumeNode(kmlToken::EQUALS)
-			<< new ConsumeNode(kmlToken::ATTRIBUTE)
-			<< new ForwardNode(kmlRule::AttrSepOptional));
+			<< new ForwardNode(kmlRule::OptionalAttrPossible));
 		(*rule) += &((*(new Sequence())));
 		rules->push_back(rule);
 
-		rule = new Rule(kmlRule::AttrSepOptional, "AttrSepOptional");
-		(*rule) += &((*(new Sequence()))
-			<< new ConsumeNode(kmlToken::WS)
-			<< new ForwardNode(kmlRule::NextAttrPossible));
-		(*rule) += new Sequence();
-		rules->push_back(rule);
-
-		rule = new Rule(kmlRule::NextAttrPossible, "NextAttrPossible");
+		rule = new Rule(kmlRule::OptionalAttrPossible, "OptionalAttrPossible");
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(kmlToken::STRING)
 			<< new ConsumeNode(kmlToken::EQUALS)
 			<< new ConsumeNode(kmlToken::ATTRIBUTE)
-			<< new ForwardNode(kmlRule::AttrSepOptional));
+			<< new ForwardNode(kmlRule::OptionalAttr));
 		(*rule) += new Sequence();
 		rules->push_back(rule);
 
@@ -437,9 +427,7 @@ namespace nsKML {
 			<< new ForwardNode(kmlRule::PostInstruction));
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(kmlToken::EXCLAMATION)
-			<< new ConsumeNode(kmlToken::DASH)
-			<< new ConsumeNode(kmlToken::DASH)
-			<< new ForwardNode(kmlRule::CommentTag));
+			<< new ForwardNode(kmlRule::CommentOrCDATA));
 		(*rule) += &((*(new Sequence()))
 			<< new ForwardNode(kmlRule::NormalGeometryNestedTag));
 		rules->push_back(rule);
@@ -494,9 +482,7 @@ namespace nsKML {
 			<< new ForwardNode(kmlRule::ConsumeWS));
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(kmlToken::EXCLAMATION)
-			<< new ConsumeNode(kmlToken::DASH)
-			<< new ConsumeNode(kmlToken::DASH)
-			<< new ForwardNode(kmlRule::CommentTag)
+			<< new ForwardNode(kmlRule::CommentOrCDATA)
 			<< new ForwardNode(kmlRule::OptionalPairTagCoordinatesContent));
 		rules->push_back(rule);
 
