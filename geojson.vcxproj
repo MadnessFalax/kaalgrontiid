@@ -500,6 +500,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='TestKML|x64'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
     </None>
+    <None Include="test\short.osm" />
     <None Include="test\utf8_test.json" />
   </ItemGroup>
   <ItemGroup>

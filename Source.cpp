@@ -44,7 +44,7 @@ constexpr auto PATH = R"(C:\Users\Petr\Downloads\src\test\kaalgrontiid\test\exam
 #endif
 
 #ifdef _WORK
-constexpr auto PATH = R"(C:\Users\uiv56391\source\repos\framework-back-up\test\kaalgrontiid\test\frenstat.osm)";
+constexpr auto PATH = R"(C:\Users\uiv56391\source\repos\framework-back-up\test\kaalgrontiid\test\short.osm)";
 #endif
 
 
@@ -76,7 +76,7 @@ static void helper() {
 	//space_desc_3d = nullptr;
 
 
-	// KML Parser test ----------------
+	// OSM Parser test ----------------
 	String path = PATH;
 	auto* p = nsOSM::setup_parser();
 	p->open(path);

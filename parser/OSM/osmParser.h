@@ -39,7 +39,7 @@ namespace nsOSM {
 		lexer->add_token_definition(osmToken::WS, R"(\s+)", "WS");
 		lexer->add_token_definition(osmToken::SLASH, "/", "SLASH");
 		lexer->add_token_definition(osmToken::COMMA, R"(\,)", "COMMA");
-		lexer->add_token_definition(osmToken::ATTRIBUTE, R"("[^"]+")", "ATTRIBUTE");
+		lexer->add_token_definition(osmToken::ATTRIBUTE, R"(("[^"]+")|('[^']+'))", "ATTRIBUTE");
 		lexer->add_token_definition(osmToken::NUMBER, R"(\-?\d+(\.\d+)?,\-?\d+(\.\d+)?(,\-?\d+(\.\d+)?)?( \s*\-?\d+(\.\d+)?,\-?\d+(\.\d+)?(,\-?\d+(\.\d+)?)?)*)", "NUMBER");
 		lexer->add_token_definition(osmToken::STRING, R"([^<>" =]+)", "STRING");
 		return lexer;
@@ -59,7 +59,7 @@ namespace nsOSM {
 		lexer->add_token_definition(osmToken::WS, R"(\s+)", "WS");
 		lexer->add_token_definition(osmToken::SLASH, "/", "SLASH");
 		lexer->add_token_definition(osmToken::COMMA, R"(\,)", "COMMA");
-		lexer->add_token_definition(osmToken::ATTRIBUTE, R"("[^"]+")", "ATTRIBUTE");
+		lexer->add_token_definition(osmToken::ATTRIBUTE, R"(("[^"]+")|('[^']+'))", "ATTRIBUTE");
 		lexer->add_token_definition(osmToken::NUMBER, R"(\-?\d+(\.\d+)?,\-?\d+(\.\d+)?(,\-?\d+(\.\d+)?)?( \s*\-?\d+(\.\d+)?,\-?\d+(\.\d+)?(,\-?\d+(\.\d+)?)?)*)", "NUMBER");
 		lexer->add_token_definition(osmToken::STRING, R"([^\[\]<>" =]+)", "STRING");
 
