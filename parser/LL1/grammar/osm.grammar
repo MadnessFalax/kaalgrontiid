@@ -18,7 +18,8 @@ cdata_content						-> '!' cdata_content
 									| WS cdata_content
 									| '/' cdata_content
 									| ',' cdata_content
-									| ATTRIBUTE cdata_content
+									| ''' cdata_content
+									| '"' cdata_content
 									| NUMBER cdata_content
 									| STRING cdata_content
 
@@ -33,7 +34,8 @@ cdata_first_rbracket				-> '!' cdata_content
 									| WS cdata_content
 									| '/' cdata_content
 									| ',' cdata_content
-									| ATTRIBUTE cdata_content
+									| ''' cdata_content
+									| '"' cdata_content
 									| NUMBER cdata_content
 									| STRING cdata_content
 
@@ -47,7 +49,8 @@ cdata_second_rbracket				-> '!' cdata_content
 									| WS cdata_content
 									| '/' cdata_content
 									| ',' cdata_content
-									| ATTRIBUTE cdata_content
+									| ''' cdata_content
+									| '"' cdata_content
 									| NUMBER cdata_content
 									| STRING cdata_content
 									| null
@@ -66,6 +69,8 @@ comment_content						-> '!' comment_content
 									| '=' comment_content
 									| ',' comment_content
 									| '/' comment_content
+									| ''' comment_content
+									| '"' comment_content
 									| NUMBER comment_content
 									| STRING comment_content
 									| null
@@ -77,6 +82,8 @@ optional_text_content				-> '!' optional_text_content
 									| ',' optional_text_content
 									| '/' optional_text_content
 									| '-' optional_text_content
+									| ''' optional_text_content
+									| '"' optional_text_content
 									| NUMBER optional_text_content
 									| STRING optional_text_content
 									| null
@@ -88,9 +95,70 @@ normal_tag							-> 'node' node_attr generic_single_or_pair_tag
 optional_attr						-> WS attr_possible 
 									| null
 									
-attr_possible						-> STRING '=' ATTRIBUTE optional_attr
+attr_possible						-> STRING '=' attr_value optional_attr
 									| null
 
+attr_value							-> ''' attr_value_quoted '''
+									| '"' attr_value_double_quoted '"'
+
+attr_value_quoted					-> '!' attr_value_quoted
+									| WS attr_value_quoted
+									| '?' attr_value_quoted
+									| '=' attr_value_quoted
+									| '[' attr_value_quoted
+									| ']' attr_value_quoted
+									| ',' attr_value_quoted
+									| '/' attr_value_quoted
+									| '-' attr_value_quoted
+									| '"' attr_value_quoted
+									| NUMBER attr_value_quoted
+									| STRING attr_value_quoted
+									| null
+									
+attr_value_double_quoted			-> '!' attr_value_double_quoted
+									| WS attr_value_double_quoted
+									| '?' attr_value_double_quoted
+									| '=' attr_value_double_quoted
+									| '[' attr_value_double_quoted
+									| ']' attr_value_double_quoted
+									| ',' attr_value_double_quoted
+									| '/' attr_value_double_quoted
+									| '-' attr_value_double_quoted
+									| ''' attr_value_double_quoted
+									| NUMBER attr_value_double_quoted
+									| STRING attr_value_double_quoted
+									| null
+
+extractable_attr_value				-> ''' extractable_attr_value_quoted '''
+									| '"' extractable_attr_value_double_quoted '"'
+
+extractable_attr_value_quoted		-> '!' extractable_attr_value_quoted
+									| WS extractable_attr_value_quoted
+									| '?' extractable_attr_value_quoted
+									| '=' extractable_attr_value_quoted
+									| '[' extractable_attr_value_quoted
+									| ']' extractable_attr_value_quoted
+									| ',' extractable_attr_value_quoted
+									| '/' extractable_attr_value_quoted
+									| '-' extractable_attr_value_quoted
+									| '"' extractable_attr_value_quoted
+									| NUMBER extractable_attr_value_quoted
+									| STRING extractable_attr_value_quoted
+									| null
+									
+extractable_attr_value_double_quoted	-> '!' extractable_attr_value_double_quoted
+										| WS extractable_attr_value_double_quoted
+										| '?' extractable_attr_value_double_quoted
+										| '=' extractable_attr_value_double_quoted
+										| '[' extractable_attr_value_double_quoted
+										| ']' extractable_attr_value_double_quoted
+										| ',' extractable_attr_value_double_quoted
+										| '/' extractable_attr_value_double_quoted
+										| '-' extractable_attr_value_double_quoted
+										| ''' extractable_attr_value_double_quoted
+										| NUMBER extractable_attr_value_double_quoted
+										| STRING extractable_attr_value_double_quoted
+										| null
 
 generic_single_or_pair_tag			-> '/''>' consume_ws
 									| '>' consume_ws optional_pair_tag_any_content
@@ -104,17 +172,17 @@ nested_or_ending_tag				-> '/' STRING '>' consume_ws
 node_attr							-> WS node_attr_possible
 									| null
 
-node_attr_possible					-> 'id' '=' ATTRIBUTE node_attr
-									| 'lat' '=' ATTRIBUTE node_attr
-									| 'lon' '=' ATTRIBUTE node_attr
-									| STRING '=' ATTRIBUTE node_attr
+node_attr_possible					-> 'id' '=' extractable_attr_value node_attr
+									| 'lat' '=' extractable_attr_value node_attr
+									| 'lon' '=' extractable_attr_value node_attr
+									| STRING '=' attr_value node_attr
 									| null
 
 way_attr							-> WS way_attr_possible
 									| null
 
-way_attr_possible					-> 'id' '=' ATTRIBUTE way_attr
-									| STRING '=' ATTRIBUTE way_attr
+way_attr_possible					-> 'id' '=' extractable_attr_value way_attr
+									| STRING '=' attr_value way_attr
 									| null
 
 way_single_or_pair_tag				-> '/''>' consume_ws
@@ -136,6 +204,6 @@ normal_way_nested_tag				-> 'nd' nd_attr generic_single_or_pair_tag
 nd_attr								-> WS nd_attr_possible
 									| null
 
-nd_attr_possible					-> 'ref' '=' ATTRIBUTE nd_attr
-									| STRING '=' ATTRIBUTE nd_attr
+nd_attr_possible					-> 'ref' '=' extractable_attr_value nd_attr
+									| STRING '=' attr_value nd_attr
 									| null	

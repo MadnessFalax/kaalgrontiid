@@ -35,13 +35,14 @@ namespace nsOSM {
 		lexer->add_token_definition(osmToken::DASH, R"(\-)", "DASH");
 		lexer->add_token_definition(osmToken::QMARK, R"(\?)", "QMARK");
 		lexer->add_token_definition(osmToken::EXCLAMATION, "!", "EXCLAMATION");
+		lexer->add_token_definition(osmToken::QUOTE, "'", "QUOTE");
+		lexer->add_token_definition(osmToken::DOUBLEQUOTE, "\"", "DOUBLEQUOTE");
 		lexer->add_token_definition(osmToken::EQUALS, "=", "EQUALS");
 		lexer->add_token_definition(osmToken::WS, R"(\s+)", "WS");
 		lexer->add_token_definition(osmToken::SLASH, "/", "SLASH");
 		lexer->add_token_definition(osmToken::COMMA, R"(\,)", "COMMA");
-		lexer->add_token_definition(osmToken::ATTRIBUTE, R"(("[^"]+")|('[^']+'))", "ATTRIBUTE");
 		lexer->add_token_definition(osmToken::NUMBER, R"(\-?\d+(\.\d+)?,\-?\d+(\.\d+)?(,\-?\d+(\.\d+)?)?( \s*\-?\d+(\.\d+)?,\-?\d+(\.\d+)?(,\-?\d+(\.\d+)?)?)*)", "NUMBER");
-		lexer->add_token_definition(osmToken::STRING, R"([^<>" =]+)", "STRING");
+		lexer->add_token_definition(osmToken::STRING, R"([^<>"' =]+)", "STRING");
 		return lexer;
 	}
 
@@ -55,13 +56,14 @@ namespace nsOSM {
 		lexer->add_token_definition(osmToken::DASH, R"(\-)", "DASH");
 		lexer->add_token_definition(osmToken::QMARK, R"(\?)", "QMARK");
 		lexer->add_token_definition(osmToken::EXCLAMATION, "!", "EXCLAMATION");
+		lexer->add_token_definition(osmToken::QUOTE, "'", "QUOTE");
+		lexer->add_token_definition(osmToken::DOUBLEQUOTE, "\"", "DOUBLEQUOTE");
 		lexer->add_token_definition(osmToken::EQUALS, "=", "EQUALS");
 		lexer->add_token_definition(osmToken::WS, R"(\s+)", "WS");
 		lexer->add_token_definition(osmToken::SLASH, "/", "SLASH");
 		lexer->add_token_definition(osmToken::COMMA, R"(\,)", "COMMA");
-		lexer->add_token_definition(osmToken::ATTRIBUTE, R"(("[^"]+")|('[^']+'))", "ATTRIBUTE");
 		lexer->add_token_definition(osmToken::NUMBER, R"(\-?\d+(\.\d+)?,\-?\d+(\.\d+)?(,\-?\d+(\.\d+)?)?( \s*\-?\d+(\.\d+)?,\-?\d+(\.\d+)?(,\-?\d+(\.\d+)?)?)*)", "NUMBER");
-		lexer->add_token_definition(osmToken::STRING, R"([^\[\]<>" =]+)", "STRING");
+		lexer->add_token_definition(osmToken::STRING, R"([^\[\]<>"' =]+)", "STRING");
 
 		auto* rules = new Array<Rule*>();
 
@@ -140,7 +142,10 @@ namespace nsOSM {
 			<< new ConsumeNode(osmToken::COMMA)
 			<< new ForwardNode(osmRule::CDATAContent));
 		(*rule) += &((*(new Sequence()))
-			<< new ConsumeNode(osmToken::ATTRIBUTE)
+			<< new ConsumeNode(osmToken::QUOTE)
+			<< new ForwardNode(osmRule::CDATAContent));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(osmToken::DOUBLEQUOTE)
 			<< new ForwardNode(osmRule::CDATAContent));
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(osmToken::NUMBER)
@@ -185,7 +190,10 @@ namespace nsOSM {
 			<< new ConsumeNode(osmToken::COMMA)
 			<< new ForwardNode(osmRule::CDATAContent));
 		(*rule) += &((*(new Sequence()))
-			<< new ConsumeNode(osmToken::ATTRIBUTE)
+			<< new ConsumeNode(osmToken::QUOTE)
+			<< new ForwardNode(osmRule::CDATAContent));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(osmToken::DOUBLEQUOTE)
 			<< new ForwardNode(osmRule::CDATAContent));
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(osmToken::NUMBER)
@@ -227,7 +235,10 @@ namespace nsOSM {
 			<< new ConsumeNode(osmToken::COMMA)
 			<< new ForwardNode(osmRule::CDATAContent));
 		(*rule) += &((*(new Sequence()))
-			<< new ConsumeNode(osmToken::ATTRIBUTE)
+			<< new ConsumeNode(osmToken::QUOTE)
+			<< new ForwardNode(osmRule::CDATAContent));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(osmToken::DOUBLEQUOTE)
 			<< new ForwardNode(osmRule::CDATAContent));
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(osmToken::NUMBER)
@@ -280,6 +291,12 @@ namespace nsOSM {
 			<< new ConsumeNode(osmToken::SLASH)
 			<< new ForwardNode(osmRule::CommentContent));
 		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(osmToken::QUOTE)
+			<< new ForwardNode(osmRule::CommentContent));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(osmToken::DOUBLEQUOTE)
+			<< new ForwardNode(osmRule::CommentContent));
+		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(osmToken::NUMBER)
 			<< new ForwardNode(osmRule::CommentContent));
 		(*rule) += &((*(new Sequence()))
@@ -291,31 +308,37 @@ namespace nsOSM {
 		rule = new Rule(osmRule::OptionalTextContent, "OptionalTextContent");
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(osmToken::EXCLAMATION)
-			<< new ForwardNode(osmRule::CommentContent));
+			<< new ForwardNode(osmRule::OptionalTextContent));
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(osmToken::WS)
-			<< new ForwardNode(osmRule::CommentContent));
+			<< new ForwardNode(osmRule::OptionalTextContent));
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(osmToken::QMARK)
-			<< new ForwardNode(osmRule::CommentContent));
+			<< new ForwardNode(osmRule::OptionalTextContent));
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(osmToken::EQUALS)
-			<< new ForwardNode(osmRule::CommentContent));
+			<< new ForwardNode(osmRule::OptionalTextContent));
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(osmToken::COMMA)
-			<< new ForwardNode(osmRule::CommentContent));
+			<< new ForwardNode(osmRule::OptionalTextContent));
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(osmToken::SLASH)
-			<< new ForwardNode(osmRule::CommentContent));
+			<< new ForwardNode(osmRule::OptionalTextContent));
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(osmToken::DASH)
-			<< new ForwardNode(osmRule::CommentContent));
+			<< new ForwardNode(osmRule::OptionalTextContent));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(osmToken::QUOTE)
+			<< new ForwardNode(osmRule::OptionalTextContent));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(osmToken::DOUBLEQUOTE)
+			<< new ForwardNode(osmRule::OptionalTextContent));
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(osmToken::NUMBER)
-			<< new ForwardNode(osmRule::CommentContent));
+			<< new ForwardNode(osmRule::OptionalTextContent));
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(osmToken::STRING)
-			<< new ForwardNode(osmRule::CommentContent));
+			<< new ForwardNode(osmRule::OptionalTextContent));
 		(*rule) += new Sequence();
 		rules->push_back(rule);
 
@@ -345,8 +368,192 @@ namespace nsOSM {
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(osmToken::STRING)
 			<< new ConsumeNode(osmToken::EQUALS)
-			<< new ConsumeNode(osmToken::ATTRIBUTE)
+			<< new ForwardNode(osmRule::AttrValue)
 			<< new ForwardNode(osmRule::OptionalAttr));
+		(*rule) += new Sequence();
+		rules->push_back(rule);
+
+		rule = new Rule(osmRule::AttrValue, "AttrValue");
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(osmToken::QUOTE)
+			<< new ForwardNode(osmRule::AttrValueQuoted)
+			<< new ConsumeNode(osmToken::QUOTE));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(osmToken::DOUBLEQUOTE)
+			<< new ForwardNode(osmRule::AttrValueQuoted)
+			<< new ConsumeNode(osmToken::DOUBLEQUOTE));
+		(*rule) += new Sequence();
+		rules->push_back(rule);
+
+		rule = new Rule(osmRule::AttrValueQuoted, "AttrValueQuoted");
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(osmToken::EXCLAMATION)
+			<< new ForwardNode(osmRule::AttrValueQuoted));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(osmToken::WS)
+			<< new ForwardNode(osmRule::AttrValueQuoted));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(osmToken::QMARK)
+			<< new ForwardNode(osmRule::AttrValueQuoted));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(osmToken::EQUALS)
+			<< new ForwardNode(osmRule::AttrValueQuoted));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(osmToken::LBRACKET)
+			<< new ForwardNode(osmRule::AttrValueQuoted));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(osmToken::RBRACKET)
+			<< new ForwardNode(osmRule::AttrValueQuoted));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(osmToken::COMMA)
+			<< new ForwardNode(osmRule::AttrValueQuoted));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(osmToken::SLASH)
+			<< new ForwardNode(osmRule::AttrValueQuoted));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(osmToken::DASH)
+			<< new ForwardNode(osmRule::AttrValueQuoted));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(osmToken::DOUBLEQUOTE)
+			<< new ForwardNode(osmRule::AttrValueQuoted));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(osmToken::NUMBER)
+			<< new ForwardNode(osmRule::AttrValueQuoted));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(osmToken::STRING)
+			<< new ForwardNode(osmRule::AttrValueQuoted));
+		(*rule) += new Sequence();
+		rules->push_back(rule);
+
+		rule = new Rule(osmRule::AttrValueDoubleQuoted, "AttrValueDoubleQuoted");
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(osmToken::EXCLAMATION)
+			<< new ForwardNode(osmRule::AttrValueDoubleQuoted));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(osmToken::WS)
+			<< new ForwardNode(osmRule::AttrValueDoubleQuoted));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(osmToken::QMARK)
+			<< new ForwardNode(osmRule::AttrValueDoubleQuoted));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(osmToken::EQUALS)
+			<< new ForwardNode(osmRule::AttrValueDoubleQuoted));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(osmToken::LBRACKET)
+			<< new ForwardNode(osmRule::AttrValueDoubleQuoted));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(osmToken::RBRACKET)
+			<< new ForwardNode(osmRule::AttrValueDoubleQuoted));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(osmToken::COMMA)
+			<< new ForwardNode(osmRule::AttrValueDoubleQuoted));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(osmToken::SLASH)
+			<< new ForwardNode(osmRule::AttrValueDoubleQuoted));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(osmToken::DASH)
+			<< new ForwardNode(osmRule::AttrValueDoubleQuoted));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(osmToken::QUOTE)
+			<< new ForwardNode(osmRule::AttrValueDoubleQuoted));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(osmToken::NUMBER)
+			<< new ForwardNode(osmRule::AttrValueDoubleQuoted));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(osmToken::STRING)
+			<< new ForwardNode(osmRule::AttrValueDoubleQuoted));
+		(*rule) += new Sequence();
+		rules->push_back(rule);
+
+		rule = new Rule(osmRule::ExtractableAttrValue, "ExtractableAttrValue");
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(osmToken::QUOTE)
+			<< new ForwardNode(osmRule::ExtractableAttrValueQuoted)
+			<< new ConsumeNode(osmToken::QUOTE));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(osmToken::DOUBLEQUOTE)
+			<< new ForwardNode(osmRule::ExtractableAttrValueDoubleQuoted)
+			<< new ConsumeNode(osmToken::DOUBLEQUOTE));
+		(*rule) += new Sequence();
+		rules->push_back(rule);
+
+		rule = new Rule(osmRule::ExtractableAttrValueQuoted, "ExtractableAttrValueQuoted");
+		(*rule) += &((*(new Sequence()))
+			<< new ExtractNode(osmToken::EXCLAMATION, ExtractNode::ExtractType::STRING)
+			<< new ForwardNode(osmRule::ExtractableAttrValueQuoted));
+		(*rule) += &((*(new Sequence()))
+			<< new ExtractNode(osmToken::WS, ExtractNode::ExtractType::STRING)
+			<< new ForwardNode(osmRule::ExtractableAttrValueQuoted));
+		(*rule) += &((*(new Sequence()))
+			<< new ExtractNode(osmToken::QMARK, ExtractNode::ExtractType::STRING)
+			<< new ForwardNode(osmRule::ExtractableAttrValueQuoted));
+		(*rule) += &((*(new Sequence()))
+			<< new ExtractNode(osmToken::EQUALS, ExtractNode::ExtractType::STRING)
+			<< new ForwardNode(osmRule::ExtractableAttrValueQuoted));
+		(*rule) += &((*(new Sequence()))
+			<< new ExtractNode(osmToken::LBRACKET, ExtractNode::ExtractType::STRING)
+			<< new ForwardNode(osmRule::ExtractableAttrValueQuoted));
+		(*rule) += &((*(new Sequence()))
+			<< new ExtractNode(osmToken::RBRACKET, ExtractNode::ExtractType::STRING)
+			<< new ForwardNode(osmRule::ExtractableAttrValueQuoted));
+		(*rule) += &((*(new Sequence()))
+			<< new ExtractNode(osmToken::COMMA, ExtractNode::ExtractType::STRING)
+			<< new ForwardNode(osmRule::ExtractableAttrValueQuoted));
+		(*rule) += &((*(new Sequence()))
+			<< new ExtractNode(osmToken::SLASH, ExtractNode::ExtractType::STRING)
+			<< new ForwardNode(osmRule::ExtractableAttrValueQuoted));
+		(*rule) += &((*(new Sequence()))
+			<< new ExtractNode(osmToken::DASH, ExtractNode::ExtractType::STRING)
+			<< new ForwardNode(osmRule::ExtractableAttrValueQuoted));
+		(*rule) += &((*(new Sequence()))
+			<< new ExtractNode(osmToken::DOUBLEQUOTE, ExtractNode::ExtractType::STRING)
+			<< new ForwardNode(osmRule::ExtractableAttrValueQuoted));
+		(*rule) += &((*(new Sequence()))
+			<< new ExtractNode(osmToken::NUMBER, ExtractNode::ExtractType::NUMBER)
+			<< new ForwardNode(osmRule::ExtractableAttrValueQuoted));
+		(*rule) += &((*(new Sequence()))
+			<< new ExtractNode(osmToken::STRING, ExtractNode::ExtractType::STRING)
+			<< new ForwardNode(osmRule::ExtractableAttrValueQuoted));
+		(*rule) += new Sequence();
+		rules->push_back(rule);
+
+		rule = new Rule(osmRule::ExtractableAttrValueDoubleQuoted, "ExtractableAttrValueDoubleQuoted");
+		(*rule) += &((*(new Sequence()))
+			<< new ExtractNode(osmToken::EXCLAMATION, ExtractNode::ExtractType::STRING)
+			<< new ForwardNode(osmRule::ExtractableAttrValueDoubleQuoted));
+		(*rule) += &((*(new Sequence()))
+			<< new ExtractNode(osmToken::WS, ExtractNode::ExtractType::STRING)
+			<< new ForwardNode(osmRule::ExtractableAttrValueDoubleQuoted));
+		(*rule) += &((*(new Sequence()))
+			<< new ExtractNode(osmToken::QMARK, ExtractNode::ExtractType::STRING)
+			<< new ForwardNode(osmRule::ExtractableAttrValueDoubleQuoted));
+		(*rule) += &((*(new Sequence()))
+			<< new ExtractNode(osmToken::EQUALS, ExtractNode::ExtractType::STRING)
+			<< new ForwardNode(osmRule::ExtractableAttrValueDoubleQuoted));
+		(*rule) += &((*(new Sequence()))
+			<< new ExtractNode(osmToken::LBRACKET, ExtractNode::ExtractType::STRING)
+			<< new ForwardNode(osmRule::ExtractableAttrValueDoubleQuoted));
+		(*rule) += &((*(new Sequence()))
+			<< new ExtractNode(osmToken::RBRACKET, ExtractNode::ExtractType::STRING)
+			<< new ForwardNode(osmRule::ExtractableAttrValueDoubleQuoted));
+		(*rule) += &((*(new Sequence()))
+			<< new ExtractNode(osmToken::COMMA, ExtractNode::ExtractType::STRING)
+			<< new ForwardNode(osmRule::ExtractableAttrValueDoubleQuoted));
+		(*rule) += &((*(new Sequence()))
+			<< new ExtractNode(osmToken::SLASH, ExtractNode::ExtractType::STRING)
+			<< new ForwardNode(osmRule::ExtractableAttrValueDoubleQuoted));
+		(*rule) += &((*(new Sequence()))
+			<< new ExtractNode(osmToken::DASH, ExtractNode::ExtractType::STRING)
+			<< new ForwardNode(osmRule::ExtractableAttrValueDoubleQuoted));
+		(*rule) += &((*(new Sequence()))
+			<< new ExtractNode(osmToken::QUOTE, ExtractNode::ExtractType::STRING)
+			<< new ForwardNode(osmRule::ExtractableAttrValueDoubleQuoted));
+		(*rule) += &((*(new Sequence()))
+			<< new ExtractNode(osmToken::NUMBER, ExtractNode::ExtractType::NUMBER)
+			<< new ForwardNode(osmRule::ExtractableAttrValueDoubleQuoted));
+		(*rule) += &((*(new Sequence()))
+			<< new ExtractNode(osmToken::STRING, ExtractNode::ExtractType::STRING)
+			<< new ForwardNode(osmRule::ExtractableAttrValueDoubleQuoted));
 		(*rule) += new Sequence();
 		rules->push_back(rule);
 
@@ -392,22 +599,22 @@ namespace nsOSM {
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(osmToken::STRING, "id")
 			<< new ConsumeNode(osmToken::EQUALS)
-			<< new ExtractNode(osmToken::ATTRIBUTE, ExtractNode::ExtractType::STRING)
+			<< new ForwardNode(osmRule::ExtractableAttrValue)
 			<< new ForwardNode(osmRule::NodeAttr));
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(osmToken::STRING, "lat")
 			<< new ConsumeNode(osmToken::EQUALS)
-			<< new ExtractNode(osmToken::ATTRIBUTE, ExtractNode::ExtractType::STRING)
+			<< new ForwardNode(osmRule::ExtractableAttrValue)
 			<< new ForwardNode(osmRule::NodeAttr));
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(osmToken::STRING, "lon")
 			<< new ConsumeNode(osmToken::EQUALS)
-			<< new ExtractNode(osmToken::ATTRIBUTE, ExtractNode::ExtractType::STRING)
+			<< new ForwardNode(osmRule::ExtractableAttrValue)
 			<< new ForwardNode(osmRule::NodeAttr));
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(osmToken::STRING)
 			<< new ConsumeNode(osmToken::EQUALS)
-			<< new ConsumeNode(osmToken::ATTRIBUTE)
+			<< new ForwardNode(osmRule::AttrValue)
 			<< new ForwardNode(osmRule::NodeAttr));
 		(*rule) += new Sequence();
 		rules->push_back(rule);
@@ -423,12 +630,12 @@ namespace nsOSM {
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(osmToken::STRING, "id")
 			<< new ConsumeNode(osmToken::EQUALS)
-			<< new ConsumeNode(osmToken::ATTRIBUTE)
+			<< new ForwardNode(osmRule::ExtractableAttrValue)
 			<< new ForwardNode(osmRule::WayAttr));
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(osmToken::STRING)
 			<< new ConsumeNode(osmToken::EQUALS)
-			<< new ConsumeNode(osmToken::ATTRIBUTE)
+			<< new ForwardNode(osmRule::AttrValue)
 			<< new ForwardNode(osmRule::WayAttr));
 		(*rule) += new Sequence();
 		rules->push_back(rule);
@@ -502,12 +709,12 @@ namespace nsOSM {
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(osmToken::STRING, "ref")
 			<< new ConsumeNode(osmToken::EQUALS)
-			<< new ExtractNode(osmToken::ATTRIBUTE, ExtractNode::ExtractType::STRING)
+			<< new ForwardNode(osmRule::ExtractableAttrValue)
 			<< new ForwardNode(osmRule::NdAttr));
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(osmToken::STRING)
 			<< new ConsumeNode(osmToken::EQUALS)
-			<< new ConsumeNode(osmToken::ATTRIBUTE)
+			<< new ForwardNode(osmRule::AttrValue)
 			<< new ForwardNode(osmRule::NdAttr));
 		(*rule) += new Sequence();
 		rules->push_back(rule);
