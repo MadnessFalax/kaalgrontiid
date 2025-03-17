@@ -125,7 +125,7 @@ optional_pair_tag_way_content		-> '<' way_nested_or_ending_tag
 way_nested_or_ending_tag			-> '/' STRING '>' consume_ws
 									| any_way_nested_tag_content optional_pair_tag_way_content
 
-any_way_nested_tag_content			-> '?' instruction_tag
+any_way_nested_tag_content			-> '?' STRING optional_attr '?' '>' consume_ws post_instruction
 									| '!' comment_or_cdata
 									| normal_way_nested_tag
 

@@ -7,13 +7,9 @@
 #include "container/pString.h"
 #include "container/pMap.h"
 #include "container/pPair.h"
-#include "abstract/pHashable.h"
-#include "parser/regex/pRegex.h"
-#include "utils/match.h"
-#include "parser/LL1/lexer/pLexer.h"
 #include "parser/GeoJSON/gjParser.h"
-#include "parser/LL1/parser/node/pConsumeNode.h"
 #include "parser/KML/kmlParser.h"
+#include "parser/OSM/osmParser.h"
 
 #include "cLineString.h"
 #include "cPolygon.h"
@@ -48,7 +44,7 @@ constexpr auto PATH = R"(C:\Users\Petr\Downloads\src\test\kaalgrontiid\test\exam
 #endif
 
 #ifdef _WORK
-constexpr auto PATH = R"(C:\Users\uiv56391\source\repos\framework-back-up\test\kaalgrontiid\test\example.kml)";
+constexpr auto PATH = R"(C:\Users\uiv56391\source\repos\framework-back-up\test\kaalgrontiid\test\map.osm)";
 #endif
 
 
@@ -79,9 +75,10 @@ static void helper() {
 	//delete space_desc_3d;
 	//space_desc_3d = nullptr;
 
+
 	// KML Parser test ----------------
 	String path = PATH;
-	auto* p = nsKML::setup_parser();
+	auto* p = nsOSM::setup_parser();
 	p->open(path);
 	while (p->get_item()) {
 		// do nothing
@@ -89,6 +86,18 @@ static void helper() {
 	}
 
 	delete p;
+	// ------------------------------------
+
+	// KML Parser test ----------------
+	//String path = PATH;
+	//auto* p = nsKML::setup_parser();
+	//p->open(path);
+	//while (p->get_item()) {
+	//	// do nothing
+	//	printf("got value \n");
+	//}
+
+	//delete p;
 	// ------------------------------------
 
 	// GeoJSON Parser test ----------------
