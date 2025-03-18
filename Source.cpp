@@ -51,11 +51,7 @@ constexpr auto PATH = R"(C:\Users\uiv56391\source\repos\framework-back-up\test\k
 // used for out of scope stack disposal check so that _CrtDumpMemoryLeaks doesnt show false positive leaks on stack allocated memory
 static void helper() {
 
-	//const double vals[3] = {3.1235, 2.8644, 15.4655};
-	//const double vals2[3] = {1.65465, 2.6465, 10.465165};
-	//const double vals3[3] = {12.465, .6646, 5.486};
-
-	//SeqArrayContext* context = new SeqArrayContext();
+	SeqArrayContext* context = new SeqArrayContext();
 
 	//cSpaceDescriptor* space_desc_2d = new cSpaceDescriptor(DIMENSION_2, new cTuple(), new cInt());
 	//cSpaceDescriptor* space_desc_3d = new cSpaceDescriptor(DIMENSION_3, new cTuple(), new cInt());

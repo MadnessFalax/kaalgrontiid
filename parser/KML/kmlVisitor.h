@@ -88,6 +88,12 @@ namespace nsKML {
 
 			if (p_size == 1) {
 				_context.item_type = DataShape::DS_SPHERE;
+				auto* pt_cpy = new Array<double>();
+				for (size_t i = 0; i < (*_points)[0]->size(); i++) {
+					pt_cpy->push_back(double{ (*(*_points)[0])[i] });
+				}
+				_points->push_back(pt_cpy);
+				p_size = _points->size();
 			}
 			else {
 				_context.item_type = DataShape::DS_POLYGON;
@@ -109,11 +115,11 @@ namespace nsKML {
 
 			_context.last_item_sd = desc;
 
-			cNTuple** tuples = new cNTuple * [p_size];
+			cNTuple** tuples = new cNTuple* [p_size];
 			for (size_t i = 0; i < p_size; i++) {
 				tuples[i] = new cNTuple(desc);
 				for (size_t j = 0; j < _context.dimension; j++) {
-					tuples[i]->SetValue((unsigned int)j, (int)(*(*_points)[i])[j], desc);
+					tuples[i]->SetValue((unsigned int)j, (*(*_points)[i])[j], desc);
 				}
 			}
 

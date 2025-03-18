@@ -169,8 +169,8 @@ namespace nspParser {
 				_rule_map[rule->get_id()] = rule;
 			}
 
-			_space_desc_2d = new cSpaceDescriptor(DIMENSION_2, new cTuple(), new cInt());
-			_space_desc_3d = new cSpaceDescriptor(DIMENSION_3, new cTuple(), new cInt());
+			_space_desc_2d = new cSpaceDescriptor(DIMENSION_2, new cNTuple(), new cDouble());
+			_space_desc_3d = new cSpaceDescriptor(DIMENSION_3, new cNTuple(), new cDouble());
 		}
 
 		virtual ~pParserVisitor() {
