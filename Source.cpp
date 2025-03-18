@@ -47,36 +47,28 @@ constexpr auto PATH = R"(C:\Users\Petr\Downloads\src\test\kaalgrontiid\test\exam
 constexpr auto PATH = R"(C:\Users\uiv56391\source\repos\framework-back-up\test\kaalgrontiid\test\example.kml)";
 #endif
 
+static void print_shape_info() {
+
+}
 
 // used for out of scope stack disposal check so that _CrtDumpMemoryLeaks doesnt show false positive leaks on stack allocated memory
 static void helper() {
 
-	SeqArrayContext* context = new SeqArrayContext();
+	auto* space_desc_3d = new cSpaceDescriptor(DIMENSION_3, new cNTuple(), new cDouble());
+	auto* context = new SeqArrayContext();
+	auto* header = new SeqArrayHeader("seqArray", 8192, space_desc_3d, cDStructConst::DSMODE_DEFAULT);
+	header->SetCodeType(ELIAS_DELTA);
 
-	//cSpaceDescriptor* space_desc_2d = new cSpaceDescriptor(DIMENSION_2, new cTuple(), new cInt());
-	//cSpaceDescriptor* space_desc_3d = new cSpaceDescriptor(DIMENSION_3, new cTuple(), new cInt());
+	cQuickDB* db = new cQuickDB();
+	db->Create("test", 500, 10000, 8192);
 
-	//SeqArrayHeader* mHeader = new SeqArrayHeader("seqarray1", 8192, space_desc_2d, cDStructConst::DSMODE_DEFAULT);
-	//mHeader->SetCodeType(ELIAS_DELTA);
+	auto* seq_array = new SeqArray();
+	seq_array->Create(header, db);
 
-	//auto** line_vtcs = new cTuple * [3];
+	unsigned int node_id, position;
 
-	//for (size_t i = 0; i < 3; i++) {
-	//	line_vtcs[i] = new cTuple(space_desc_3d);
-	//	line_vtcs[i]->SetValue(0, (int) vals[i], space_desc_3d);
-	//	line_vtcs[i]->SetValue(1, (int) vals2[i], space_desc_3d);
-	//	line_vtcs[i]->SetValue(2, (int) vals3[i], space_desc_3d);
-	//}
-
-	//cDataShape<cTuple>* linestring = cDataShape<cTuple>::CreateDataShape(DataShape::DS_LINESTRING, line_vtcs, 3, space_desc_3d);
-
-	//linestring->PrintAllTuples(space_desc_3d);
-
-	//delete space_desc_2d;
-	//space_desc_2d = nullptr;
-	//delete space_desc_3d;
-	//space_desc_3d = nullptr;
-
+	cNTuple** tuple_arr = nullptr;
+	unsigned int tuple_size = 0;
 
 	// OSM Parser test ----------------
 	//String path = PATH;
@@ -97,7 +89,15 @@ static void helper() {
 	cDataShape<cNTuple>* item = nullptr;
 	while (item = p->get_item()) {
 		// do nothing
-		item->PrintAllTuples(p->get_space_descriptor());
+
+		tuple_arr = item->GetVerticesCollection();
+		tuple_size = item->GetVerticesCount();
+
+
+		for (unsigned int i = 0; i < tuple_size; i++) {
+			seq_array->AddItem(node_id, position, *(tuple_arr[i]));
+		}
+
 		delete item;
 		item = nullptr;
 	}
@@ -116,6 +116,15 @@ static void helper() {
 
 	//delete p;
 	// ------------------------------------
+	printf("Inserted %i items.", seq_array->GetHeader()->GetItemCount());
+
+	db->Close();
+
+	delete seq_array;
+	delete db;
+	delete header;
+	delete context;
+
 	return;
 }
 

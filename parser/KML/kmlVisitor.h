@@ -94,6 +94,7 @@ namespace nsKML {
 				}
 				_points->push_back(pt_cpy);
 				p_size = _points->size();
+				pt_cpy = nullptr;
 			}
 			else {
 				_context.item_type = DataShape::DS_POLYGON;
