@@ -44,7 +44,7 @@ constexpr auto PATH = R"(C:\Users\Petr\Downloads\src\test\kaalgrontiid\test\exam
 #endif
 
 #ifdef _WORK
-constexpr auto PATH = R"(C:\Users\uiv56391\source\repos\framework-back-up\test\kaalgrontiid\test\short.osm)";
+constexpr auto PATH = R"(C:\Users\uiv56391\source\repos\framework-back-up\test\kaalgrontiid\test\example.kml)";
 #endif
 
 
@@ -98,9 +98,12 @@ static void helper() {
 	String path = PATH;
 	auto* p = nsKML::setup_parser();
 	p->open(path);
-	while (p->get_item()) {
+	cDataShape<cNTuple>* item = nullptr;
+	while (item = p->get_item()) {
 		// do nothing
-		printf("got value \n");
+		item->PrintAllTuples(p->get_space_descriptor());
+		delete item;
+		item = nullptr;
 	}
 
 	delete p;

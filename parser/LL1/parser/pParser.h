@@ -119,17 +119,20 @@ namespace nspParser {
 		//	}
 		//}
 
-		bool get_item() {
+		cSpaceDescriptor* get_space_descriptor() {
+			return _context->last_item_sd;
+		}
+
+		cDataShape<cNTuple>* get_item() {
 			while (!_context->end && !_context->has_item) {
 				if (!_resolve_current_node()) {
 					break;
 				}
 			}
-			if (_context->has_item) {
-				_context->has_item = false;
-				return true;
-			}	
-			return false;
+			auto* item = _context->item;
+			_context->item = nullptr;
+			_context->has_item = false;
+			return item;
 		}
 	};
 

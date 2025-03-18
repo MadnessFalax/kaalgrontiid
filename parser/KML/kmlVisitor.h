@@ -10,7 +10,6 @@ namespace nsKML {
 		using Array = nspArray::pArray<T>;
 		using pErrorReporter = nspParser::pErrorReporter;
 
-		size_t _dimension = 0;
 		Array<double>* _point = nullptr;
 		Array<Array<double>*>* _points = nullptr;
 
@@ -72,7 +71,11 @@ namespace nsKML {
 
 		template<>
 		void resolve_custom_visit<kmlHandler::BufferPoint>(CustomNode& node) {
-			_dimension = _point->size();
+			auto current_dim = _point->size();
+			if (current_dim > _context.dimension) {
+				_context.dimension = current_dim;
+			}
+
 			_points->push_back(_point);
 			_point = new Array<double>();
 
@@ -84,7 +87,7 @@ namespace nsKML {
 			size_t p_size = _points->size();
 
 			if (p_size == 1) {
-				_context.item_type = DataShape::DS_POINT;
+				_context.item_type = DataShape::DS_SPHERE;
 			}
 			else {
 				_context.item_type = DataShape::DS_POLYGON;
@@ -99,33 +102,25 @@ namespace nsKML {
 				}
 			}
 
-			switch (_context.item_type) {
-			case DataShape::DS_POINT:
-				_context.dimension = _dimension;
-				_context.point = cDataShape<cTuple>::CreateDataShape(_context.item_type, );
-				break;
-			case DataShape::DS_SPHERE:
-				_context.dimension = _dimension;
-				_context.sphere = static_cast<cSphere<cTuple>*>(cDataShape<cTuple>::CreateDataShape());
-				break;
-			case DataShape::DS_LINESTRING:
-				_context.dimension = _dimension;
-				_context.sphere = static_cast<cSphere<cTuple>*>(cDataShape<cTuple>::CreateDataShape());
-				break;
-			case DataShape::DS_POLYGON:
-				_context.dimension = _dimension;
-				_context.sphere = static_cast<cSphere<cTuple>*>(cDataShape<cTuple>::CreateDataShape());
-				break;
+			cSpaceDescriptor* desc = _space_desc_2d;
+			if (_context.dimension == 3) {
+				desc = _space_desc_3d;
 			}
 
+			_context.last_item_sd = desc;
 
+			cNTuple** tuples = new cNTuple * [p_size];
 			for (size_t i = 0; i < p_size; i++) {
-				Array<double>* point = (*_points)[i];
-				size_t point_size = point->size();
-				for (size_t j = 0; j < point_size; j++) {
+				tuples[i] = new cNTuple(desc);
+				for (size_t j = 0; j < _context.dimension; j++) {
+					tuples[i]->SetValue((unsigned int)j, (int)(*(*_points)[i])[j], desc);
 				}
 			}
+
+			_context.item = cDataShape<cNTuple>::CreateDataShape(_context.item_type, tuples, (unsigned int) _points->size(), desc);
 			
+			tuples = nullptr;
+
 			for (size_t i = 0; i < p_size; i++) {
 				delete (*_points)[i];
 				(*_points)[i] = nullptr;

@@ -52,32 +52,19 @@ namespace nspParser {
 			bool end = false;
 			
 			bool has_item = false;
-			DataShape item_type = DataShape::DS_POINT;
-			cLineString<cTuple>* line = nullptr;
-			cPolygon<cTuple>* polygon = nullptr;
-			cSphere<cTuple>* sphere = nullptr;
-			cDataShape<cTuple>* point = nullptr;
+			DataShape item_type = DataShape{};
+			cDataShape<cNTuple>* item = nullptr;
 			size_t dimension = 0;
+			cSpaceDescriptor* last_item_sd = nullptr;
 
 
 			Context() = default;
 
 			~Context() {
-				if (line) {
-					delete line;
-					line = nullptr;
-				}
-				if (polygon) {
-					delete polygon;
-					polygon = nullptr;
-				}
-				if (sphere) {
-					delete sphere;
-					sphere = nullptr;
-				}
-				if (point) {
-					delete point;
-					point = nullptr;
+				last_item_sd = nullptr;
+				if (item) {
+					delete item;
+					item = nullptr;
 				}
 				delete current_instance;
 				current_instance = nullptr;
@@ -319,8 +306,13 @@ namespace nspParser {
 			return _context.has_item;
 		}
 
-		void get_item() {
-			return;
+		cDataShape<cNTuple>* get_item() {
+			auto* retval = _context.item;
+			_context.item = nullptr;
+			_context.has_item = false;
+			_context.dimension = 0;
+			_context.item_type = DataShape{};
+			return retval;
 		}
 
 		virtual void custom_visit_root(CustomNode& node) = 0;
