@@ -74,7 +74,9 @@ namespace nsOSM {
 		auto* rule = new Rule(osmRule::OSM, "OSM");
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(osmToken::LANGLEBRACKET)
-			<< new ForwardNode(osmRule::AnyTagContent));
+			<< new ForwardNode(osmRule::AnyTagContent)
+			<< new CustomNode(osmHandler::PointsToArray)
+			<< new ForwardNode(osmRule::FinalSequence));
 		rules->push_back(rule);
 
 		rule = new Rule(osmRule::AnyTagContent, "AnyTagContent");
@@ -346,6 +348,7 @@ namespace nsOSM {
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(osmToken::STRING, "node")
 			<< new ForwardNode(osmRule::NodeAttr)
+			<< new CustomNode(osmHandler::CommitPoint)
 			<< new ForwardNode(osmRule::GenericSingleOrPairTag));
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(osmToken::STRING, "way")
@@ -504,7 +507,8 @@ namespace nsOSM {
 			<< new ForwardNode(osmRule::ExtractableAttrValueQuoted));
 		(*rule) += &((*(new Sequence()))
 			<< new ExtractNode(osmToken::DASH, ExtractNode::ExtractType::STRING)
-			<< new ForwardNode(osmRule::ExtractableAttrValueQuoted));
+			<< new ForwardNode(osmRule::ExtractableAttrValueQuoted)
+			<< new CustomNode(osmHandler::ChangeSign));
 		(*rule) += &((*(new Sequence()))
 			<< new ExtractNode(osmToken::DOUBLEQUOTE, ExtractNode::ExtractType::STRING)
 			<< new ForwardNode(osmRule::ExtractableAttrValueQuoted));
@@ -544,7 +548,8 @@ namespace nsOSM {
 			<< new ForwardNode(osmRule::ExtractableAttrValueDoubleQuoted));
 		(*rule) += &((*(new Sequence()))
 			<< new ExtractNode(osmToken::DASH, ExtractNode::ExtractType::STRING)
-			<< new ForwardNode(osmRule::ExtractableAttrValueDoubleQuoted));
+			<< new ForwardNode(osmRule::ExtractableAttrValueDoubleQuoted)
+			<< new CustomNode(osmHandler::ChangeSign));
 		(*rule) += &((*(new Sequence()))
 			<< new ExtractNode(osmToken::QUOTE, ExtractNode::ExtractType::STRING)
 			<< new ForwardNode(osmRule::ExtractableAttrValueDoubleQuoted));
@@ -600,16 +605,19 @@ namespace nsOSM {
 			<< new ConsumeNode(osmToken::STRING, "id")
 			<< new ConsumeNode(osmToken::EQUALS)
 			<< new ForwardNode(osmRule::ExtractableAttrValue)
+			<< new CustomNode(osmHandler::SetId)
 			<< new ForwardNode(osmRule::NodeAttr));
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(osmToken::STRING, "lat")
 			<< new ConsumeNode(osmToken::EQUALS)
 			<< new ForwardNode(osmRule::ExtractableAttrValue)
+			<< new CustomNode(osmHandler::SetLatitude)
 			<< new ForwardNode(osmRule::NodeAttr));
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(osmToken::STRING, "lon")
 			<< new ConsumeNode(osmToken::EQUALS)
 			<< new ForwardNode(osmRule::ExtractableAttrValue)
+			<< new CustomNode(osmHandler::SetLongitude)
 			<< new ForwardNode(osmRule::NodeAttr));
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(osmToken::STRING)
@@ -665,6 +673,7 @@ namespace nsOSM {
 			<< new ConsumeNode(osmToken::SLASH)
 			<< new ConsumeNode(osmToken::STRING)
 			<< new ConsumeNode(osmToken::RANGLEBRACKET)
+			<< new CustomNode(osmHandler::CommitShape)
 			<< new ForwardNode(osmRule::ConsumeWS));
 		(*rule) += &((*(new Sequence()))
 			<< new ForwardNode(osmRule::AnyWayNestedTagContent)
@@ -710,6 +719,7 @@ namespace nsOSM {
 			<< new ConsumeNode(osmToken::STRING, "ref")
 			<< new ConsumeNode(osmToken::EQUALS)
 			<< new ForwardNode(osmRule::ExtractableAttrValue)
+			<< new CustomNode(osmHandler::SetRef)
 			<< new ForwardNode(osmRule::NdAttr));
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(osmToken::STRING)
@@ -718,6 +728,10 @@ namespace nsOSM {
 			<< new ForwardNode(osmRule::NdAttr));
 		(*rule) += new Sequence();
 		rules->push_back(rule);
+
+		rule = new Rule(osmRule::FinalSequence, "FinalSequence");
+		(*rule) += &((*(new Sequence()))
+			<< new CustomNode(osmHandler::DisposePoints));
 
 		auto* stack = new Stack(first_rule);
 

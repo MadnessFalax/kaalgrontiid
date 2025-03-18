@@ -371,9 +371,9 @@
       <WarningLevel>Level3</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <SDLCheck>true</SDLCheck>
+      <SDLCheck>false</SDLCheck>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
+      <ConformanceMode>false</ConformanceMode>
       <AdditionalIncludeDirectories>..\..;..\..\common;..\..\common\datatype\tuple;..\..\common\datatype;..\..\common\datatype\geo;..\..\common\stream;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
@@ -503,7 +503,7 @@
     <ClInclude Include="..\..\dstruct\paged\sequentialarray\cSequentialArrayNodeHeader.h" />
     <ClInclude Include="utils\string.h" />
   </ItemGroup>
-  <ItemGroup>   
+  <ItemGroup>
     <ClCompile Include="..\..\common\cCommon.cpp" />
     <ClCompile Include="..\..\common\datatype\cBasicType.cpp" />
     <ClCompile Include="..\..\common\cBitString.cpp" />

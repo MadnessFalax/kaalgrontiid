@@ -107,7 +107,9 @@ namespace nsGeoJSON {
 			<< new ConsumeNode(gjToken::COLON) 
 			<< new ConsumeNode(gjToken::LBRACKET) 
 			<< new ForwardNode(gjRule::CoordinatesRoot) 
-			<< new ConsumeNode(gjToken::RBRACKET));
+			<< new CustomNode(gjHandler::DepthOut)
+			<< new ConsumeNode(gjToken::RBRACKET)
+			<< new CustomNode(gjHandler::CommitShape));
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(gjToken::STRING, "\"geometries\"")
 			<< new ConsumeNode(gjToken::COLON)

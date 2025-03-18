@@ -40,7 +40,7 @@ using SeqArrayContext = dstruct::paged::sqarray::cSequentialArrayContext<Tkey>;
 using SeqArrayHeader = dstruct::paged::sqarray::cSequentialArrayHeader<Tkey>;
 
 #ifndef _WORK
-constexpr auto PATH = R"(C:\Users\Petr\Downloads\src\test\kaalgrontiid\test\example.kml)";
+constexpr auto PATH = R"(C:\Users\Petr\Downloads\src\test\kaalgrontiid\test\short.osm)";
 #endif
 
 #ifdef _WORK
@@ -71,20 +71,8 @@ static void helper() {
 	unsigned int tuple_size = 0;
 
 	// OSM Parser test ----------------
-	//String path = PATH;
-	//auto* p = nsOSM::setup_parser();
-	//p->open(path);
-	//while (p->get_item()) {
-	//	// do nothing
-	//	printf("got value \n");
-	//}
-
-	//delete p;
-	// ------------------------------------
-
-	// KML Parser test ----------------
 	String path = PATH;
-	auto* p = nsKML::setup_parser();
+	auto* p = nsOSM::setup_parser();
 	p->open(path);
 	cDataShape<cNTuple>* item = nullptr;
 	while (item = p->get_item()) {
@@ -105,13 +93,47 @@ static void helper() {
 	delete p;
 	// ------------------------------------
 
+	// KML Parser test ----------------
+	//String path = PATH;
+	//auto* p = nsKML::setup_parser();
+	//p->open(path);
+	//cDataShape<cNTuple>* item = nullptr;
+	//while (item = p->get_item()) {
+	//	// do nothing
+
+	//	tuple_arr = item->GetVerticesCollection();
+	//	tuple_size = item->GetVerticesCount();
+
+
+	//	for (unsigned int i = 0; i < tuple_size; i++) {
+	//		seq_array->AddItem(node_id, position, *(tuple_arr[i]));
+	//	}
+
+	//	delete item;
+	//	item = nullptr;
+	//}
+
+	//delete p;
+	// ------------------------------------
+
 	// GeoJSON Parser test ----------------
 	//String path = PATH;
 	//auto* p = nsGeoJSON::setup_parser();
 	//p->open(path);
-	//while (p->get_item()) {
+	//cDataShape<cNTuple>* item = nullptr;
+	//while (item = p->get_item()) {
 	//	// do nothing
-	//	printf("got value \n");
+
+	//	tuple_arr = item->GetVerticesCollection();
+	//	tuple_size = item->GetVerticesCount();
+
+
+	//	for (unsigned int i = 0; i < tuple_size; i++) {
+	//		seq_array->AddItem(node_id, position, *(tuple_arr[i]));
+	//	}
+
+	//	delete item;
+	//	item = nullptr;
 	//}
 
 	//delete p;

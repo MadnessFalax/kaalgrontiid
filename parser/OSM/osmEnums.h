@@ -59,11 +59,20 @@ namespace nsOSM {
 		AnyWayNestedTagContent,
 		NormalWayNestedTag,
 		NdAttr,
-		NdAttrPossible
+		NdAttrPossible,
+		FinalSequence
 	};
 
 	enum osmHandler {
-		C0CK
+		ChangeSign,
+		SetLongitude,
+		SetLatitude,
+		SetId,
+		SetRef,
+		PointsToArray,
+		CommitPoint,
+		CommitShape,
+		DisposePoints
 	};
 
 }
