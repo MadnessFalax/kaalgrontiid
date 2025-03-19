@@ -656,7 +656,7 @@ namespace nsOSM {
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(osmToken::RANGLEBRACKET)
 			<< new ForwardNode(osmRule::ConsumeWS)
-			<< new ForwardNode(osmRule::OptionalPairTagAnyContent));
+			<< new ForwardNode(osmRule::OptionalPairTagWayContent));
 		rules->push_back(rule);
 
 		rule = new Rule(osmRule::OptionalPairTagWayContent, "OptionalPairTagWayContent");
