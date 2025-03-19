@@ -72,8 +72,8 @@ namespace nsGeoJSON {
 		void resolve_custom_visit<gjHandler::BufferPoint>(CustomNode& node) {
 			if (_context.dimension < _point->size()) {
 				_context.dimension = _point->size();
-				_depth = depth::CoordsLevel;
 			}
+			_depth = depth::CoordsLevel;
 			_points->push_back(_point);
 			_point = new Array<double>();
 
@@ -85,16 +85,24 @@ namespace nsGeoJSON {
 		void resolve_custom_visit<gjHandler::CommitShape>(CustomNode& node) {
 			size_t p_size = _points->size();
 
-			if (_depth == depth::PointsLevel && (_context.last_extracted_string == "\"Point\"" || _context.last_extracted_string == "\"MultiPoint\"")) {
-				auto* pt_cpy = new Array<double>();
-				for (size_t i = 0; i < (*_points)[0]->size(); i++) {
-					pt_cpy->push_back(double{ (*(*_points)[0])[i] });
-				}
-				_points->push_back(pt_cpy);
-				p_size = _points->size();
-				pt_cpy = nullptr;
+			cSpaceDescriptor* desc = _space_desc_2d;
+			if (_context.dimension == 3) {
+				desc = _space_desc_3d;
+			}
 
-				_context.item_type = DataShape::DS_SPHERE;
+			_context.last_item_sd = desc;
+
+			if (_depth == depth::PointsLevel && (_context.last_extracted_string == "\"Point\"" || _context.last_extracted_string == "\"MultiPoint\"")) {
+				_context.item_type = DataShape::DS_POINT;
+
+				cNTuple* tuple = new cNTuple(desc);
+				for (size_t i = 0; i < _context.dimension; i++) {
+					tuple->SetValue((unsigned int)i, (*(*_points)[0])[i], desc);
+				}
+
+				_context.item = tuple;
+
+				tuple = nullptr;
 			}
 			else if (_depth == depth::ShapeLevel && (_context.last_extracted_string == "\"LineString\"" || _context.last_extracted_string == "\"MultiLineString\"" || _context.last_extracted_string == "\"Polygon\"" || _context.last_extracted_string == "\"MultiPolygon\"")) {
 				_context.item_type = DataShape::DS_POLYGON;
@@ -107,26 +115,20 @@ namespace nsGeoJSON {
 						break;
 					}
 				}
-			}
 
-			cSpaceDescriptor* desc = _space_desc_2d;
-			if (_context.dimension == 3) {
-				desc = _space_desc_3d;
-			}
-
-			_context.last_item_sd = desc;
-
-			cNTuple** tuples = new cNTuple * [p_size];
-			for (size_t i = 0; i < p_size; i++) {
-				tuples[i] = new cNTuple(desc);
-				for (size_t j = 0; j < _context.dimension; j++) {
-					tuples[i]->SetValue((unsigned int)j, (*(*_points)[i])[j], desc);
+				cNTuple** tuples = new cNTuple * [p_size];
+				for (size_t i = 0; i < p_size; i++) {
+					tuples[i] = new cNTuple(desc);
+					for (size_t j = 0; j < _context.dimension; j++) {
+						tuples[i]->SetValue((unsigned int)j, (*(*_points)[i])[j], desc);
+					}
 				}
+
+				_context.item = cDataShape<cNTuple>::CreateDataShape(_context.item_type, tuples, (unsigned int)_points->size(), desc);
+
+				tuples = nullptr;
 			}
 
-			_context.item = cDataShape<cNTuple>::CreateDataShape(_context.item_type, tuples, (unsigned int)_points->size(), desc);
-
-			tuples = nullptr;
 
 			for (size_t i = 0; i < p_size; i++) {
 				delete (*_points)[i];

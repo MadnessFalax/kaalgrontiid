@@ -53,7 +53,7 @@ namespace nspParser {
 			
 			bool has_item = false;
 			DataShape item_type = DataShape{};
-			cDataShape<cNTuple>* item = nullptr;
+			cDataType* item = nullptr;
 			size_t dimension = 0;
 			cSpaceDescriptor* last_item_sd = nullptr;
 
@@ -239,7 +239,7 @@ namespace nspParser {
 				return;
 			}
 			_stack->register_rule(_rule_map[node.get_rule_id()]);
-			_context.current_rule = node.get_entry_rule_id();
+			_context.current_rule = node.get_rule_id();
 			_context.last_status = Context::LastStatus::OK;
 			return;
 		}
@@ -308,7 +308,7 @@ namespace nspParser {
 			return _context.has_item;
 		}
 
-		cDataShape<cNTuple>* get_item() {
+		cDataType* get_item() {
 			auto* retval = _context.item;
 			_context.item = nullptr;
 			_context.has_item = false;

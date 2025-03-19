@@ -40,7 +40,7 @@ using SeqArrayContext = dstruct::paged::sqarray::cSequentialArrayContext<Tkey>;
 using SeqArrayHeader = dstruct::paged::sqarray::cSequentialArrayHeader<Tkey>;
 
 #ifndef _WORK
-constexpr auto PATH = R"(C:\Users\Petr\Downloads\src\test\kaalgrontiid\test\short.osm)";
+constexpr auto PATH = R"(C:\Users\Petr\Downloads\src\test\kaalgrontiid\test\sample_geo.json)";
 #endif
 
 #ifdef _WORK
@@ -70,74 +70,91 @@ static void helper() {
 	cNTuple** tuple_arr = nullptr;
 	unsigned int tuple_size = 0;
 
-	// OSM Parser test ----------------
 	String path = PATH;
+
+#ifdef _OSM
 	auto* p = nsOSM::setup_parser();
+#endif
+
+#ifdef _GEOJS
+	auto* p = nsGeoJSON::setup_parser();
+#endif
+
+#ifdef _KML
+	auto* p = nsKML::setup_parser();
+#endif
+
+	cLineString<cNTuple>* ls = nullptr;
+	cPolygon<cNTuple>* poly = nullptr;
+	cSphere<cNTuple>* sphere = nullptr;
+	cNTuple* point = nullptr;
+
 	p->open(path);
-	cDataShape<cNTuple>* item = nullptr;
+	cDataType* item = nullptr;
 	while (item = p->get_item()) {
 		// do nothing
 
-		tuple_arr = item->GetVerticesCollection();
-		tuple_size = item->GetVerticesCount();
+		switch (p->get_shape_type()) {
+		case DataShape::DS_POINT:
+			point = static_cast<cNTuple*>(item);
+			seq_array->AddItem(node_id, position, *point);
 
+			delete point;
+			point = nullptr;
+			item = nullptr;
+			break;
+		case DataShape::DS_LINESTRING:
+			ls = static_cast<cLineString<cNTuple>*>(item);
+			tuple_arr = ls->GetVerticesCollection();
+			tuple_size = ls->GetVerticesCount();
 
-		for (unsigned int i = 0; i < tuple_size; i++) {
-			seq_array->AddItem(node_id, position, *(tuple_arr[i]));
+			for (unsigned int i = 0; i < tuple_size; i++) {
+				seq_array->AddItem(node_id, position, *(tuple_arr[i]));
+			}
+
+			delete ls;
+			ls = nullptr;
+			item = nullptr;
+			break;
+		case DataShape::DS_POLYGON:
+			poly = static_cast<cPolygon<cNTuple>*>(item);
+			tuple_arr = poly->GetVerticesCollection();
+			tuple_size = poly->GetVerticesCount();
+
+			for (unsigned int i = 0; i < tuple_size; i++) {
+				seq_array->AddItem(node_id, position, *(tuple_arr[i]));
+			}
+
+			delete poly;
+			poly = nullptr;
+			item = nullptr;
+			break;
+		case DataShape::DS_SPHERE:
+			sphere = static_cast<cSphere<cNTuple>*>(item);
+			tuple_arr = sphere->GetVerticesCollection();
+			tuple_size = sphere->GetVerticesCount();
+
+			for (unsigned int i = 0; i < tuple_size; i++) {
+				seq_array->AddItem(node_id, position, *(tuple_arr[i]));
+			}
+
+			delete sphere;
+			sphere = nullptr;
+			item = nullptr;
+			break;
+		default:
+			printf("wtf");
+			break;
 		}
 
-		delete item;
-		item = nullptr;
+
+		// impossible to delete through base class, dtor not virtual!!!
+		//delete item;
+		//item = nullptr;
 	}
 
 	delete p;
-	// ------------------------------------
 
-	// KML Parser test ----------------
-	//String path = PATH;
-	//auto* p = nsKML::setup_parser();
-	//p->open(path);
-	//cDataShape<cNTuple>* item = nullptr;
-	//while (item = p->get_item()) {
-	//	// do nothing
-
-	//	tuple_arr = item->GetVerticesCollection();
-	//	tuple_size = item->GetVerticesCount();
-
-
-	//	for (unsigned int i = 0; i < tuple_size; i++) {
-	//		seq_array->AddItem(node_id, position, *(tuple_arr[i]));
-	//	}
-
-	//	delete item;
-	//	item = nullptr;
-	//}
-
-	//delete p;
-	// ------------------------------------
-
-	// GeoJSON Parser test ----------------
-	//String path = PATH;
-	//auto* p = nsGeoJSON::setup_parser();
-	//p->open(path);
-	//cDataShape<cNTuple>* item = nullptr;
-	//while (item = p->get_item()) {
-	//	// do nothing
-
-	//	tuple_arr = item->GetVerticesCollection();
-	//	tuple_size = item->GetVerticesCount();
-
-
-	//	for (unsigned int i = 0; i < tuple_size; i++) {
-	//		seq_array->AddItem(node_id, position, *(tuple_arr[i]));
-	//	}
-
-	//	delete item;
-	//	item = nullptr;
-	//}
-
-	//delete p;
-	// ------------------------------------
 	printf("Inserted %i items.", seq_array->GetHeader()->GetItemCount());
 
 	db->Close();

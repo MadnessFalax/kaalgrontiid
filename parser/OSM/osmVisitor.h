@@ -173,24 +173,17 @@ namespace nsOSM {
 				auto* desc = _space_desc_2d;
 				_context.last_item_sd = desc;
 
-				_context.item_type = DataShape::DS_SPHERE;
+				_context.item_type = DataShape::DS_POINT;
 
-				cNTuple** tuples = new cNTuple *[2];
-				tuples[0] = new cNTuple(desc);
-				tuples[0]->SetValue((unsigned int)0, point->longitude, desc);
-				tuples[0]->SetValue((unsigned int)1, point->latitude, desc);
-				tuples[1] = new cNTuple(desc);
-				tuples[1]->SetValue((unsigned int)0, point->longitude, desc);
-				tuples[1]->SetValue((unsigned int)1, point->latitude, desc);
+				cNTuple* tuple = new cNTuple(desc);
+				tuple->SetValue((unsigned int)0, point->longitude, desc);
+				tuple->SetValue((unsigned int)1, point->latitude, desc);
 			
-				_context.item = cDataShape<cNTuple>::CreateDataShape(_context.item_type, tuples, 2, desc);
+				_context.item = tuple;
 
-				tuples = nullptr;
+				tuple = nullptr;
 
-				(*_points)[0] = nullptr;
-
-				delete _points;
-				_points = new Array<Point*>();
+				point = nullptr;
 
 				_context.has_item = true;
 
@@ -199,6 +192,9 @@ namespace nsOSM {
 				_context.last_status = Context::LastStatus::OK;
 			}
 			else {
+				delete _points;
+				_points = nullptr;
+
 				_context.end = true;
 				_context.last_status = Context::LastStatus::OK;
 			}

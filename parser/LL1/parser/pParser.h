@@ -119,11 +119,15 @@ namespace nspParser {
 		//	}
 		//}
 
+		DataShape get_shape_type() {
+			return _context->item_type;
+		}
+
 		cSpaceDescriptor* get_space_descriptor() {
 			return _context->last_item_sd;
 		}
 
-		cDataShape<cNTuple>* get_item() {
+		cDataType* get_item() {
 			while (!_context->end && !_context->has_item) {
 				if (!_resolve_current_node()) {
 					break;
