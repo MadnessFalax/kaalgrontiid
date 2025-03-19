@@ -200,6 +200,7 @@ namespace nspParser {
 			
 			// now behave like ForwardNode
 			_stack->register_rule(_rule_map[node.get_entry_rule_id()]);
+			_context.current_rule = node.get_entry_rule_id();
 			_context.last_status = Context::LastStatus::OK;
 			return;
 		}
@@ -238,6 +239,7 @@ namespace nspParser {
 				return;
 			}
 			_stack->register_rule(_rule_map[node.get_rule_id()]);
+			_context.current_rule = node.get_entry_rule_id();
 			_context.last_status = Context::LastStatus::OK;
 			return;
 		}
