@@ -74,9 +74,7 @@ namespace nsOSM {
 		auto* rule = new Rule(osmRule::OSM, "OSM");
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(osmToken::LANGLEBRACKET)
-			<< new ForwardNode(osmRule::AnyTagContent)
-			<< new CustomNode(osmHandler::PointsToArray)
-			<< new ForwardNode(osmRule::FinalSequence));
+			<< new ForwardNode(osmRule::AnyTagContent));
 		rules->push_back(rule);
 
 		rule = new Rule(osmRule::AnyTagContent, "AnyTagContent");
@@ -383,7 +381,7 @@ namespace nsOSM {
 			<< new ConsumeNode(osmToken::QUOTE));
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(osmToken::DOUBLEQUOTE)
-			<< new ForwardNode(osmRule::AttrValueQuoted)
+			<< new ForwardNode(osmRule::AttrValueDoubleQuoted)
 			<< new ConsumeNode(osmToken::DOUBLEQUOTE));
 		(*rule) += new Sequence();
 		rules->push_back(rule);
@@ -732,10 +730,17 @@ namespace nsOSM {
 		rule = new Rule(osmRule::FinalSequence, "FinalSequence");
 		(*rule) += &((*(new Sequence()))
 			<< new CustomNode(osmHandler::DisposePoints));
+		rules->push_back(rule);
+
+		auto* ending_rule = new Rule(osmRule::EndingRule, "EndingRule");
+		(*ending_rule) += &((*(new Sequence()))
+			<< new CustomNode(osmHandler::PointsToArray)
+			<< new ForwardNode(osmRule::FinalSequence));
+		rules->push_back(ending_rule);
 
 		auto* stack = new Stack(first_rule);
 
-		auto* visitor = new osmVisitor(lexer, rules, stack);
+		auto* visitor = new osmVisitor(lexer, rules, stack, ending_rule);
 
 		Parser* parser = new Parser(rules, first_rule, visitor, lexer, stack);
 

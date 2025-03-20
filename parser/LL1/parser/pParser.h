@@ -128,16 +128,24 @@ namespace nspParser {
 		}
 
 		cDataType* get_item() {
-			while (!_context->end && !_context->has_item) {
+			while (!_context->has_item) {
 				if (!_resolve_current_node()) {
 					break;
 				}
+			}
+			if (_context->item == nullptr && _visitor->has_ending_rule()) {
+				_context->end = false;
+				_stack->register_rule(_visitor->pop_end_rule());
+				_stack->success();
+				return get_item();
 			}
 			auto* item = _context->item;
 			_context->item = nullptr;
 			_context->has_item = false;
 			return item;
 		}
+
+
 	};
 
 }

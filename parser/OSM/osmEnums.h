@@ -60,7 +60,8 @@ namespace nsOSM {
 		NormalWayNestedTag,
 		NdAttr,
 		NdAttrPossible,
-		FinalSequence
+		FinalSequence,
+		EndingRule
 	};
 
 	enum osmHandler {

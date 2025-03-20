@@ -23,17 +23,19 @@ namespace nsOSM {
 		Map<size_t, Point, unsigned short> _nodes;		// Point owner
 
 	public:
-		osmVisitor(Lexer* lexer, Array<Rule*>* rules, Stack* stack) : nspParser::pParserVisitor<osmToken, osmRule, osmHandler, osmVisitor>(lexer, rules, stack) {
+		osmVisitor(Lexer* lexer, Array<Rule*>* rules, Stack* stack, Rule* ending_rule = nullptr) : nspParser::pParserVisitor<osmToken, osmRule, osmHandler, osmVisitor>(lexer, rules, stack, ending_rule) {
 			_points = new Array<Point*>();
 		}
 
 		~osmVisitor() {
-			size_t p_size = _points->size();
-			for (size_t i = 0; i < p_size; i++) {
-				(*_points)[i] = nullptr;
+			if (_points) {
+				size_t p_size = _points->size();
+				for (size_t i = 0; i < p_size; i++) {
+					(*_points)[i] = nullptr;
+				}
+				delete _points;
+				_points = nullptr;
 			}
-			delete _points;
-			_points = nullptr;
 		}
 
 		void custom_visit_root(CustomNode& node) override {

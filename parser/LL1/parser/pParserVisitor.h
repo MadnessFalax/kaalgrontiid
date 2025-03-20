@@ -81,6 +81,7 @@ namespace nspParser {
 		Stack* _stack = nullptr;									// Stack is owned by pParser class
 		cSpaceDescriptor* _space_desc_2d = nullptr;
 		cSpaceDescriptor* _space_desc_3d = nullptr;
+		Rule* _ending_rule = nullptr;
 
 
 		bool _try_extract_number() {
@@ -164,7 +165,7 @@ namespace nspParser {
 
 	public:
 		// Does not take ownership of lexer, rules or stack
-		pParserVisitor(Lexer* lexer, Array<Rule*>* rules, Stack* stack) : _lexer(lexer), _stack(stack) {
+		pParserVisitor(Lexer* lexer, Array<Rule*>* rules, Stack* stack, Rule* ending_rule = nullptr) : _lexer(lexer), _stack(stack), _ending_rule(ending_rule) {
 			for (Rule* rule : *rules) {
 				_rule_map[rule->get_id()] = rule;
 			}
@@ -175,6 +176,7 @@ namespace nspParser {
 
 		virtual ~pParserVisitor() {
 			// no ownership of lexer or rules
+			_ending_rule = nullptr;
 			_lexer = nullptr;
 			_stack = nullptr;
 			delete _space_desc_2d;
@@ -306,6 +308,16 @@ namespace nspParser {
 
 		bool has_item() {
 			return _context.has_item;
+		}
+
+		Rule* pop_end_rule() {
+			auto* end_rule = _ending_rule;
+			_ending_rule = nullptr;
+			return end_rule;
+		}
+		
+		bool has_ending_rule() {
+			return _ending_rule != nullptr;
 		}
 
 		cDataType* get_item() {

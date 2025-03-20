@@ -131,7 +131,7 @@ namespace nspParser {
 	public:
 		// returns whether it is possible to obtain another node
 		bool success() {
-			bool status = _node_stack[_node_stack.size() - 1]->next_node();
+			bool status = _node_stack.size() > 0 ? _node_stack[_node_stack.size() - 1]->next_node() : false;
 			if (!status) {
 				status = _remove_stack_block();
 			}
