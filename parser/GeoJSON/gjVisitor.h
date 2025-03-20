@@ -64,6 +64,7 @@ namespace nsGeoJSON {
 		template<>
 		void resolve_custom_visit<gjHandler::BufferNumber>(CustomNode& node) {
 			_point->push_back(_context.last_extracted_number);
+			_depth = depth::CoordsLevel;
 
 			_context.last_status = Context::LastStatus::OK;
 		}
@@ -73,7 +74,6 @@ namespace nsGeoJSON {
 			if (_context.dimension < _point->size()) {
 				_context.dimension = _point->size();
 			}
-			_depth = depth::CoordsLevel;
 			_points->push_back(_point);
 			_point = new Array<double>();
 
@@ -103,8 +103,18 @@ namespace nsGeoJSON {
 				_context.item = tuple;
 
 				tuple = nullptr;
+
+				for (size_t i = 0; i < p_size; i++) {
+					delete (*_points)[i];
+					(*_points)[i] = nullptr;
+				}
+				delete _points;
+				_points = new Array<Array<double>*>();
+
+				_context.dimension = 0;
+				_context.has_item = true;
 			}
-			else if (_depth == depth::ShapeLevel && (_context.last_extracted_string == "\"LineString\"" || _context.last_extracted_string == "\"MultiLineString\"" || _context.last_extracted_string == "\"Polygon\"" || _context.last_extracted_string == "\"MultiPolygon\"")) {
+			else if (_depth == depth::PointsLevel && (_context.last_extracted_string == "\"LineString\"" || _context.last_extracted_string == "\"MultiLineString\"" || _context.last_extracted_string == "\"Polygon\"" || _context.last_extracted_string == "\"MultiPolygon\"")) {
 				_context.item_type = DataShape::DS_POLYGON;
 				auto* first_point = (*_points)[0];
 				auto* last_point = (*_points)[p_size - 1];
@@ -127,17 +137,19 @@ namespace nsGeoJSON {
 				_context.item = cDataShape<cNTuple>::CreateDataShape(_context.item_type, tuples, (unsigned int)_points->size(), desc);
 
 				tuples = nullptr;
+
+				for (size_t i = 0; i < p_size; i++) {
+					delete (*_points)[i];
+					(*_points)[i] = nullptr;
+				}
+				delete _points;
+				_points = new Array<Array<double>*>();
+
+				_context.dimension = 0;
+				_context.has_item = true;
 			}
 
 
-			for (size_t i = 0; i < p_size; i++) {
-				delete (*_points)[i];
-				(*_points)[i] = nullptr;
-			}
-			delete _points;
-			_points = new Array<Array<double>*>();
-
-			_context.has_item = true;
 			_context.last_status = Context::LastStatus::OK;
 		}
 

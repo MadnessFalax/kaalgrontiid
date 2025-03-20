@@ -287,8 +287,7 @@ namespace nsGeoJSON {
 			<< new ForwardNode(gjRule::CoordinatesRoot)
 			<< new CustomNode(gjHandler::DepthOut)
 			<< new ConsumeNode(gjToken::RBRACKET)
-			<< new ForwardNode(gjRule::CoordinatesRootTail)
-			<< new CustomNode(gjHandler::CommitShape));
+			<< new ForwardNode(gjRule::CoordinatesRootTail));
 		(*rule) += &((*(new Sequence()))
 			<< new ForwardNode(gjRule::Coordinates)
 			<< new CustomNode(gjHandler::BufferPoint));
@@ -301,9 +300,9 @@ namespace nsGeoJSON {
 			<< new ForwardNode(gjRule::CoordinatesRoot)
 			<< new CustomNode(gjHandler::DepthOut)
 			<< new ConsumeNode(gjToken::RBRACKET)
-			<< new ForwardNode(gjRule::CoordinatesRootTail)
+			<< new ForwardNode(gjRule::CoordinatesRootTail));
+		(*rule) += &((*(new Sequence()))
 			<< new CustomNode(gjHandler::CommitShape));
-		(*rule) += new Sequence();
 		rules->push_back(rule);
 
 		rule = new Rule(gjRule::Coordinates, "Coordinates");
