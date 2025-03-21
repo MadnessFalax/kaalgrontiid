@@ -351,6 +351,8 @@
     <ClInclude Include="abstract\pHasId.h" />
     <ClInclude Include="container\pMap.h" />
     <ClInclude Include="container\pPair.h" />
+    <ClInclude Include="exporter\buffer\pFileWriter.h" />
+    <ClInclude Include="exporter\pExporter.h" />
     <ClInclude Include="parser\buffer\pFileHandler.h" />
     <ClInclude Include="parser\GeoJSON\gjParser.h" />
     <ClInclude Include="parser\GeoJSON\gjEnums.h" />
@@ -503,7 +505,7 @@
     <ClCompile Include="..\..\dstruct\paged\core\cTreeHeader.cpp" />
     <ClCompile Include="parser\regex\AST\pRegexNode.cpp" />
     <ClCompile Include="parser\regex\NFA\pState.cpp" />
-    <ClCompile Include="Source.cpp" />
+    <ClCompile Include="Source1.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />
