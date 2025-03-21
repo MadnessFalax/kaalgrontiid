@@ -98,6 +98,9 @@ namespace nspFile {
 		}
 
 		bool set_position(size_t pos) {
+			if (pos < 0) {
+				pos = 0;
+			}
 			if (pos < _file_size) {
 				_pos = pos;
 				if (_pos < _buffer_pos || _pos >= _buffer_pos + _buffer_size) {
@@ -124,6 +127,7 @@ namespace nspFile {
 			return '\0';
 		}
 
+		// shouldn't cause errors if called on first char as far as I know (I hope)
 		void unget_char() {
 			_pos--;
 		}

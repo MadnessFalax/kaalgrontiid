@@ -164,7 +164,7 @@ namespace nspParser {
 		}
 
 	public:
-		// Does not take ownership of lexer, rules or stack
+		// Does not take ownership of lexer, rules, stack nor ending_rule
 		pParserVisitor(Lexer* lexer, Array<Rule*>* rules, Stack* stack, Rule* ending_rule = nullptr) : _lexer(lexer), _stack(stack), _ending_rule(ending_rule) {
 			for (Rule* rule : *rules) {
 				_rule_map[rule->get_id()] = rule;
