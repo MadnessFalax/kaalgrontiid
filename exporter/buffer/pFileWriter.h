@@ -23,7 +23,7 @@ namespace nspFile {
 			auto buf_siz = _buffer->length() + 1;
 			char* buf_cpy = new char[buf_siz];
 			memcpy(buf_cpy, _buffer->c_str(), buf_siz);
-			bool result = _file->Write(buf_cpy, buf_siz, nullptr);
+			bool result = _file->Write(buf_cpy, (int) buf_siz, nullptr);
 			delete[] buf_cpy;
 			buf_cpy = nullptr;
 
@@ -44,6 +44,33 @@ namespace nspFile {
 			_is_open = _file->Open(reinterpret_cast<const char*>(_filename.c_str()), ACCESS_WRITE, FILE_CREATE);
 			_buffer = new String();
 		}
+
+		pFileWriter(const pFileWriter&) = delete;
+		pFileWriter(pFileWriter&& other) noexcept {
+			_filename = other._filename;
+			_file = other._file;
+			_is_open = other._is_open;
+			_buffer = other._buffer;
+			
+			other._filename = "";
+			other._file = nullptr;
+			other._buffer = nullptr;
+		}
+		
+		pFileWriter& operator=(const pFileWriter&) = delete;
+		pFileWriter& operator=(pFileWriter&& other) noexcept {
+			if (this != &other) {
+				_filename = other._filename;
+				_file = other._file;
+				_is_open = other._is_open;
+				_buffer = other._buffer;
+				
+				other._filename = "";
+				other._file = nullptr;
+				other._buffer = nullptr;
+			}
+		}
+
 
 		bool write(String string) {
 			bool status = false;
