@@ -40,7 +40,7 @@ using SeqArrayContext = dstruct::paged::sqarray::cSequentialArrayContext<Tkey>;
 using SeqArrayHeader = dstruct::paged::sqarray::cSequentialArrayHeader<Tkey>;
 
 #ifndef _WORK
-constexpr auto PATH = R"(C:\Users\Petr\Downloads\src\test\kaalgrontiid\test.json)";
+constexpr auto PATH = R"(C:\Users\Petr\Downloads\src\test\kaalgrontiid\test\output.kml)";
 #endif
 
 #ifdef _WORK
