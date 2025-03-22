@@ -93,6 +93,8 @@ namespace nsOSM {
 
 			char* num_buf = new char[32];
 
+			auto dim = point->GetLength();
+
 			output += "<node id=\"";
 			snprintf(num_buf, 32, "%llu", _cur_id++);
 			output += num_buf;
@@ -102,6 +104,13 @@ namespace nsOSM {
 			output += "\" lon=\"";
 			snprintf(num_buf, 32, "%.7f", point->GetDouble(0, nullptr));
 			output += num_buf;
+
+			if (dim > 2) {
+				output += "\" ele=\"";
+				snprintf(num_buf, 32, "%.7f", point->GetDouble(2, nullptr));
+				output += num_buf;
+			}
+
 			output += "\">\n";
 			output += "</node>\n";
 

@@ -26,79 +26,57 @@ static void helper() {
     cNTuple* point = new cNTuple(space);
     point->SetValue(0, (double)0.0f, nullptr);
     point->SetValue(1, (double)1.0f, nullptr);
-#ifndef _OSM
     point->SetValue(2, (double)2.0f, nullptr);
-#endif
 
     cNTuple* point2 = new cNTuple(space);
     point2->SetValue(0, (double)3.0f, nullptr);
     point2->SetValue(1, (double)4.0f, nullptr);
-#ifndef _OSM
     point2->SetValue(2, (double)5.0f, nullptr);
-#endif
 
     cNTuple* point3 = new cNTuple(space);
     point3->SetValue(0, (double)7.0f, nullptr);
     point3->SetValue(1, (double)6.0f, nullptr);
-#ifndef _OSM
     point3->SetValue(2, (double)8.0f, nullptr);
-#endif
 
     cNTuple* point4 = new cNTuple(space);
     point4->SetValue(0, (double)9.0f, nullptr);
     point4->SetValue(1, (double)10.0f, nullptr);
-#ifndef _OSM
     point4->SetValue(2, (double)11.0f, nullptr);
-#endif
 
     cNTuple* point5 = new cNTuple(space);
     point5->SetValue(0, (double)12.0f, nullptr);
     point5->SetValue(1, (double)13.0f, nullptr);
-#ifndef _OSM
     point5->SetValue(2, (double)14.0f, nullptr);
-#endif
 
     cNTuple* point5_2 = new cNTuple(space);
     point5_2->SetValue(0, (double)12.0f, nullptr);
     point5_2->SetValue(1, (double)13.0f, nullptr);
-#ifndef _OSM
     point5_2->SetValue(2, (double)14.0f, nullptr);
-#endif
 
     cNTuple* point6 = new cNTuple(space);
     point6->SetValue(0, (double)15.0f, nullptr);
     point6->SetValue(1, (double)16.0f, nullptr);
-#ifndef _OSM
     point6->SetValue(2, (double)17.0f, nullptr);
-#endif
 
     cNTuple* point7 = new cNTuple(space);
     point7->SetValue(0, (double)19.0f, nullptr);
     point7->SetValue(1, (double)18.0f, nullptr);
-#ifndef _OSM
     point7->SetValue(2, (double)20.0f, nullptr);
-#endif
 
     cNTuple* point8 = new cNTuple(space);
     point8->SetValue(0, (double)22.0f, nullptr);
     point8->SetValue(1, (double)21.0f, nullptr);
-#ifndef _OSM
     point8->SetValue(2, (double)23.0f, nullptr);
-#endif
 
     cNTuple* point9 = new cNTuple(space);
     point9->SetValue(0, (double)24.0f, nullptr);
     point9->SetValue(1, (double)25.0f, nullptr);
-#ifndef _OSM
     point9->SetValue(2, (double)26.0f, nullptr);
-#endif
 
     cNTuple* point10 = new cNTuple(space);
     point10->SetValue(0, (double)27.0f, nullptr);
     point10->SetValue(1, (double)28.0f, nullptr);
-#ifndef _OSM
     point10->SetValue(2, (double)29.0f, nullptr);
-#endif
 
 	cNTuple** ls_points = new cNTuple * [4];
 	ls_points[0] = point2;
