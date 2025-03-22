@@ -40,7 +40,7 @@ using SeqArrayContext = dstruct::paged::sqarray::cSequentialArrayContext<Tkey>;
 using SeqArrayHeader = dstruct::paged::sqarray::cSequentialArrayHeader<Tkey>;
 
 #ifndef _WORK
-constexpr auto PATH = R"(C:\Users\Petr\Downloads\src\test\kaalgrontiid\test\short.osm)";
+constexpr auto PATH = R"(C:\Users\Petr\Downloads\src\test\kaalgrontiid\test\sample_geo.json)";
 #endif
 
 #ifdef _WORK
@@ -162,6 +162,7 @@ static void helper() {
 	delete db;
 	delete header;
 	delete context;
+	delete space_desc_3d;
 
 	return;
 }

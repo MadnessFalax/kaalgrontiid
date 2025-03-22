@@ -2,7 +2,6 @@
 
 #include "pArray.h"
 #include "cstdlib"
-#include "cstring"
 #include "../abstract/pHashable.h"
 #include "../utils/exception/pOutOfRangeException.h"
 #include "../utils/string.h"
@@ -26,7 +25,8 @@ namespace nspString {
 		size_t _count = 0;			// string unsigned char length ('\0' NOT included)
 
 	public:
-		pString() : _data(new unsigned char[START_SIZE]) {
+		pString() {
+			_data = new unsigned char[_size];
 			memset(_data, '\0', _size);
 		}
 
@@ -58,10 +58,10 @@ namespace nspString {
 			_size = _count + START_SIZE;
 			_data = new unsigned char[_size];
 
-			memset(this->_data, '\0', this->_size);
+			memset(_data, '\0', _size);
 
 			if (other != nullptr) {
-				memcpy(this->_data, other, this->_count);
+				memcpy(_data, other, _count);
 			}
 		}
 
@@ -75,35 +75,38 @@ namespace nspString {
 			}
 			_size = _count + START_SIZE;
 			_data = new unsigned char[_size];
-			memset(this->_data, '\0', this->_size);
+			memset(_data, '\0', _size);
 			if (cast_other != nullptr) {
-				memcpy(this->_data, cast_other, _count);
+				memcpy(_data, cast_other, _count);
 			}
 		}
 
 		~pString() {
-			delete[] _data;
-			_data = nullptr;
+			if (_data != nullptr) {
+				delete[] _data;
+				_data = nullptr;
+			}
 		}
 
-		void operator= (const pString& other) noexcept {
+		void operator= (const pString& other) {
 			if (this != &other) {
 				_count = other._count;
 
-				if (_count >= this->_size) {
+				if (_count >= _size) {
 					_size = _count + START_SIZE;
 					delete[] _data;
 					_data = nullptr;
 					_data = new unsigned char[_size];
 				}
-				memset(this->_data, '\0', this->_size);
+				memset(_data, '\0', _size);
 
-				memcpy(this->_data, other._data, _count);
+				memcpy(_data, other._data, _count);
 			}
 		}
 
 		void operator= (pString&& other) noexcept {
 			delete[] _data;
+			_data = nullptr;
 
 			_count = other._count;
 			_size = other._size;
@@ -117,21 +120,21 @@ namespace nspString {
 				if (other != this->_data) {
 					_count = strlen(other);
 
-					if (_count + 1 > this->_size) {
+					if (_count + 1 >= this->_size) {
 						delete[] _data;
 						_data = nullptr;
-						this->_size = _count + START_SIZE;
+						_size = _count + START_SIZE;
 						_data = new unsigned char[_size];
-						memset(this->_data, '\0', this->_size);
+						memset(_data, '\0', _size);
 					}
 
-					memcpy(this->_data, other, _count);
+					memcpy(_data, other, _count);
 				}
 			}
 		}
 
 		void operator= (const unsigned char other) {
-			memset(this->_data, '\0', this->_size);
+			memset(_data, '\0', _size);
 			_count = 1;
 			_data[0] = other;
 		}
@@ -147,7 +150,7 @@ namespace nspString {
 				if (this != &other) {
 					size_t tmp_count = other._count + _count;
 					if (tmp_count + 1 >= _size) {
-						increase_size(other._count + 1);
+						increase_size(other._count);
 					}
 					memcpy(&(_data[_count]), other._data, other._count);
 					_count = tmp_count;
@@ -157,7 +160,7 @@ namespace nspString {
 					if (target_count + 1 >= _size) {
 						increase_size(_count + 1);
 					}
-					memmove(&(_data[_count]), _data, _count);
+					memcpy(&(_data[_count]), _data, _count);
 					_count = target_count;
 				}
 			}
@@ -168,7 +171,7 @@ namespace nspString {
 				if (this->_data != other) {
 					size_t tmp_count = strlen(other);
 					if (_count + tmp_count + 1 >= _size) {
-						increase_size(tmp_count + 1);
+						increase_size(tmp_count);
 					}
 
 					memcpy(&(_data[_count]), other, tmp_count);
@@ -179,7 +182,7 @@ namespace nspString {
 					if (target_count + 1 >= _size) {
 						increase_size(_count + 1);
 					}
-					memmove(&(_data[_count]), _data, _count);
+					memcpy(&(_data[_count]), _data, _count);
 					_count = target_count;
 				}
 			}
@@ -191,7 +194,7 @@ namespace nspString {
 			}
 
 			if (_count + 2 >= _size) {
-				increase_size(2);
+				increase_size(1);
 			}
 
 			_data[_count] = other;
@@ -307,6 +310,7 @@ namespace nspString {
 			delete[] this->_data;
 			this->_data = nullptr;
 			this->_data = tmp_buf;
+			tmp_buf = nullptr;
 		}
 
 		// suggested for usage in loop

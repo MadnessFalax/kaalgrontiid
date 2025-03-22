@@ -22,10 +22,12 @@ namespace nspFile {
 		bool _flush() {
 			auto buf_siz = _buffer->length() + 1;
 			char* buf_cpy = new char[buf_siz];
-			memcpy(buf_cpy, _buffer->c_str(), buf_siz);
+			nspString::memcpy(reinterpret_cast<unsigned char*>(buf_cpy), _buffer->c_str(), buf_siz);
 			bool result = _file->Write(buf_cpy, (int) buf_siz, nullptr);
 			delete[] buf_cpy;
 			buf_cpy = nullptr;
+			delete _buffer;
+			_buffer = new String();
 
 			return result;
 		}
@@ -38,8 +40,8 @@ namespace nspFile {
 
 	public:
 		pFileWriter() = delete;
-		pFileWriter(String string) {
-			_filename = string;
+		pFileWriter(String path) {
+			_filename = path;
 			_file = new FileStream();
 			_is_open = _file->Open(reinterpret_cast<const char*>(_filename.c_str()), ACCESS_WRITE, FILE_CREATE);
 			_buffer = new String();

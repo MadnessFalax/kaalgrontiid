@@ -31,4 +31,10 @@ namespace nspString {
 		}
 		return 0;
 	}
+
+	void memset(unsigned char* data, unsigned char byte, size_t size) {
+		for (size_t i = 0; i < size; i++) {
+			data[i] = byte;
+		}
+	}
 }

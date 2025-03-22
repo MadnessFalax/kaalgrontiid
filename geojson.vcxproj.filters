@@ -369,6 +369,15 @@
     <ClInclude Include="exporter\buffer\pFileWriter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="exporter\gjExporter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="exporter\kmlExporter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="exporter\osmExporter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="parser\regex\NFA\pState.cpp">
@@ -491,7 +500,7 @@
     <ClCompile Include="..\..\dstruct\paged\core\cTreeHeader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source1.cpp">
+    <ClCompile Include="Source.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
