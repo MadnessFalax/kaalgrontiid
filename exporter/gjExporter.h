@@ -128,7 +128,7 @@ namespace nsGeoJSON {
 				}
 				output += "{";
 				output += "\"type\": \"Polygon\",";
-				output += "\"coordinates\": [";
+				output += "\"coordinates\": [[";
 				auto pt_size = polygon->GetVerticesCount();
 				auto* vertices = polygon->GetVerticesCollection();
 				for (unsigned int i = 0; i < pt_size; i++) {
@@ -149,7 +149,7 @@ namespace nsGeoJSON {
 					}
 					output += "]";
 				}
-				output += "]";
+				output += "]]";
 				output += "}";
 				status &= _file->write(output);
 			}

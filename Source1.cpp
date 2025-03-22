@@ -9,6 +9,7 @@
 #include "container/pPair.h"
 
 #include "exporter/gjExporter.h"
+#include "exporter/kmlExporter.h"
 
 template <class T>
 using Array = nspArray::pArray<T>;
@@ -32,8 +33,8 @@ static void helper() {
     point2->SetValue(2, (double)5.0f, nullptr);
 
     cNTuple* point3 = new cNTuple(space);
-    point3->SetValue(0, (double)6.0f, nullptr);
-    point3->SetValue(1, (double)7.0f, nullptr);
+    point3->SetValue(0, (double)7.0f, nullptr);
+    point3->SetValue(1, (double)6.0f, nullptr);
     point3->SetValue(2, (double)8.0f, nullptr);
 
     cNTuple* point4 = new cNTuple(space);
@@ -57,13 +58,13 @@ static void helper() {
     point6->SetValue(2, (double)17.0f, nullptr);
 
     cNTuple* point7 = new cNTuple(space);
-    point7->SetValue(0, (double)18.0f, nullptr);
-    point7->SetValue(1, (double)19.0f, nullptr);
+    point7->SetValue(0, (double)19.0f, nullptr);
+    point7->SetValue(1, (double)18.0f, nullptr);
     point7->SetValue(2, (double)20.0f, nullptr);
 
     cNTuple* point8 = new cNTuple(space);
-    point8->SetValue(0, (double)21.0f, nullptr);
-    point8->SetValue(1, (double)22.0f, nullptr);
+    point8->SetValue(0, (double)22.0f, nullptr);
+    point8->SetValue(1, (double)21.0f, nullptr);
     point8->SetValue(2, (double)23.0f, nullptr);
 
     cNTuple* point9 = new cNTuple(space);
@@ -76,30 +77,37 @@ static void helper() {
     point10->SetValue(1, (double)28.0f, nullptr);
     point10->SetValue(2, (double)29.0f, nullptr);
 
-	cNTuple** ls_points = new cNTuple * [3];
+	cNTuple** ls_points = new cNTuple * [4];
 	ls_points[0] = point2;
 	ls_points[1] = point3;
 	ls_points[2] = point4;
+    ls_points[3] = point7;
 
-	cLineString<cNTuple>* line = new cLineString<cNTuple>(ls_points, 3, space);
+	cLineString<cNTuple>* line = new cLineString<cNTuple>(ls_points, 4, space);
 
-	cNTuple** poly_points = new cNTuple * [5];
+	cNTuple** poly_points = new cNTuple * [4];
 	poly_points[0] = point5;
 	poly_points[1] = point6;
-	poly_points[2] = point7;
-	poly_points[3] = point8;
-	poly_points[4] = point5_2;
+	poly_points[2] = point8;
+	poly_points[3] = point5_2;
 
-	cPolygon<cNTuple>* poly = new cPolygon<cNTuple>(poly_points, 5, space);
+	cPolygon<cNTuple>* poly = new cPolygon<cNTuple>(poly_points, 4, space);
 
 	cNTuple** sphere_points = new cNTuple * [2];
 	sphere_points[0] = point9;
 	sphere_points[1] = point10;
 
 	cSphere<cNTuple>* sphere = new cSphere<cNTuple>(sphere_points, 2, space);
-
-	nsGeoJSON::gjExporter* exporter = new nsGeoJSON::gjExporter(".\\test.json");
-	exporter->begin();
+#ifdef _GEOJS
+	auto* exporter = new nsGeoJSON::gjExporter(".\\test\\output.json");
+#endif
+#ifdef _KML
+    auto* exporter = new nsKML::kmlExporter(".\\test\\output.kml");
+#endif
+#ifdef _OSM
+    auto* exporter = new nsOSM::osmExporter(".\\test\\output.osm");
+#endif
+    exporter->begin();
 	exporter->export_item(point);
 	exporter->export_item(line);
 	exporter->export_item(poly);
