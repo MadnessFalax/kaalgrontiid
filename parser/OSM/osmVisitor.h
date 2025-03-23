@@ -217,9 +217,9 @@ namespace nsOSM {
 				}
 				tuples[i] = new cNTuple(sp_desc);
 				tuples[i]->SetValue((unsigned int)0, (*(*_points)[i]).longitude, nullptr);
-				tuples[i]->SetValue((unsigned int)0, (*(*_points)[i]).latitude, nullptr);
+				tuples[i]->SetValue((unsigned int)1, (*(*_points)[i]).latitude, nullptr);
 				if (dim == 3) {
-					tuples[i]->SetValue((unsigned int)0, (*(*_points)[i]).elevation, nullptr);
+					tuples[i]->SetValue((unsigned int)2, (*(*_points)[i]).elevation, nullptr);
 				}
 			}
 
@@ -246,22 +246,27 @@ namespace nsOSM {
 			if (_points->size() != 0) {
 				point = (*_points)--;
 
-				_context.dimension = 2;
+				_context.dimension = point->dim;
 
-				auto* desc = _space_desc_2d;
+				auto* desc = point->dim == 2 ? _space_desc_2d : _space_desc_3d;
 				_context.last_item_sd = desc;
 
 				_context.item_type = DataShape::DS_POINT;
 
 				cNTuple* tuple = new cNTuple(desc);
-				tuple->SetValue((unsigned int)0, point->longitude, desc);
-				tuple->SetValue((unsigned int)1, point->latitude, desc);
+				tuple->SetValue((unsigned int)0, point->longitude, nullptr);
+				tuple->SetValue((unsigned int)1, point->latitude, nullptr);
+				if (point->dim == 3) {
+					tuple->SetValue((unsigned int)2, point->elevation, nullptr);
+				}
 			
 				_context.item = tuple;
 
 				tuple = nullptr;
 
 				point = nullptr;
+
+				_context.last_item_sd = desc;
 
 				_context.has_item = true;
 

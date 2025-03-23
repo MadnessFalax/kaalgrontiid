@@ -677,6 +677,7 @@ namespace nsOSM {
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(osmToken::STRING, "tag")
 			<< new ForwardNode(osmRule::TagAttr)
+			<< new CustomNode(osmHandler::CommitTag)
 			<< new ForwardNode(osmRule::GenericSingleOrPairTag));
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(osmToken::STRING)
@@ -709,8 +710,7 @@ namespace nsOSM {
 			<< new ConsumeNode(osmToken::EQUALS)
 			<< new ForwardNode(osmRule::AttrValue)
 			<< new ForwardNode(osmRule::TagAttr));
-		(*rule) += &((*(new Sequence()))
-			<< new CustomNode(osmHandler::CommitTag));
+		(*rule) += new Sequence();
 		rules->push_back(rule);
 
 		rule = new Rule(osmRule::WayAttr, "WayAttr");
