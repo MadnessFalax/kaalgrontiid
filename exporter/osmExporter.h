@@ -104,15 +104,16 @@ namespace nsOSM {
 			output += "\" lon=\"";
 			snprintf(num_buf, 32, "%.7f", point->GetDouble(0, nullptr));
 			output += num_buf;
+			output += "\">\n";
 
 			if (dim > 2) {
-				output += "\" ele=\"";
+				output += "<tag k=\"ele\" v=\"";
 				snprintf(num_buf, 32, "%.7f", point->GetDouble(2, nullptr));
 				output += num_buf;
+				output += "\"/>\n";
 			}
-
-			output += "\">\n";
 			output += "</node>\n";
+
 
 			delete[] num_buf;
 
