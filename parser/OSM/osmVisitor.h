@@ -5,17 +5,30 @@
 
 namespace nsOSM {
 	class osmVisitor : public nspParser::pParserVisitor<osmToken, osmRule, osmHandler, osmVisitor> {
+		using String = nspString::pString;
 		using Rule = nspParser::pRule<osmToken, osmRule>;
 		template<class T>
 		using Array = nspArray::pArray<T>;
 		using pErrorReporter = nspParser::pErrorReporter;
+		using ExtractType = nspParser::pExtractNode<osmToken, osmRule>::ExtractType;
 
 		struct Point {
 			double longitude = 0;
 			double latitude = 0;
+			double elevation = 0;
+			size_t dim = 2;
 			size_t id = 0;
 			bool is_used = false;
 		};
+
+		struct Tag {
+			String key = "";
+			double num_value = 0;
+			String text_value = "";
+			bool key_set = false;
+			bool value_set = false;
+			ExtractType type = ExtractType::STRING;
+		} last_tag = Tag{};
 
 		size_t cur_ref = 0;
 		Point cur_point = Point{};
@@ -48,6 +61,15 @@ namespace nsOSM {
 				break;
 			case osmHandler::SetLatitude:
 				resolve_custom_visit<osmHandler::SetLatitude>(node);
+				break;
+			case osmHandler::SetKey:
+				resolve_custom_visit<osmHandler::SetKey>(node);
+				break;
+			case osmHandler::SetValue:
+				resolve_custom_visit<osmHandler::SetValue>(node);
+				break;
+			case osmHandler::CommitTag:
+				resolve_custom_visit<osmHandler::CommitTag>(node);
 				break;
 			case osmHandler::SetId:
 				resolve_custom_visit<osmHandler::SetId>(node);
@@ -94,6 +116,41 @@ namespace nsOSM {
 			cur_point.latitude = _context.last_extracted_number;
 			_context.last_status = Context::LastStatus::OK;
 		}
+		
+		template<>
+		void resolve_custom_visit<osmHandler::SetKey>(CustomNode& node) {
+			last_tag.key = _context.last_extracted_string;
+			last_tag.key_set = true;
+			_context.last_status = Context::LastStatus::OK;
+		}
+
+		template<>
+		void resolve_custom_visit<osmHandler::SetValue>(CustomNode& node) {
+			last_tag.type = _context.last_extract_type;
+			if (last_tag.type == ExtractType::NUMBER) {
+				last_tag.num_value = _context.last_extracted_number;
+				last_tag.value_set = true;
+			}
+			else {
+				last_tag.text_value = _context.last_extracted_string;
+				last_tag.value_set = true;
+			}
+			_context.last_status = Context::LastStatus::OK;
+		}
+
+		template<>
+		void resolve_custom_visit<osmHandler::CommitTag>(CustomNode& node) {
+			if (last_tag.key_set && last_tag.value_set) {
+				if (last_tag.type == ExtractType::NUMBER && last_tag.key == "ele") {
+					cur_point.elevation = last_tag.num_value;
+					cur_point.dim = 3;
+				}
+			}
+
+			last_tag = Tag{};
+
+			_context.last_status = Context::LastStatus::OK;
+		}
 
 		template<>
 		void resolve_custom_visit<osmHandler::SetId>(CustomNode& node) {
@@ -122,17 +179,20 @@ namespace nsOSM {
 		template<>
 		void resolve_custom_visit<osmHandler::CommitPoint>(CustomNode& node) {
 			_nodes[cur_point.id] = cur_point;
+			cur_point = Point{};
 			_context.last_status = Context::LastStatus::OK;
 		}
 
 		template<>
 		void resolve_custom_visit<osmHandler::CommitShape>(CustomNode& node) {
-			_context.dimension = 2;
-			
-			auto* desc = _space_desc_2d;
-			_context.last_item_sd = desc;
+			auto shape_dim = 2;
 
 			auto p_size = _points->size();
+			if (p_size == 0) {
+				_context.last_status = Context::LastStatus::FAIL;
+				return;
+			}
+
 			auto* first_point = (*_points)[0];
 			auto* last_point = (*_points)[p_size - 1];
 
@@ -143,14 +203,30 @@ namespace nsOSM {
 				_context.item_type = DataShape::DS_POLYGON;
 			}
 
+			cSpaceDescriptor* sp_desc = nullptr;
+
 			cNTuple** tuples = new cNTuple * [p_size];
 			for (size_t i = 0; i < p_size; i++) {
-				tuples[i] = new cNTuple(desc);
-				tuples[i]->SetValue((unsigned int)0, (*(*_points)[i]).longitude, desc);
-				tuples[i]->SetValue((unsigned int)0, (*(*_points)[i]).latitude, desc);
+				auto dim = (*(*_points)[i]).dim;
+				if (dim == 3) {
+					sp_desc = _space_desc_3d;
+					shape_dim = 3;
+				}
+				else {
+					sp_desc = _space_desc_2d;
+				}
+				tuples[i] = new cNTuple(sp_desc);
+				tuples[i]->SetValue((unsigned int)0, (*(*_points)[i]).longitude, nullptr);
+				tuples[i]->SetValue((unsigned int)0, (*(*_points)[i]).latitude, nullptr);
+				if (dim == 3) {
+					tuples[i]->SetValue((unsigned int)0, (*(*_points)[i]).elevation, nullptr);
+				}
 			}
 
-			_context.item = cDataShape<cNTuple>::CreateDataShape(_context.item_type, tuples, p_size, desc);
+			auto* shape_desc = (shape_dim == 2 ? _space_desc_2d : _space_desc_3d);
+
+			_context.item = cDataShape<cNTuple>::CreateDataShape(_context.item_type, tuples, p_size, shape_desc);
+			_context.last_item_sd = shape_desc;
 
 			tuples = nullptr;
 

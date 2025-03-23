@@ -88,7 +88,7 @@ optional_text_content				-> '!' optional_text_content
 									| STRING optional_text_content
 									| null
 									
-normal_tag							-> 'node' node_attr generic_single_or_pair_tag
+normal_tag							-> 'node' node_attr node_single_or_pair_tag
 									| 'way' way_attr way_single_or_pair_tag
 									|  STRING optional_attr generic_single_or_pair_tag
 
@@ -176,6 +176,30 @@ node_attr_possible					-> 'id' '=' extractable_attr_value node_attr
 									| 'lat' '=' extractable_attr_value node_attr
 									| 'lon' '=' extractable_attr_value node_attr
 									| STRING '=' attr_value node_attr
+									| null
+
+node_single_or_pair_tag				-> '/''>' consume_ws
+									| '>' consume_ws optional_pair_tag_node_content
+
+optional_pair_tag_node_content		-> '<' node_nested_or_ending_tag
+									| optional_text_content optional_pair_tag_node_content
+
+node_nested_or_ending_tag			-> '/' STRING '>' consume_ws
+									| any_node_nested_tag_content optional_pair_tag_node_content
+
+any_node_nested_tag_content			-> '?' STRING optional_attr '?' '>' consume_ws post_instruction
+									| '!' comment_or_cdata
+									| normal_node_nested_tag
+
+normal_node_nested_tag				-> 'tag' tag_attr generic_single_or_pair_tag
+									| STRING optional_attr generic_single_or_pair_tag
+
+tag_attr							-> WS tag_attr_possible
+									| null
+
+tag_attr_possible					-> 'k' '=' extractable_attr_value tag_attr
+									| 'v' '=' extractable_attr_value tag_attr
+									| STRING '=' attr_value tag_attr
 									| null
 
 way_attr							-> WS way_attr_possible

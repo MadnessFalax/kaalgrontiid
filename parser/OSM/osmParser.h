@@ -346,8 +346,7 @@ namespace nsOSM {
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(osmToken::STRING, "node")
 			<< new ForwardNode(osmRule::NodeAttr)
-			<< new CustomNode(osmHandler::CommitPoint)
-			<< new ForwardNode(osmRule::GenericSingleOrPairTag));
+			<< new ForwardNode(osmRule::NodeSingleOrPairTag));
 		(*rule) += &((*(new Sequence()))
 			<< new ConsumeNode(osmToken::STRING, "way")
 			<< new ForwardNode(osmRule::WayAttr)
@@ -623,6 +622,95 @@ namespace nsOSM {
 			<< new ForwardNode(osmRule::AttrValue)
 			<< new ForwardNode(osmRule::NodeAttr));
 		(*rule) += new Sequence();
+		rules->push_back(rule);
+
+		rule = new Rule(osmRule::NodeSingleOrPairTag, "NodeSingleOrPairTag");
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(osmToken::SLASH)
+			<< new ConsumeNode(osmToken::RANGLEBRACKET)
+			<< new CustomNode(osmHandler::CommitPoint)
+			<< new ForwardNode(osmRule::ConsumeWS));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(osmToken::RANGLEBRACKET)
+			<< new ForwardNode(osmRule::ConsumeWS)
+			<< new ForwardNode(osmRule::OptionalPairTagNodeContent));
+		rules->push_back(rule);
+
+		rule = new Rule(osmRule::OptionalPairTagNodeContent, "OptionalPairTagNodeContent");
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(osmToken::LANGLEBRACKET)
+			<< new ForwardNode(osmRule::NodeNestedOrEndingTag));
+		(*rule) += &((*(new Sequence()))
+			<< new ForwardNode(osmRule::OptionalTextContent)
+			<< new ForwardNode(osmRule::OptionalPairTagNodeContent));
+		rules->push_back(rule);
+
+		rule = new Rule(osmRule::NodeNestedOrEndingTag, "NodeNestedOrEndingTag");
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(osmToken::SLASH)
+			<< new ConsumeNode(osmToken::STRING)
+			<< new ConsumeNode(osmToken::RANGLEBRACKET)
+			<< new CustomNode(osmHandler::CommitPoint)
+			<< new ForwardNode(osmRule::ConsumeWS));
+		(*rule) += &((*(new Sequence()))
+			<< new ForwardNode(osmRule::AnyNodeNestedTagContent)
+			<< new ForwardNode(osmRule::OptionalPairTagNodeContent));
+		rules->push_back(rule);
+
+		rule = new Rule(osmRule::AnyNodeNestedTagContent, "AnyNodeNestedTagContent");
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(osmToken::QMARK)
+			<< new ConsumeNode(osmToken::STRING)
+			<< new ForwardNode(osmRule::OptionalAttr)
+			<< new ConsumeNode(osmToken::QMARK)
+			<< new ConsumeNode(osmToken::RANGLEBRACKET)
+			<< new ForwardNode(osmRule::ConsumeWS)
+			<< new ForwardNode(osmRule::PostInstruction));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(osmToken::EXCLAMATION)
+			<< new ForwardNode(osmRule::CommentOrCDATA));
+		(*rule) += &((*(new Sequence()))
+			<< new ForwardNode(osmRule::NormalNodeNestedTag));
+		rules->push_back(rule);
+
+		rule = new Rule(osmRule::NormalNodeNestedTag, "NormalNodeNestedTag");
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(osmToken::STRING, "tag")
+			<< new ForwardNode(osmRule::TagAttr)
+			<< new ForwardNode(osmRule::GenericSingleOrPairTag));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(osmToken::STRING)
+			<< new ForwardNode(osmRule::OptionalAttr)
+			<< new ForwardNode(osmRule::GenericSingleOrPairTag));
+		rules->push_back(rule);
+
+		rule = new Rule(osmRule::TagAttr, "TagAttr");
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(osmToken::WS)
+			<< new ForwardNode(osmRule::TagAttrPossible));
+		(*rule) += new Sequence();
+		rules->push_back(rule);
+
+		rule = new Rule(osmRule::TagAttrPossible, "TagAttrPossible");
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(osmToken::STRING, "k")
+			<< new ConsumeNode(osmToken::EQUALS)
+			<< new ForwardNode(osmRule::ExtractableAttrValue)
+			<< new CustomNode(osmHandler::SetKey)
+			<< new ForwardNode(osmRule::TagAttr));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(osmToken::STRING, "v")
+			<< new ConsumeNode(osmToken::EQUALS)
+			<< new ForwardNode(osmRule::ExtractableAttrValue)
+			<< new CustomNode(osmHandler::SetValue)
+			<< new ForwardNode(osmRule::TagAttr));
+		(*rule) += &((*(new Sequence()))
+			<< new ConsumeNode(osmToken::STRING)
+			<< new ConsumeNode(osmToken::EQUALS)
+			<< new ForwardNode(osmRule::AttrValue)
+			<< new ForwardNode(osmRule::TagAttr));
+		(*rule) += &((*(new Sequence()))
+			<< new CustomNode(osmHandler::CommitTag));
 		rules->push_back(rule);
 
 		rule = new Rule(osmRule::WayAttr, "WayAttr");
