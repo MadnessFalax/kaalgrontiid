@@ -408,7 +408,7 @@
     <ClInclude Include="parser\regex\pBadPatternException.h" />
     <ClInclude Include="parser\regex\pRegex.h" />
     <ClInclude Include="parser\buffer\pBinaryException.h" />
-    <ClInclude Include="parser\Shp\shpFileHeader.h" />
+    <ClInclude Include="parser\Shapefile\shpFileHeader.h" />
     <ClInclude Include="utils\exception\pOutOfRangeException.h" />
     <ClInclude Include="utils\is_pointer.h" />
     <ClInclude Include="container\pArray.h" />

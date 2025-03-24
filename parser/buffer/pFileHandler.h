@@ -196,7 +196,8 @@ namespace nspFile {
 					read_val = (buf[0] << 24) | (buf[1] << 16) | (buf[2] << 8) | buf[3];
 				}
 				else {
-					read_val = buf[0] | (buf[1] << 8) | (buf[2] << 16) | (buf[3] << 24);
+					read_val = (buf[0] << 24) | (buf[1] << 16) | (buf[2] << 8) | buf[3];
+					read_val = _byteswap_ulong(read_val);
 				}
 
 				delete[] buf;
@@ -225,10 +226,15 @@ namespace nspFile {
 				}
 
 				if (byte_order == ByteOrder::BE) {
-					read_val = (buf[0] << 24) | (buf[1] << 16) | (buf[2] << 8) | buf[3];
+					for (size_t i = 0; i < 4; i++) {
+						char tmp = buf[i];
+						buf[i] = buf[7 - i];
+						buf[7 - i] = tmp;
+					}
+					read_val = *reinterpret_cast<double*>(buf);
 				}
 				else {
-					read_val = buf[0] | (buf[1] << 8) | (buf[2] << 16) | (buf[3] << 24);
+					read_val = *reinterpret_cast<double*>(buf);
 				}
 
 				delete[] buf;

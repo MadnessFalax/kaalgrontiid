@@ -27,12 +27,12 @@ namespace nsShapeFile {
 		shpHeader() = default;
 
 		bool load(FileHandler* fh) {
-			file_code = fh->get_int();
+			file_code = fh->get_int(FileHandler::ByteOrder::BE);
 			if (file_code != 9994) {
 				return false;
 			}
 			fh->set_position(24);
-			file_length = fh->get_int();
+			file_length = fh->get_int(FileHandler::ByteOrder::BE);
 			version = fh->get_int();
 			shape_type = fh->get_int();
 			x_min = fh->get_double();

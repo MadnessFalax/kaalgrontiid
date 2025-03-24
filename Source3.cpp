@@ -9,6 +9,7 @@
 #include "container/pPair.h"
 
 #include "parser/buffer/pFileHandler.h"
+#include "parser/Shapefile/shpFileHeader.h"
 
 template <class T>
 using Array = nspArray::pArray<T>;
@@ -16,6 +17,7 @@ using String = nspString::pString;
 template <class T, class U, class V = unsigned char>
 using Map = nspMap::pMap<T, U, V>;
 using FileHandler = nspFile::pFileHandler;
+using Header = nsShapeFile::shpHeader;
 
 // used for out of scope stack disposal check so that _CrtDumpMemoryLeaks doesnt show false positive leaks on stack allocated memory
 static void helper() {
@@ -23,12 +25,10 @@ static void helper() {
     String path = "C:\\Users\\Petr\\Downloads\\src\\test\\kaalgrontiid\\test\\gis_osm_water_a_07_1.shx";
 
     FileHandler* fh = new FileHandler(path, true);
+	Header* header = new Header();
+	header->load(fh);
 
-    fh->set_position(24);
-    int input = fh->get_int(FileHandler::ByteOrder::BE);
-
-    printf("%i\n", input);
-
+	delete header;
     delete fh;
 
     return;
