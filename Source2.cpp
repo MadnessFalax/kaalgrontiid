@@ -1,3 +1,4 @@
+//#include "parser/JSON/GeoJSONConverter.h"
 #define _CRTDBG_MAP_ALLOC
 #include <stdlib.h>
 #include <crtdbg.h>
@@ -20,6 +21,17 @@
 #include "dstruct/paged/sequentialarray/cSequentialArrayContext.h"
 #include "dstruct/paged/sequentialarray/cSequentialArrayHeader.h"
 #include "dstruct/paged/sequentialarray/cSequentialArrayNodeHeader.h"
+
+#include "exporter/gjExporter.h"
+#include "exporter/kmlExporter.h"
+#include "exporter/osmExporter.h"
+
+template <class T>
+using Array = nspArray::pArray<T>;
+using String = nspString::pString;
+template <class T, class U, class V = unsigned char>
+using Map = nspMap::pMap<T, U, V>;
+using FileWriter = nspFile::pFileWriter;
 
 template <class T>
 using Array = nspArray::pArray<T>;
@@ -207,12 +219,29 @@ static void helper() {
 		//item = nullptr;
 	}
 
-	delete p;
 
-	printf("Inserted %i items.", seq_array->GetHeader()->GetItemCount());
+	auto item_count = seq_array->GetHeader()->GetItemCount();
+
+	printf("Inserted %i items.", item_count);
+
+	char* read_item = nullptr;
+
+	seq_array->OpenContext(header->GetFirstNodeIndex(), 0, context);
+
+
+	for (decltype(item_count) i = 0; i < item_count; i++) {
+		if (i != 0) {
+			seq_array->Advance(context);
+		}
+		cNTuple::Print(context->GetItem(), "\n", space_desc_3d);
+	}
+
+	seq_array->CloseContext(context);
+
 
 	db->Close();
 
+	delete p;
 	delete seq_array;
 	delete db;
 	delete header;
@@ -227,7 +256,7 @@ int main() {
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 	_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG);
 #endif
-	
+
 	helper();
 
 #ifdef _DEBUG
