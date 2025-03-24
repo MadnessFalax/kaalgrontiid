@@ -349,6 +349,7 @@
     <ClInclude Include="abstract\pException.h" />
     <ClInclude Include="abstract\pHashable.h" />
     <ClInclude Include="abstract\pHasId.h" />
+    <ClInclude Include="abstract\pBaseParser.h" />
     <ClInclude Include="container\pMap.h" />
     <ClInclude Include="container\pPair.h" />
     <ClInclude Include="exporter\buffer\pFileWriter.h" />

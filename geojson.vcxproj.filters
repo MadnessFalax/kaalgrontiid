@@ -384,6 +384,9 @@
     <ClInclude Include="parser\buffer\pBinaryException.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="abstract\pBaseParser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="parser\regex\NFA\pState.cpp">

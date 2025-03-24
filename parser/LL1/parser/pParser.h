@@ -2,11 +2,12 @@
 #include "pRule.h"
 #include "node/pParserNode.h"
 #include "pParserVisitor.h"
+#include "../../../abstract/pBaseParser.h"
 
 namespace nspParser {
 
 	template<class enum_t, class enum_r, class enum_c, class custom_visitor_t>	
-	class pParser {
+	class pParser : public pBaseParser {
 		using Rule = nspParser::pRule<enum_t, enum_r>;
 		using Visitor = pParserVisitor<enum_t, enum_r, enum_c, custom_visitor_t>;
 		template<class T, class U, class V = unsigned char> 
@@ -119,15 +120,15 @@ namespace nspParser {
 		//	}
 		//}
 
-		DataShape get_shape_type() {
+		DataShape get_shape_type() override {
 			return _context->item_type;
 		}
 
-		cSpaceDescriptor* get_space_descriptor() {
+		cSpaceDescriptor* get_space_descriptor() override {
 			return _context->last_item_sd;
 		}
 
-		cDataType* get_item() {
+		cDataType* get_item() override {
 			while (!_context->has_item) {
 				if (!_resolve_current_node()) {
 					break;
@@ -145,7 +146,9 @@ namespace nspParser {
 			return item;
 		}
 
-
+		String get_parser_format() override {
+			return "TEXT";
+		}
 	};
 
 }
