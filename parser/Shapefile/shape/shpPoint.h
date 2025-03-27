@@ -18,5 +18,10 @@ namespace nsShapeFile {
 			is_loaded = true;
 			return is_loaded;
 		}
+
+
+		virtual shpShapeType get_shape_type() override {
+			return shpShapeType::POINT;
+		}
 	};
 }

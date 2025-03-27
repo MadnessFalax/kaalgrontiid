@@ -11,5 +11,8 @@ namespace nsShapeFile {
 		bool is_loaded = false;
 
 		virtual bool load(FileHandler* fh) = 0;
+		virtual shpShapeType get_shape_type() {
+			return shpShapeType::NULLSHAPE;
+		}
 	};
 }
