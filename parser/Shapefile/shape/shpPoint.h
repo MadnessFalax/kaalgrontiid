@@ -2,7 +2,7 @@
 #include "../shpRecordContent.h"
 
 namespace nsShapeFile {
-	struct shpPoint : protected shpRecordContent {
+	struct shpPoint : public shpRecordContent {
 		double X = 0.0;
 		double Y = 0.0;
 
@@ -20,8 +20,23 @@ namespace nsShapeFile {
 		}
 
 
-		virtual shpShapeType get_shape_type() override {
+		shpShapeType get_shape_type() override {
 			return shpShapeType::POINT;
+		}
+
+		cDataType* get_item() override {
+			if (index == 0) {
+
+				cNTuple* tuple = new cNTuple(&sd_2d);
+				tuple->SetValue(0, X, nullptr);
+				tuple->SetValue(1, Y, nullptr);
+
+				index++;
+
+				return tuple;
+			}
+
+			return nullptr;
 		}
 	};
 }

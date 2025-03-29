@@ -3,11 +3,20 @@
 #include "shpRecordHeader.h"
 #include "shpFileHeader.h"
 
+#include "cSphere.h"
+#include "cLineString.h"
+#include "cPolygon.h"
+
 namespace nsShapeFile {
 	using FileHandler = nspFile::pFileHandler;
 	using Header = nsShapeFile::shpRecordHeader;
 
 	struct shpRecordContent {
+		int index = 0;
+
+		cSpaceDescriptor sd_2d = cSpaceDescriptor(2, new cNTuple(), new cDouble());
+		cSpaceDescriptor sd_3d = cSpaceDescriptor(3, new cNTuple(), new cDouble());
+
 		struct Box {
 			double Xmin = 0.0;
 			double Ymin = 0.0;
@@ -33,5 +42,6 @@ namespace nsShapeFile {
 		virtual shpShapeType get_shape_type() {
 			return shpShapeType::NULLSHAPE;
 		}
+		virtual cDataType* get_item() = 0;
 	};
 }

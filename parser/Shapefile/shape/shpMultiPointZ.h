@@ -4,7 +4,7 @@
 
 
 namespace nsShapeFile {
-	struct shpMultiPointZ : protected shpMultiPointM {
+	struct shpMultiPointZ : public shpMultiPointM {
 		template <class T>
 		using Array = nspArray::pArray<T>;
 
@@ -12,6 +12,7 @@ namespace nsShapeFile {
 		Array<double> z_array = Array<double>();
 
 		bool load(FileHandler* fh, Header& header) override {
+			index = 0;
 			is_loaded = false;
 			shape_type = fh->get_int();
 			if (shape_type != 18) {
@@ -54,8 +55,24 @@ namespace nsShapeFile {
 		}
 
 
-		virtual shpShapeType get_shape_type() override {
+		shpShapeType get_shape_type() override {
 			return shpShapeType::MULTIPOINTZ;
+		}
+
+		cDataType* get_item() override {
+			if (index < num_points) {
+
+				cNTuple* tuple = new cNTuple(&sd_3d);
+				tuple->SetValue(0, points[index * 2], nullptr);
+				tuple->SetValue(1, points[index * 2 + 1], nullptr);
+				tuple->SetValue(2, z_array[index], nullptr);
+
+				index++;
+
+				return tuple;
+			}
+
+			return nullptr;
 		}
 	};
 }

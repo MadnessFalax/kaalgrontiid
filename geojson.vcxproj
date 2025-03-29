@@ -408,6 +408,7 @@
     <ClInclude Include="parser\regex\pBadPatternException.h" />
     <ClInclude Include="parser\regex\pRegex.h" />
     <ClInclude Include="parser\buffer\pBinaryException.h" />
+    <ClInclude Include="parser\Shapefile\shape\shpMultiPatch.h" />
     <ClInclude Include="parser\Shapefile\shape\shpMultiPointM.h" />
     <ClInclude Include="parser\Shapefile\shape\shpMultiPointZ.h" />
     <ClInclude Include="parser\Shapefile\shape\shpPointZ.h" />

@@ -5,7 +5,7 @@
 
 
 namespace nsShapeFile {
-	struct shpPolyLineM : protected shpPolyLine {
+	struct shpPolyLineM : public shpPolyLine {
 		template <class T>
 		using Array = nspArray::pArray<T>;
 
@@ -14,6 +14,7 @@ namespace nsShapeFile {
 		Array<double> m_array = Array<double>();
 
 		bool load(FileHandler* fh, Header& header) override {
+			index = 0;
 			is_loaded = false;
 			shape_type = fh->get_int();
 			if (shape_type != 23) {
@@ -54,8 +55,34 @@ namespace nsShapeFile {
 		}
 
 
-		virtual shpShapeType get_shape_type() override {
+		shpShapeType get_shape_type() override {
 			return shpShapeType::POLYLINEM;
+		}
+
+		cDataType* get_item() override {
+			if (index < num_parts) {
+				auto part_start = parts[index++];
+				auto part_end = index < parts.size() ? parts[index] : points.size();
+
+				auto tuple_ptr_arr = Array<cNTuple*>();
+				for (auto i = part_start; i < part_end; i += 2) {
+					auto* tuple_ptr = new cNTuple(&sd_2d);
+					tuple_ptr->SetValue(0, points[i], nullptr);
+					tuple_ptr->SetValue(1, points[i + 1], nullptr);
+					tuple_ptr_arr.push_back(tuple_ptr);
+				}
+
+				auto arr_len = tuple_ptr_arr.size();
+				auto** tuple_arr_raw = new cNTuple * [arr_len];
+				for (size_t i = 0; i < arr_len; i++) {
+					tuple_arr_raw[i] = tuple_ptr_arr[i];
+				}
+
+				auto* line = cDataShape<cNTuple>::CreateDataShape(DataShape::DS_LINESTRING, tuple_arr_raw, arr_len, &sd_2d);
+				return line;
+			}
+
+			return nullptr;
 		}
 	};
 }

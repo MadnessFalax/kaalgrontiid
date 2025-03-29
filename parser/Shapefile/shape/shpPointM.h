@@ -3,7 +3,7 @@
 #include "shpPoint.h"
 
 namespace nsShapeFile {
-	struct shpPointM : protected shpPoint {
+	struct shpPointM : public shpPoint {
 		double M = 0.0;
 
 		bool load(FileHandler* fh, Header& header) override {
@@ -21,8 +21,23 @@ namespace nsShapeFile {
 		}
 
 
-		virtual shpShapeType get_shape_type() override {
+		shpShapeType get_shape_type() override {
 			return shpShapeType::POINTM;
+		}
+
+		cDataType* get_item() override {
+			if (index == 0) {
+
+				cNTuple* tuple = new cNTuple(&sd_2d);
+				tuple->SetValue(0, X, nullptr);
+				tuple->SetValue(1, Y, nullptr);
+
+				index++;
+
+				return tuple;
+			}
+
+			return nullptr;
 		}
 	};
 }

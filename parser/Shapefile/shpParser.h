@@ -1,51 +1,171 @@
 #pragma once
+#include "../../abstract/pBaseParser.h"
 #include "../buffer/pFileHandler.h"
 #include "shpFileHeader.h"
 #include "shpRecordIndex.h"
 #include "shpRecordHeader.h"
 #include "shpRecordContent.h"
 
+#include "shape/shpPoint.h"
+#include "shape/shpPointM.h"
+#include "shape/shpPointZ.h"
+#include "shape/shpMultiPoint.h"
+#include "shape/shpMultiPointM.h"
+#include "shape/shpMultiPointZ.h"
+#include "shape/shpPolygon.h"
+#include "shape/shpPolygonM.h"
+#include "shape/shpPolygonZ.h"
+#include "shape/shpPolyLine.h"
+#include "shape/shpPolyLineM.h"
+#include "shape/shpPolyLineZ.h"
+#include "shape/shpMultiPatch.h"
+
 namespace nsShapeFile {
 
 	using FileHandler = nspFile::pFileHandler;
 
-	class shpParser {
+	class shpParser : protected pBaseParser {
+		
 	private:
-		FileHandler* _fh = nullptr;
-		shpFileHeader _file_header;
-		shpRecordIndex _record_index;
-		shpRecordHeader _record_header;
-		shpRecordContent _record_content;
-
-		bool _is_loaded = false;
+		cSpaceDescriptor* _space_descriptor = nullptr;
+		FileHandler* _shx = nullptr;
+		FileHandler* _shp = nullptr;
+		DataShape _shape_type = DataShape{};
+		cDataType* _item = nullptr;
+		shpFileHeader _shp_header = shpFileHeader();
+		shpFileHeader _shx_header = shpFileHeader();
+		shpRecordHeader _record_header = shpRecordHeader();
+		shpRecordContent* _record_content = nullptr;
+		shpRecordIndex _record_index = shpRecordIndex();
 
 	public:
-		shpParser(FileHandler* fh) : _fh(fh) {}
+		shpParser() {}
 
-		bool load() {
-			_is_loaded = false;
-			_file_header.load(_fh);
-			_record_index.load(_fh);
-			_record_header.load(_fh);
-			_record_content.load(_fh);
-			_is_loaded = true;
-			return _is_loaded;
+		~shpParser() {
+			delete _shx;
+			_shx = nullptr;
+			delete _shp;
+			_shp = nullptr;
+			delete _space_descriptor;
+			_space_descriptor = nullptr;
+			delete _item;
+			_item = nullptr;
+			delete _record_content;
+			_record_content = nullptr;
 		}
 
-		shpFileHeader* get_file_header() {
-			return &_file_header;
+		void open(String shp, String shx) {
+			delete _shx;
+			_shx = new FileHandler(shx);
+			delete _shp;
+			_shp = new FileHandler(shp);
+			delete _space_descriptor;
+			_space_descriptor = nullptr;
+			delete _item;
+			_item = nullptr;
+			delete _record_content;
+			_record_content = nullptr;
+			
+			_shp_header.load(_shp);
+			_shx_header.load(_shx);
+
+			switch (_shp_header.en_shape_type) {
+			case shpShapeType::POINT:
+				_space_descriptor = new cSpaceDescriptor(DIMENSION_2, new cNTuple(), new cDouble());
+				_shape_type = DataShape::DS_POINT;
+				_record_content = new shpPoint();
+				break;
+			case shpShapeType::POLYLINE:
+				_space_descriptor = new cSpaceDescriptor(DIMENSION_2, new cNTuple(), new cDouble());
+				_shape_type = DataShape::DS_LINESTRING;
+				_record_content = new shpPolyLine();
+				break;
+			case shpShapeType::POLYGON:
+				_space_descriptor = new cSpaceDescriptor(DIMENSION_2, new cNTuple(), new cDouble());
+				_shape_type = DataShape::DS_POLYGON;
+				_record_content = new shpPolygon();
+				break;
+			case shpShapeType::MULTIPOINT:
+				_space_descriptor = new cSpaceDescriptor(DIMENSION_2, new cNTuple(), new cDouble());
+				_shape_type = DataShape::DS_POINT;
+				_record_content = new shpMultiPoint();
+				break;
+			case shpShapeType::POINTZ:
+				_space_descriptor = new cSpaceDescriptor(DIMENSION_3, new cNTuple(), new cDouble());
+				_shape_type = DataShape::DS_POINT;
+				_record_content = new shpPointZ();
+				break;
+			case shpShapeType::POLYLINEZ:
+				_space_descriptor = new cSpaceDescriptor(DIMENSION_3, new cNTuple(), new cDouble());
+				_shape_type = DataShape::DS_LINESTRING;
+				_record_content = new shpPolyLineZ();
+				break;
+			case shpShapeType::POLYGONZ:
+				_space_descriptor = new cSpaceDescriptor(DIMENSION_3, new cNTuple(), new cDouble());
+				_shape_type = DataShape::DS_POLYGON;
+				_record_content = new shpPolygonZ();
+				break;
+			case shpShapeType::MULTIPOINTZ:
+				_space_descriptor = new cSpaceDescriptor(DIMENSION_3, new cNTuple(), new cDouble());
+				_shape_type = DataShape::DS_POINT;
+				_record_content = new shpMultiPointZ();
+				break;
+			case shpShapeType::POINTM:
+				_space_descriptor = new cSpaceDescriptor(DIMENSION_2, new cNTuple(), new cDouble());
+				_shape_type = DataShape::DS_POINT;
+				_record_content = new shpPointM();
+				break;
+			case shpShapeType::POLYLINEM:
+				_space_descriptor = new cSpaceDescriptor(DIMENSION_2, new cNTuple(), new cDouble());
+				_shape_type = DataShape::DS_LINESTRING;
+				_record_content = new shpPolyLineM();
+				break;
+			case shpShapeType::POLYGONM:
+				_space_descriptor = new cSpaceDescriptor(DIMENSION_2, new cNTuple(), new cDouble());
+				_shape_type = DataShape::DS_POLYGON;
+				_record_content = new shpPolygonM();
+				break;
+			case shpShapeType::MULTIPOINTM:
+				_space_descriptor = new cSpaceDescriptor(DIMENSION_2, new cNTuple(), new cDouble());
+				_shape_type = DataShape::DS_POINT;
+				_record_content = new shpMultiPointM();
+				break;
+			case shpShapeType::MULTIPATCH:
+				_space_descriptor = new cSpaceDescriptor(DIMENSION_3, new cNTuple(), new cDouble());
+				_shape_type = DataShape::DS_POLYGON;
+				_record_content = nullptr;
+				break;
+			}
 		}
 
-		shpRecordIndex* get_record_index() {
-			return &_record_index;
+		DataShape get_shape_type() override {
+			return _shape_type;
 		}
 
-		shpRecordHeader* get_record_header() {
-			return &_record_header;
+		cSpaceDescriptor* get_space_descriptor() override {
+			return _space_descriptor;
 		}
 
-		shpRecordContent* get_record_content() {
-			return &_record_content;
+		cDataType* get_item() override {
+			if (_record_content) {
+				auto* possible_item = _record_content->get_item();
+				if (possible_item) {
+					return possible_item;
+				}
+			}
+			_record_index.load(_shx);
+			if (_record_index.offset != 0) {
+				_record_header.load(_shp);
+				_record_content->load(_shp, _record_header);
+
+				auto* item = _record_content->get_item();
+				return item;
+			}
+			return nullptr;
+		}
+
+		String get_parser_format() override {
+			return "SHAPEFILE";
 		}
 	};
 

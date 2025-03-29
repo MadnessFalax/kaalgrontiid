@@ -4,7 +4,7 @@
 
 
 namespace nsShapeFile {
-	struct shpMultiPoint : protected shpRecordContent {
+	struct shpMultiPoint : public shpRecordContent {
 		template <class T>
 		using Array = nspArray::pArray<T>;
 
@@ -16,6 +16,7 @@ namespace nsShapeFile {
 
 
 		bool load(FileHandler* fh, Header& header) override {
+			index = 0;
 			is_loaded = false;
 			shape_type = fh->get_int();
 			if (shape_type != 8) {
@@ -39,8 +40,23 @@ namespace nsShapeFile {
 		}
 
 
-		virtual shpShapeType get_shape_type() override {
+		shpShapeType get_shape_type() override {
 			return shpShapeType::MULTIPOINT;
+		}
+
+		cDataType* get_item() override {
+			if (index < num_points) {
+
+				cNTuple* tuple = new cNTuple(&sd_2d);
+				tuple->SetValue(0, points[index * 2], nullptr);
+				tuple->SetValue(1, points[index * 2 + 1], nullptr);
+
+				index++;
+
+				return tuple;
+			}
+
+			return nullptr;
 		}
 	};
 }
