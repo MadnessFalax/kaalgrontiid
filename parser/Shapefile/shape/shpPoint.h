@@ -6,7 +6,7 @@ namespace nsShapeFile {
 		double X = 0.0;
 		double Y = 0.0;
 
-		bool load(FileHandler* fh) override {
+		bool load(FileHandler* fh, Header& header) override {
 			is_loaded = false;
 			shape_type = fh->get_int();
 			if (shape_type != 1) {

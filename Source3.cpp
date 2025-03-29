@@ -10,7 +10,7 @@
 
 #include "parser/buffer/pFileHandler.h"
 #include "parser/Shapefile/shpFileHeader.h"
-#include "parser/Shapefile/shpIndexRecord.h"
+#include "parser/Shapefile/shpRecordIndex.h"
 
 template <class T>
 using Array = nspArray::pArray<T>;
@@ -18,8 +18,8 @@ using String = nspString::pString;
 template <class T, class U, class V = unsigned char>
 using Map = nspMap::pMap<T, U, V>;
 using FileHandler = nspFile::pFileHandler;
-using Header = nsShapeFile::shpHeader;
-using Index = nsShapeFile::shpIndexRecord;
+using Header = nsShapeFile::shpFileHeader;
+using Index = nsShapeFile::shpRecordIndex;
 
 // used for out of scope stack disposal check so that _CrtDumpMemoryLeaks doesnt show false positive leaks on stack allocated memory
 static void helper() {

@@ -8,14 +8,7 @@ namespace nsShapeFile {
 		template <class T>
 		using Array = nspArray::pArray<T>;
 		
-		double X = 0.0;
-		double Y = 0.0;
-		struct Box {
-			double Xmin = 0.0;
-			double Ymin = 0.0;
-			double Xmax = 0.0;
-			double Ymax = 0.0;
-		} box = Box{};
+		Box box = Box{};
 
 		int num_parts = 0;
 		int num_points = 0;
@@ -24,7 +17,7 @@ namespace nsShapeFile {
 		Array<double> points;
 
 
-		bool load(FileHandler* fh) override {
+		bool load(FileHandler* fh, Header& header) override {
 			is_loaded = false;
 			shape_type = fh->get_int();
 			if (shape_type != 3) {
