@@ -13,6 +13,9 @@ namespace nsShapeFile {
 
 		bool load(FileHandler* fh, Header& header) override {
 			index = 0;
+			points = Array<double>();
+			m_array = Array<double>();
+			z_array = Array<double>();
 			is_loaded = false;
 			shape_type = fh->get_int();
 			if (shape_type != 18) {
@@ -74,5 +77,7 @@ namespace nsShapeFile {
 
 			return nullptr;
 		}
+
+		~shpMultiPointZ() {}
 	};
 }

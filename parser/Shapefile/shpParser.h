@@ -56,9 +56,9 @@ namespace nsShapeFile {
 
 		void open(String shp, String shx) {
 			delete _shx;
-			_shx = new FileHandler(shx);
+			_shx = new FileHandler(shx, true);
 			delete _shp;
-			_shp = new FileHandler(shp);
+			_shp = new FileHandler(shp, true);
 			delete _space_descriptor;
 			_space_descriptor = nullptr;
 			delete _item;

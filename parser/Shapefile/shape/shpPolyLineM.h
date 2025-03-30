@@ -15,6 +15,9 @@ namespace nsShapeFile {
 
 		bool load(FileHandler* fh, Header& header) override {
 			index = 0;
+			points = Array<double>();
+			parts = Array<int>();
+			m_array = Array<double>();
 			is_loaded = false;
 			shape_type = fh->get_int();
 			if (shape_type != 23) {
@@ -84,5 +87,7 @@ namespace nsShapeFile {
 
 			return nullptr;
 		}
+
+		~shpPolyLineM() {}
 	};
 }

@@ -43,5 +43,6 @@ namespace nsShapeFile {
 			return shpShapeType::NULLSHAPE;
 		}
 		virtual cDataType* get_item() = 0;
+		virtual ~shpRecordContent() {};
 	};
 }

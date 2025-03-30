@@ -41,5 +41,7 @@ namespace nsShapeFile {
 
 			return nullptr;
 		}
+
+		~shpPointZ() {}
 	};
 }
