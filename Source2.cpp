@@ -50,11 +50,11 @@ using SeqArray = dstruct::paged::sqarray::cSequentialArray<Tkey>;
 using SeqArrayContext = dstruct::paged::sqarray::cSequentialArrayContext<Tkey>;
 using SeqArrayHeader = dstruct::paged::sqarray::cSequentialArrayHeader<Tkey>;
 
-#ifndef _WORK
+#ifndef WORK
 constexpr auto PATH = R"(C:\Users\Petr\Downloads\src\test\kaalgrontiid\test\output.osm)";
 #endif
 
-#ifdef _WORK
+#ifdef WORK
 constexpr auto PATH = R"(C:\Users\uiv56391\source\repos\framework-back-up\test\kaalgrontiid\test\example.kml)";
 #endif
 
@@ -139,15 +139,15 @@ static void helper() {
 
 	String path = PATH;
 
-#ifdef _OSM
+#ifdef OSM
 	auto* p = nsOSM::setup_parser();
 #endif
 
-#ifdef _GEOJS
+#ifdef GEOJS
 	auto* p = nsGeoJSON::setup_parser();
 #endif
 
-#ifdef _KML
+#ifdef KML
 	auto* p = nsKML::setup_parser();
 #endif
 

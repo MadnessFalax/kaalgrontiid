@@ -56,10 +56,10 @@ namespace nsShapeFile {
 		cDataType* get_item() override {
 			if (index < num_parts) {
 				auto part_start = parts[index++];
-				auto part_end = index < parts.size() ? parts[index] : points.size()/2;
+				auto part_end = index < parts.size() ? parts[index] : points.size() / 2;
 
 				auto tuple_ptr_arr = Array<cNTuple*>();
-				for (auto i = part_start*2; i < part_end*2; i += 2) {
+				for (auto i = part_start * 2; i < part_end * 2; i += 2) {
 					auto* tuple_ptr = new cNTuple(&sd_2d);
 					tuple_ptr->SetValue(0, points[i], nullptr);
 					tuple_ptr->SetValue(1, points[i + 1], nullptr);

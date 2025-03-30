@@ -9,6 +9,7 @@
 #include "parser/GeoJSON/gjParser.h"
 #include "parser/KML/kmlParser.h"
 #include "parser/OSM/osmParser.h"
+#include "parser/Shapefile/shpParser.h"
 
 #include "cLineString.h"
 #include "cPolygon.h"
@@ -38,12 +39,17 @@ using SeqArray = dstruct::paged::sqarray::cSequentialArray<Tkey>;
 using SeqArrayContext = dstruct::paged::sqarray::cSequentialArrayContext<Tkey>;
 using SeqArrayHeader = dstruct::paged::sqarray::cSequentialArrayHeader<Tkey>;
 
-#ifndef _WORK
+#ifndef WORK
 constexpr auto PATH = R"(C:\Users\Petr\Downloads\src\test\kaalgrontiid\test\output.osm)";
 #endif
 
-#ifdef _WORK
+#ifdef WORK
 constexpr auto PATH = R"(C:\Users\uiv56391\source\repos\framework-back-up\test\kaalgrontiid\test\example.kml)";
+#endif
+
+#ifdef SHP
+constexpr auto shp = R"(C:\Users\Petr\Downloads\src\test\kaalgrontiid\test\shp\multipatch.shp)";
+constexpr auto shx = R"(C:\Users\Petr\Downloads\src\test\kaalgrontiid\test\shp\multipatch.shx)";
 #endif
 
 static void print_point_info(cNTuple* point) {
@@ -127,16 +133,24 @@ static void helper() {
 
 	String path = PATH;
 
-#ifdef _OSM
+#ifdef OSM
 	auto* p = nsOSM::setup_parser();
+	p->open(path);
 #endif
 
-#ifdef _GEOJS
+#ifdef GEOJS
 	auto* p = nsGeoJSON::setup_parser();
+	p->open(path);
 #endif
 
-#ifdef _KML
+#ifdef KML
 	auto* p = nsKML::setup_parser();
+	p->open(path);
+#endif
+
+#ifdef SHP
+	auto* p = new nsShapeFile::shpParser();
+	p->open(shp, shx);
 #endif
 
 	cLineString<cNTuple>* ls = nullptr;
@@ -144,7 +158,6 @@ static void helper() {
 	cSphere<cNTuple>* sphere = nullptr;
 	cNTuple* point = nullptr;
 
-	p->open(path);
 	cDataType* item = nullptr;
 	while (item = p->get_item()) {
 		// do nothing

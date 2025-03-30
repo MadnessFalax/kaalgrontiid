@@ -24,11 +24,11 @@ using Index = nsShapeFile::shpRecordIndex;
 // used for out of scope stack disposal check so that _CrtDumpMemoryLeaks doesnt show false positive leaks on stack allocated memory
 static void helper() {
 
-#ifndef _WORK
+#ifndef WORK
     String path = "C:\\Users\\Petr\\Downloads\\src\\test\\kaalgrontiid\\test\\gis_osm_water_a_07_1.shx";
 #endif
 
-#ifdef _WORK
+#ifdef WORK
     String path = "C:\\Users\\uiv56391\\source\\repos\\framework-back-up\\test\\kaalgrontiid\\test\\gis_osm_water_a_07_1.shx";
 #endif
 

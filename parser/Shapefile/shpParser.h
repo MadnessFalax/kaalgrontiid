@@ -133,7 +133,7 @@ namespace nsShapeFile {
 			case shpShapeType::MULTIPATCH:
 				_space_descriptor = new cSpaceDescriptor(DIMENSION_3, new cNTuple(), new cDouble());
 				_shape_type = DataShape::DS_POLYGON;
-				_record_content = nullptr;
+				_record_content = new shpMultiPatch();
 				break;
 			}
 		}
