@@ -47,7 +47,7 @@ constexpr auto PATH = R"(C:\Users\Petr\Downloads\src\test\kaalgrontiid\test\outp
 constexpr auto PATH = R"(C:\Users\uiv56391\source\repos\framework-back-up\test\kaalgrontiid\test\example.kml)";
 #endif
 
-#ifdef SHP
+#ifdef TEST_SHP
 constexpr auto shp = R"(C:\Users\Petr\Downloads\src\test\kaalgrontiid\test\shp\pointzm_with_all_nodata_m.shp)";
 constexpr auto shx = R"(C:\Users\Petr\Downloads\src\test\kaalgrontiid\test\shp\pointzm_with_all_nodata_m.shx)";
 #endif
@@ -133,22 +133,22 @@ static void helper() {
 
 	String path = PATH;
 
-#ifdef OSM
+#ifdef TEST_OSM
 	auto* p = nsOSM::setup_parser();
 	p->open(path);
 #endif
 
-#ifdef GEOJS
+#ifdef TEST_GEOJS
 	auto* p = nsGeoJSON::setup_parser();
 	p->open(path);
 #endif
 
-#ifdef KML
+#ifdef TEST_KML
 	auto* p = nsKML::setup_parser();
 	p->open(path);
 #endif
 
-#ifdef SHP
+#ifdef TEST_SHP
 	auto* p = new nsShapeFile::shpParser();
 	p->open(shp, shx);
 #endif

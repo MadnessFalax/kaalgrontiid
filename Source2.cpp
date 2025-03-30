@@ -139,15 +139,15 @@ static void helper() {
 
 	String path = PATH;
 
-#ifdef OSM
+#ifdef TEST_OSM
 	auto* p = nsOSM::setup_parser();
 #endif
 
-#ifdef GEOJS
+#ifdef TEST_GEOJS
 	auto* p = nsGeoJSON::setup_parser();
 #endif
 
-#ifdef KML
+#ifdef TEST_KML
 	auto* p = nsKML::setup_parser();
 #endif
 

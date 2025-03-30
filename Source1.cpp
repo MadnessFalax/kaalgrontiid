@@ -99,13 +99,13 @@ static void helper() {
 	sphere_points[1] = point10;
 
 	cSphere<cNTuple>* sphere = new cSphere<cNTuple>(sphere_points, 2, space);
-#ifdef GEOJS
+#ifdef TEST_GEOJS
 	auto* exporter = new nsGeoJSON::gjExporter(".\\test\\output.json");
 #endif
-#ifdef KML
+#ifdef TEST_KML
     auto* exporter = new nsKML::kmlExporter(".\\test\\output.kml");
 #endif
-#ifdef OSM
+#ifdef TEST_OSM
     auto* exporter = new nsOSM::osmExporter(".\\test\\output.osm");
 #endif
     exporter->begin();

@@ -12,24 +12,34 @@ namespace nspFile {
 	class pFileWriter {
 		
 		bool _is_open = false;
+		bool _is_binary = false;
 
 		size_t _buffer_size = BUFFER_SIZE;
 		String _filename = "";
 		String* _buffer = nullptr;
+		char* _binary_buffer = nullptr;
+		size_t _cur_buffer_len = 0;
 
 		FileStream* _file = nullptr;
 
 		bool _flush() {
-			auto buf_siz = _buffer->length() + 1;
-			char* buf_cpy = new char[buf_siz];
-			nspString::memcpy(reinterpret_cast<unsigned char*>(buf_cpy), _buffer->c_str(), buf_siz);
-			bool result = _file->Write(buf_cpy, (int) buf_siz, nullptr);
-			delete[] buf_cpy;
-			buf_cpy = nullptr;
-			delete _buffer;
-			_buffer = new String();
+			if (_is_binary) {
+				bool result = _file->Write(_binary_buffer, (int)_cur_buffer_len, nullptr);
+				_cur_buffer_len = 0;
+				return result;
+			}
+			else {
+				auto buf_siz = _buffer->length() + 1;
+				char* buf_cpy = new char[buf_siz];
+				nspString::memcpy(reinterpret_cast<unsigned char*>(buf_cpy), _buffer->c_str(), buf_siz);
+				bool result = _file->Write(buf_cpy, (int) buf_siz - 1, nullptr);
+				delete[] buf_cpy;
+				buf_cpy = nullptr;
+				delete _buffer;
+				_buffer = new String();
 
-			return result;
+				return result;
+			}
 		}
 
 		void _close() {
@@ -40,11 +50,18 @@ namespace nspFile {
 
 	public:
 		pFileWriter() = delete;
-		pFileWriter(String path) {
+		pFileWriter(String path, bool is_binary = false) {
 			_filename = path;
+			_is_binary = is_binary;
 			_file = new FileStream();
 			_is_open = _file->Open(reinterpret_cast<const char*>(_filename.c_str()), ACCESS_WRITE, FILE_CREATE);
-			_buffer = new String();
+			if (_is_binary) {
+				_binary_buffer = new char[_buffer_size];
+				_cur_buffer_len = 0;
+			}
+			else {
+				_buffer = new String();
+			}
 		}
 
 		pFileWriter(const pFileWriter&) = delete;
@@ -53,7 +70,11 @@ namespace nspFile {
 			_file = other._file;
 			_is_open = other._is_open;
 			_buffer = other._buffer;
+			_is_binary = other._is_binary;
+			_binary_buffer = other._binary_buffer;
+			_cur_buffer_len = other._cur_buffer_len;
 			
+			other._binary_buffer = nullptr;
 			other._filename = "";
 			other._file = nullptr;
 			other._buffer = nullptr;
@@ -66,7 +87,11 @@ namespace nspFile {
 				_file = other._file;
 				_is_open = other._is_open;
 				_buffer = other._buffer;
+				_is_binary = other._is_binary;
+				_binary_buffer = other._binary_buffer;
+				_cur_buffer_len = other._cur_buffer_len;
 				
+				other._binary_buffer = nullptr;
 				other._filename = "";
 				other._file = nullptr;
 				other._buffer = nullptr;
@@ -83,6 +108,18 @@ namespace nspFile {
 			return status;
 		}
 
+		bool write(unsigned char* buffer, size_t size) {
+			bool status = false;
+			if (_is_binary) {
+				if (_cur_buffer_len + size >= _buffer_size) {
+					_flush();
+				}
+				memcpy(&(_binary_buffer[_cur_buffer_len]), buffer, size);
+				_cur_buffer_len += size;
+			}
+			return status;
+		}
+
 		~pFileWriter() {
 			_flush();
 			_close();
@@ -90,6 +127,10 @@ namespace nspFile {
 			_buffer = nullptr;
 			delete _file;
 			_file = nullptr;
+			if (_binary_buffer) {
+				delete[] _binary_buffer;
+				_binary_buffer = nullptr;
+			}
 		}
 		
 	};
