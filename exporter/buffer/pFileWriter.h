@@ -120,6 +120,19 @@ namespace nspFile {
 			return status;
 		}
 
+		bool set_position(size_t pos = -1) {
+			bool status = false;
+			status &= _flush();
+			if (pos == -1) {
+				status &= _file->Seek(0, SEEK_END);
+			}
+			else {
+				status &= _file->Seek(pos);
+			}
+
+			return status;
+		}	
+
 		~pFileWriter() {
 			_flush();
 			_close();

@@ -8,47 +8,27 @@
 #include "container/pMap.h"
 #include "container/pPair.h"
 
-#include "parser/buffer/pFileHandler.h"
-#include "parser/Shapefile/shpFileHeader.h"
-#include "parser/Shapefile/shpRecordIndex.h"
+#include "exporter/buffer/pFileWriter.h"
 
 template <class T>
 using Array = nspArray::pArray<T>;
 using String = nspString::pString;
 template <class T, class U, class V = unsigned char>
 using Map = nspMap::pMap<T, U, V>;
-using FileHandler = nspFile::pFileHandler;
-using Header = nsShapeFile::shpFileHeader;
-using Index = nsShapeFile::shpRecordIndex;
+using FileHandler = nspFile::pFileWriter;
 
 // used for out of scope stack disposal check so that _CrtDumpMemoryLeaks doesnt show false positive leaks on stack allocated memory
 static void helper() {
 
 #ifndef WORK
-    String path = "C:\\Users\\Petr\\Downloads\\src\\test\\kaalgrontiid\\test\\gis_osm_water_a_07_1.shx";
+    String path = "C:\\Users\\Petr\\Downloads\\src\\test\\kaalgrontiid\\test\\binary_output.txt";
 #endif
 
 #ifdef WORK
     String path = "C:\\Users\\uiv56391\\source\\repos\\framework-back-up\\test\\kaalgrontiid\\test\\gis_osm_water_a_07_1.shx";
 #endif
 
-    FileHandler* fh = new FileHandler(path, true);
-	Header* header = new Header();
-	header->load(fh);
 
-	Index index = Index();
-    while (index.load(fh)) {
-        if (index.offset == 0) {
-            break;
-        }
-        else {
-            printf("%i\n", index.offset);
-            printf("%i\n", index.content_length);
-        }
-    }
-
-	delete header;
-    delete fh;
 
     return;
 }
