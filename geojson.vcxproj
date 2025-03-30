@@ -410,6 +410,7 @@
     <ClInclude Include="exporter\kmlExporter.h" />
     <ClInclude Include="exporter\osmExporter.h" />
     <ClInclude Include="exporter\pExporter.h" />
+    <ClInclude Include="exporter\shpExporter.h" />
     <ClInclude Include="parser\buffer\pFileHandler.h" />
     <ClInclude Include="parser\GeoJSON\gjParser.h" />
     <ClInclude Include="parser\GeoJSON\gjEnums.h" />

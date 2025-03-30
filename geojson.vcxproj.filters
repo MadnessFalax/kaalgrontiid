@@ -441,6 +441,9 @@
     <ClInclude Include="parser\Shapefile\shape\shpNullShape.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="exporter\shpExporter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="parser\regex\NFA\pState.cpp">

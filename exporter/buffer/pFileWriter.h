@@ -11,6 +11,14 @@ namespace nspFile {
 
 	class pFileWriter {
 		
+	public:
+		enum class ByteOrder {
+			BE,			// BIG ENDIAN
+			LE			// LITTLE ENDIAN
+		};
+
+	private:
+
 		bool _is_open = false;
 		bool _is_binary = false;
 
@@ -116,6 +124,50 @@ namespace nspFile {
 				}
 				memcpy(&(_binary_buffer[_cur_buffer_len]), buffer, size);
 				_cur_buffer_len += size;
+			}
+			return status;
+		}
+
+		bool write_int(int value, ByteOrder byte_order = ByteOrder::LE) {
+			bool status = false;
+			if (_is_binary) {
+				if (_cur_buffer_len + 4 >= _buffer_size) {
+					_flush();
+				}
+
+				auto* buf = reinterpret_cast<unsigned char*>(&value);
+
+				if (byte_order == ByteOrder::BE) {
+					for (size_t i = 0; i < 2; i++) {
+						char tmp = buf[i];
+						buf[i] = buf[3 - i];
+						buf[3 - i] = tmp;
+					}
+				}
+				memcpy(&(_binary_buffer[_cur_buffer_len]), buf, 4);
+				_cur_buffer_len += 4;
+			}
+			return status;
+		}
+
+		bool write_double(double value, ByteOrder byte_order = ByteOrder::LE) {
+			bool status = false;
+			if (_is_binary) {
+				if (_cur_buffer_len + 8 >= _buffer_size) {
+					_flush();
+				}
+
+				auto buf = reinterpret_cast<unsigned char*>(&value);
+
+				if (byte_order == ByteOrder::BE) {
+					for (size_t i = 0; i < 4; i++) {
+						char tmp = buf[i];
+						buf[i] = buf[7 - i];
+						buf[7 - i] = tmp;
+					}
+				}
+				memcpy(&(_binary_buffer[_cur_buffer_len]), buf, 8);
+				_cur_buffer_len += 8;
 			}
 			return status;
 		}
