@@ -6,6 +6,7 @@
 #include "shpRecordHeader.h"
 #include "shpRecordContent.h"
 
+#include "shape/shpNullShape.h"
 #include "shape/shpPoint.h"
 #include "shape/shpPointM.h"
 #include "shape/shpPointZ.h"
@@ -36,6 +37,7 @@ namespace nsShapeFile {
 		shpFileHeader _shx_header = shpFileHeader();
 		shpRecordHeader _record_header = shpRecordHeader();
 		shpRecordContent* _record_content = nullptr;
+		shpNullShape _null_shape_content = shpNullShape();
 		shpRecordIndex _record_index = shpRecordIndex();
 
 	public:
@@ -70,6 +72,11 @@ namespace nsShapeFile {
 			_shx_header.load(_shx);
 
 			switch (_shp_header.en_shape_type) {
+			case shpShapeType::NULLSHAPE:
+				_space_descriptor = nullptr;
+				_shape_type = DataShape::DS_POINT;
+				_record_content = new shpNullShape();
+				break;
 			case shpShapeType::POINT:
 				_space_descriptor = new cSpaceDescriptor(DIMENSION_2, new cNTuple(), new cDouble());
 				_shape_type = DataShape::DS_POINT;
@@ -156,10 +163,16 @@ namespace nsShapeFile {
 			_record_index.load(_shx);
 			if (_record_index.offset != 0) {
 				_record_header.load(_shp);
-				_record_content->load(_shp, _record_header);
+				if (_record_header.content_length == 2) {
+					_null_shape_content.load(_shp, _record_header);
+					return get_item();
+				}
+				else {
+					_record_content->load(_shp, _record_header);
 
-				auto* item = _record_content->get_item();
-				return item;
+					auto* item = _record_content->get_item();
+					return item;
+				}
 			}
 			return nullptr;
 		}

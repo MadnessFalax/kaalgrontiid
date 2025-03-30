@@ -7,6 +7,7 @@ namespace nsShapeFile {
 		double M = 0.0;
 
 		bool load(FileHandler* fh, Header& header) override {
+			index = 0;
 			is_loaded = false;
 			shape_type = fh->get_int();
 			if (shape_type != 21) {
@@ -26,7 +27,7 @@ namespace nsShapeFile {
 		}
 
 		cDataType* get_item() override {
-			if (index == 0) {
+			if (index == 0 && is_loaded) {
 
 				cNTuple* tuple = new cNTuple(&sd_2d);
 				tuple->SetValue(0, X, nullptr);
