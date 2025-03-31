@@ -25,9 +25,30 @@ namespace nsShapeFile {
 		FileWriter* _ls_shp = nullptr;
 		FileWriter* _point_shp = nullptr;
 
+		FileWriter* _poly_z_shx = nullptr;
+		FileWriter* _ls_z_shx = nullptr;
+		FileWriter* _point_z_shx = nullptr;
+		FileWriter* _poly_z_shp = nullptr;
+		FileWriter* _ls_z_shp = nullptr;
+		FileWriter* _point_z_shp = nullptr;
+
 		String _target_dir = "";
 		time_t _timestamp = 0;
 		String _timestamp_str = "";
+
+		int _poly_len = 50;
+		int _ls_len = 50;
+		int _point_len = 50;
+		int _poly_z_len = 50;
+		int _ls_z_len = 50;
+		int _point_z_len = 50;
+
+		int _poly_number = 1;
+		int _ls_number = 1;
+		int _point_number = 1;
+		int _poly_z_number = 1;
+		int _ls_z_number = 1;
+		int _point_z_number = 1;
 
 		bool _write_file_header(int shape_type, FileWriter* file) {
 			// code
@@ -53,6 +74,7 @@ namespace nsShapeFile {
 			file->write_double(9999.0);
 			file->write_double(-9999.0);
 			file->write_double(9999.0);
+			return true;
 		}
 
 	public:
@@ -65,12 +87,18 @@ namespace nsShapeFile {
 			_timestamp_str = buffer;
 			delete[] buffer;
 
-			_poly_shx = new FileWriter(_target_dir + "polygon_" + _timestamp_str + ".shx");
-			_poly_shp = new FileWriter(_target_dir + "polygon_" + _timestamp_str + ".shp");
-			_point_shx = new FileWriter(_target_dir + "point_" + _timestamp_str + ".shx");
-			_point_shp = new FileWriter(_target_dir + "point_" + _timestamp_str + ".shp");
-			_ls_shx = new FileWriter(_target_dir + "linestring_" + _timestamp_str + ".shx");
-			_ls_shp = new FileWriter(_target_dir + "linestring_" + _timestamp_str + ".shp");
+			_poly_shx = new FileWriter(_target_dir + "_polygon_" + _timestamp_str + ".shx", true);
+			_poly_shp = new FileWriter(_target_dir + "_polygon_" + _timestamp_str + ".shp", true);
+			_point_shx = new FileWriter(_target_dir + "_point_" + _timestamp_str + ".shx", true);
+			_point_shp = new FileWriter(_target_dir + "_point_" + _timestamp_str + ".shp", true);
+			_ls_shx = new FileWriter(_target_dir + "_linestring_" + _timestamp_str + ".shx", true);
+			_ls_shp = new FileWriter(_target_dir + "_linestring_" + _timestamp_str + ".shp", true);
+			_poly_z_shx = new FileWriter(_target_dir + "_polygonz_" + _timestamp_str + ".shx", true);
+			_poly_z_shp = new FileWriter(_target_dir + "_polygonz_" + _timestamp_str + ".shp", true);
+			_point_z_shx = new FileWriter(_target_dir + "_pointz_" + _timestamp_str + ".shx", true);
+			_point_z_shp = new FileWriter(_target_dir + "_pointz_" + _timestamp_str + ".shp", true);
+			_ls_z_shx = new FileWriter(_target_dir + "_linestringz_" + _timestamp_str + ".shx", true);
+			_ls_z_shp = new FileWriter(_target_dir + "_linestringz_" + _timestamp_str + ".shp", true);
 		}
 
 		~shpExporter() {
@@ -80,26 +108,278 @@ namespace nsShapeFile {
 			delete _point_shp;
 			delete _ls_shx;
 			delete _ls_shp;
+			delete _poly_z_shx;
+			delete _poly_z_shp;
+			delete _point_z_shx;
+			delete _point_z_shp;
+			delete _ls_z_shx;
+			delete _ls_z_shp;
 		};
 		
 		bool begin() override {
-
+			_write_file_header(5, _poly_shx);
+			_write_file_header(5, _poly_shp);
+			_write_file_header(3, _ls_shx);
+			_write_file_header(3, _ls_shp);
+			_write_file_header(1, _point_shx);
+			_write_file_header(1, _point_shp);
+			_write_file_header(15, _poly_z_shx);
+			_write_file_header(15, _poly_z_shp);
+			_write_file_header(13, _ls_z_shx);
+			_write_file_header(13, _ls_z_shp);
+			_write_file_header(11, _point_z_shx);
+			_write_file_header(11, _point_z_shp);
+			return true;
 		}
 
 		bool end() override {
-		
+			_poly_shx->set_position(24);
+			_poly_shx->write_int(_poly_len, FileWriter::ByteOrder::BE);
+			_poly_shp->set_position(24);
+			_poly_shp->write_int(_poly_len, FileWriter::ByteOrder::BE);
+			
+			_point_shx->set_position(24);
+			_point_shx->write_int(_point_len, FileWriter::ByteOrder::BE);
+			_point_shp->set_position(24);
+			_point_shp->write_int(_point_len, FileWriter::ByteOrder::BE);
+			
+			_ls_shx->set_position(24);
+			_ls_shx->write_int(_ls_len, FileWriter::ByteOrder::BE);
+			_ls_shp->set_position(24);
+			_ls_shp->write_int(_ls_len, FileWriter::ByteOrder::BE);
+			
+			_poly_z_shx->set_position(24);
+			_poly_z_shx->write_int(_poly_z_len, FileWriter::ByteOrder::BE);
+			_poly_z_shp->set_position(24);
+			_poly_z_shp->write_int(_poly_z_len, FileWriter::ByteOrder::BE);
+			
+			_point_z_shx->set_position(24);
+			_point_z_shx->write_int(_point_z_len, FileWriter::ByteOrder::BE);
+			_point_z_shp->set_position(24);
+			_point_z_shp->write_int(_point_z_len, FileWriter::ByteOrder::BE);
+			
+			_ls_z_shx->set_position(24);
+			_ls_z_shx->write_int(_ls_z_len, FileWriter::ByteOrder::BE);
+			_ls_z_shp->set_position(24);
+			_ls_z_shp->write_int(_ls_z_len, FileWriter::ByteOrder::BE);
+
+			return true;
 		}
 
 		bool export_item(cNTuple* point) {
+			auto p_size = point->GetLength();
+			if (p_size == 2) {
+				_point_shp->write_int(_point_number++, FileWriter::ByteOrder::BE);
+				_point_shp->write_int(10, FileWriter::ByteOrder::BE);
+				_point_shp->write_int(1);
+				_point_shp->write_double(point->GetDouble(0, nullptr));
+				_point_shp->write_double(point->GetDouble(1, nullptr));
 
+				_point_shx->write_int(_point_len, FileWriter::ByteOrder::BE);
+				_point_len += 14;
+				_point_shx->write_int(10, FileWriter::ByteOrder::BE);
+			}
+			else {
+				_point_z_shp->write_int(_point_z_number++, FileWriter::ByteOrder::BE);
+				_point_z_shp->write_int(14, FileWriter::ByteOrder::BE);
+				_point_z_shp->write_int(11);
+				_point_z_shp->write_double(point->GetDouble(0, nullptr));
+				_point_z_shp->write_double(point->GetDouble(1, nullptr));
+				_point_z_shp->write_double(point->GetDouble(2, nullptr));
+
+				_point_z_shx->write_int(_point_z_len, FileWriter::ByteOrder::BE);
+				_point_z_len += 18;
+				_point_z_shx->write_int(14, FileWriter::ByteOrder::BE);
+			}
+			return true;
 		}
 
 		bool export_item(cLineString<cNTuple>* line) {
+			auto max_dim = 2;
+			auto** vtx_col = line->GetVerticesCollection();
+			auto vtx_count = line->GetVerticesCount();
+			int x_min = 0;
+			int x_max = 0;
+			int y_min = 0;
+			int y_max = 0;
+			for (decltype(vtx_count) i = 0; i < vtx_count; i++) {
+				auto* vtx = vtx_col[i];
+				auto p_size = vtx->GetLength();
+				if (p_size > max_dim) {
+					max_dim = p_size;
+				}
+				auto x = vtx->GetDouble(0, nullptr);
+				auto y = vtx->GetDouble(1, nullptr);
 
+				if (x < x_min) {
+					x_min = x;
+				}
+				if (x > x_max) {
+					x_max = x;
+				}
+				if (y < y_min) {
+					y_min = y;
+				}
+				if (y > y_max) {
+					y_max = y;
+				}
+			}
+			if (max_dim == 2) {
+				_ls_shp->write_int(_ls_number++, FileWriter::ByteOrder::BE);
+				_ls_shp->write_int(24 + 8 * vtx_count, FileWriter::ByteOrder::BE);
+				_ls_shp->write_int(3);
+				_ls_shp->write_double(x_min);
+				_ls_shp->write_double(y_min);
+				_ls_shp->write_double(x_max);
+				_ls_shp->write_double(y_max);
+				_ls_shp->write_int(1);
+				_ls_shp->write_int(vtx_count);
+				_ls_shp->write_int(0);
+				for (decltype(vtx_count) i = 0; i < vtx_count; i++) {
+					auto* vtx = vtx_col[i];
+					_ls_shp->write_double(vtx->GetDouble(0, nullptr));
+					_ls_shp->write_double(vtx->GetDouble(1, nullptr));
+				}
+
+				_ls_shx->write_int(_ls_len, FileWriter::ByteOrder::BE);
+				_ls_len += 28 + 8 * vtx_count;
+				_ls_shx->write_int(24 + 8 * vtx_count, FileWriter::ByteOrder::BE);
+			}
+			else {
+				int z_min = 0;
+				int z_max = 0;
+				for (decltype(vtx_count) i = 0; i < vtx_count; i++) {
+					auto* vtx = vtx_col[i];
+					auto z = vtx->GetDouble(2, nullptr);
+					if (z < z_min) {
+						z_min = z;
+					}
+					if (z > z_max) {
+						z_max = z;
+					}
+				}
+
+				_ls_z_shp->write_int(_ls_z_number++, FileWriter::ByteOrder::BE);
+				_ls_z_shp->write_int(32 + 12 * vtx_count, FileWriter::ByteOrder::BE);
+				_ls_z_shp->write_int(13);
+				_ls_z_shp->write_double(x_min);
+				_ls_z_shp->write_double(y_min);
+				_ls_z_shp->write_double(x_max);
+				_ls_z_shp->write_double(y_max);
+				_ls_z_shp->write_int(1);
+				_ls_z_shp->write_int(vtx_count);
+				_ls_z_shp->write_int(0);
+				for (decltype(vtx_count) i = 0; i < vtx_count; i++) {
+					auto* vtx = vtx_col[i];
+					_ls_z_shp->write_double(vtx->GetDouble(0, nullptr));
+					_ls_z_shp->write_double(vtx->GetDouble(1, nullptr));
+				}
+				_ls_z_shp->write_double(z_min);
+				_ls_z_shp->write_double(z_max);
+				for (decltype(vtx_count) i = 0; i < vtx_count; i++) {
+					auto* vtx = vtx_col[i];
+					_ls_z_shp->write_double(vtx->GetLength() == 3 ? vtx->GetDouble(2, nullptr) : 0.0);
+				}
+
+				_ls_z_shx->write_int(_ls_z_len, FileWriter::ByteOrder::BE);
+				_ls_z_len += 36 + 12 * vtx_count;
+				_ls_z_shx->write_int(32 + 12 * vtx_count, FileWriter::ByteOrder::BE);
+			}
+			return true;
 		}
 
 		bool export_item(cPolygon<cNTuple>* poly) {
+			auto max_dim = 2;
+			auto** vtx_col = poly->GetVerticesCollection();
+			auto vtx_count = poly->GetVerticesCount();
+			int x_min = 0;
+			int x_max = 0;
+			int y_min = 0;
+			int y_max = 0;
+			for (decltype(vtx_count) i = 0; i < vtx_count; i++) {
+				auto* vtx = vtx_col[i];
+				auto p_size = vtx->GetLength();
+				if (p_size > max_dim) {
+					max_dim = p_size;
+				}
+				auto x = vtx->GetDouble(0, nullptr);
+				auto y = vtx->GetDouble(1, nullptr);
 
+				if (x < x_min) {
+					x_min = x;
+				}
+				if (x > x_max) {
+					x_max = x;
+				}
+				if (y < y_min) {
+					y_min = y;
+				}
+				if (y > y_max) {
+					y_max = y;
+				}
+			}
+			if (max_dim == 2) {
+				_poly_shp->write_int(_poly_number++, FileWriter::ByteOrder::BE);
+				_poly_shp->write_int(24 + 8 * vtx_count, FileWriter::ByteOrder::BE);
+				_poly_shp->write_int(5);
+				_poly_shp->write_double(x_min);
+				_poly_shp->write_double(y_min);
+				_poly_shp->write_double(x_max);
+				_poly_shp->write_double(y_max);
+				_poly_shp->write_int(1);
+				_poly_shp->write_int(vtx_count);
+				_poly_shp->write_int(0);
+				for (decltype(vtx_count) i = 0; i < vtx_count; i++) {
+					auto* vtx = vtx_col[i];
+					_poly_shp->write_double(vtx->GetDouble(0, nullptr));
+					_poly_shp->write_double(vtx->GetDouble(1, nullptr));
+				}
+
+				_poly_shx->write_int(_poly_len, FileWriter::ByteOrder::BE);
+				_poly_len += 28 + 8 * vtx_count;
+				_poly_shx->write_int(24 + 8 * vtx_count, FileWriter::ByteOrder::BE);
+			}
+			else {
+				int z_min = 0;
+				int z_max = 0;
+				for (decltype(vtx_count) i = 0; i < vtx_count; i++) {
+					auto* vtx = vtx_col[i];
+					auto z = vtx->GetDouble(2, nullptr);
+					if (z < z_min) {
+						z_min = z;
+					}
+					if (z > z_max) {
+						z_max = z;
+					}
+				}
+
+				_poly_z_shp->write_int(_poly_z_number++, FileWriter::ByteOrder::BE);
+				_poly_z_shp->write_int(32 + 12 * vtx_count, FileWriter::ByteOrder::BE);
+				_poly_z_shp->write_int(15);
+				_poly_z_shp->write_double(x_min);
+				_poly_z_shp->write_double(y_min);
+				_poly_z_shp->write_double(x_max);
+				_poly_z_shp->write_double(y_max);
+				_poly_z_shp->write_int(1);
+				_poly_z_shp->write_int(vtx_count);
+				_poly_z_shp->write_int(0);
+				for (decltype(vtx_count) i = 0; i < vtx_count; i++) {
+					auto* vtx = vtx_col[i];
+					_poly_z_shp->write_double(vtx->GetDouble(0, nullptr));
+					_poly_z_shp->write_double(vtx->GetDouble(1, nullptr));
+				}
+				_poly_z_shp->write_double(z_min);
+				_poly_z_shp->write_double(z_max);
+				for (decltype(vtx_count) i = 0; i < vtx_count; i++) {
+					auto* vtx = vtx_col[i];
+					_poly_z_shp->write_double(vtx->GetLength() == 3 ? vtx->GetDouble(2, nullptr) : 0.0);
+				}
+
+				_poly_z_shx->write_int(_poly_z_len, FileWriter::ByteOrder::BE);
+				_poly_z_len += 36 + 12 * vtx_count;
+				_poly_z_shx->write_int(32 + 12 * vtx_count, FileWriter::ByteOrder::BE);
+			}
+			return true;
 		}
 
 		bool export_item(cSphere<cNTuple>* sphere) {
