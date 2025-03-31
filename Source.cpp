@@ -48,8 +48,8 @@ constexpr auto PATH = R"(C:\Users\uiv56391\source\repos\framework-back-up\test\k
 #endif
 
 #ifdef TEST_SHP
-constexpr auto shp = R"(C:\Users\Petr\Downloads\src\test\kaalgrontiid\test\shp\pointzm_with_all_nodata_m.shp)";
-constexpr auto shx = R"(C:\Users\Petr\Downloads\src\test\kaalgrontiid\test\shp\pointzm_with_all_nodata_m.shx)";
+constexpr auto shp = R"(C:\Users\Petr\Downloads\src\test\kaalgrontiid\test\output_polygon_1743441761.shp)";
+constexpr auto shx = R"(C:\Users\Petr\Downloads\src\test\kaalgrontiid\test\output_polygon_1743441761.shx)";
 #endif
 
 static void print_point_info(cNTuple* point) {

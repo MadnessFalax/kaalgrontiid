@@ -11,6 +11,7 @@
 #include "exporter/gjExporter.h"
 #include "exporter/kmlExporter.h"
 #include "exporter/osmExporter.h"
+#include "exporter/shpExporter.h"
 
 template <class T>
 using Array = nspArray::pArray<T>;
@@ -107,6 +108,9 @@ static void helper() {
 #endif
 #ifdef TEST_OSM
     auto* exporter = new nsOSM::osmExporter(".\\test\\output.osm");
+#endif
+#ifdef TEST_SHP
+	auto* exporter = new nsShapeFile::shpExporter(".\\test\\output");
 #endif
     exporter->begin();
 	exporter->export_item(point);
