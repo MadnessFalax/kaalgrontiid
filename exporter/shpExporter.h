@@ -19,12 +19,14 @@ namespace nsShapeFile {
 
 
 	class shpExporter : public nspExporter::pExporter {
+	public:
 		enum class ExportType {
 			POLYGON,
 			LINESTRING,
 			POINT
 		};
 
+	private:
 		FileWriter* _poly_shx = nullptr;
 		FileWriter* _ls_shx = nullptr;
 		FileWriter* _point_shx = nullptr;
@@ -103,14 +105,14 @@ namespace nsShapeFile {
 			time_t t = time(nullptr);
 			tm* time = localtime(&t);
 			file->write_char(time->tm_year);
-			file->write_char(time->tm_mon);
+			file->write_char(time->tm_mon + 1);
 			file->write_char(time->tm_mday);
 			// number of records
 			file->write_int(0);
 			// header length
-			file->write_short(0);
+			file->write_short(65);
 			// record length
-			file->write_short(1);
+			file->write_short(2);
 			// reserved
 			file->write_int(0);
 			file->write_int(0);
@@ -118,14 +120,14 @@ namespace nsShapeFile {
 			file->write_int(0);
 			file->write_int(0);
 
-			// dummy field descriptor - shapefile states that at least one field is required and there should be one entry for each shape
+			// dummy field descriptor - shapefile docs state that at least one field is required and there should be one entry for each shape
 			file->write_char('d');
 			file->write_char('u');
 			file->write_char('m');
 			file->write_char('m');
 			file->write_char('y');
 			file->write_int(0);
-			file->write_int(0);
+			file->write_short(0);
 			// type
 			file->write_char('L');
 			// data address
@@ -136,13 +138,7 @@ namespace nsShapeFile {
 			file->write_char(0);
 			// reserved
 			file->write_short(0);
-			// work area id
-			file->write_char(0);
-			// reserved
-			file->write_char(0);
-			// set fields
-			file->write_char(0);
-			// reserved
+			file->write_int(0);
 			file->write_int(0);
 			file->write_int(0);
 			// descriptors end
@@ -156,6 +152,12 @@ namespace nsShapeFile {
 			file->write_char(' ');
 			// write True
 			file->write_char('T');
+			return true;
+		}
+
+		bool _write_dbf_size(FileWriter* file, unsigned int record_count) {
+			file->set_position(4);
+			file->write_int(reinterpret_cast<int&>(record_count));
 			return true;
 		}
 
@@ -182,6 +184,13 @@ namespace nsShapeFile {
 			_point_z_shp = new FileWriter(_target_dir + "_pointz_" + _timestamp_str + ".shp", true);
 			_ls_z_shx = new FileWriter(_target_dir + "_linestringz_" + _timestamp_str + ".shx", true);
 			_ls_z_shp = new FileWriter(_target_dir + "_linestringz_" + _timestamp_str + ".shp", true);
+
+			_poly_dbf = new FileWriter(_target_dir + "_polygon_" + _timestamp_str + ".dbf", true);
+			_point_dbf = new FileWriter(_target_dir + "_point_" + _timestamp_str + ".dbf", true);
+			_ls_dbf = new FileWriter(_target_dir + "_linestring_" + _timestamp_str + ".dbf", true);
+			_poly_z_dbf = new FileWriter(_target_dir + "_polygonz_" + _timestamp_str + ".dbf", true);
+			_point_z_dbf = new FileWriter(_target_dir + "_pointz_" + _timestamp_str + ".dbf", true);
+			_ls_z_dbf = new FileWriter(_target_dir + "_linestringz_" + _timestamp_str + ".dbf", true);
 		}
 
 		~shpExporter() {
@@ -197,6 +206,12 @@ namespace nsShapeFile {
 			delete _point_z_shp;
 			delete _ls_z_shx;
 			delete _ls_z_shp;
+			delete _poly_dbf;
+			delete _point_dbf;
+			delete _ls_dbf;
+			delete _poly_z_dbf;
+			delete _point_z_dbf;
+			delete _ls_z_dbf;
 		};
 		
 		bool begin() override {
@@ -212,6 +227,12 @@ namespace nsShapeFile {
 			_write_file_header(13, _ls_z_shp);
 			_write_file_header(11, _point_z_shx);
 			_write_file_header(11, _point_z_shp);
+			_write_dbf_header(_poly_dbf);
+			_write_dbf_header(_point_dbf);
+			_write_dbf_header(_ls_dbf);
+			_write_dbf_header(_poly_z_dbf);
+			_write_dbf_header(_point_z_dbf);
+			_write_dbf_header(_ls_z_dbf);
 			return true;
 		}
 
@@ -246,6 +267,13 @@ namespace nsShapeFile {
 			_ls_z_shp->set_position(24);
 			_ls_z_shp->write_int(_ls_z_len, FileWriter::ByteOrder::BE);
 
+			_write_dbf_size(_poly_dbf, _poly_number - 1);
+			_write_dbf_size(_point_dbf, _point_number - 1);
+			_write_dbf_size(_ls_dbf, _ls_number - 1);
+			_write_dbf_size(_poly_z_dbf, _poly_z_number - 1);
+			_write_dbf_size(_point_z_dbf, _point_z_number - 1);
+			_write_dbf_size(_ls_z_dbf, _ls_z_number - 1);
+
 			return true;
 		}
 
@@ -261,6 +289,7 @@ namespace nsShapeFile {
 				_point_shx->write_int(_point_len, FileWriter::ByteOrder::BE);
 				_point_len += 14;
 				_point_shx->write_int(10, FileWriter::ByteOrder::BE);
+				_write_dbf_record(_point_dbf);	
 			}
 			else {
 				_point_z_shp->write_int(_point_z_number++, FileWriter::ByteOrder::BE);
@@ -273,6 +302,7 @@ namespace nsShapeFile {
 				_point_z_shx->write_int(_point_z_len, FileWriter::ByteOrder::BE);
 				_point_z_len += 18;
 				_point_z_shx->write_int(14, FileWriter::ByteOrder::BE);
+				_write_dbf_record(_point_z_dbf);
 			}
 			return true;
 		}
@@ -327,6 +357,7 @@ namespace nsShapeFile {
 				_ls_shx->write_int(_ls_len, FileWriter::ByteOrder::BE);
 				_ls_len += 28 + 8 * vtx_count;
 				_ls_shx->write_int(24 + 8 * vtx_count, FileWriter::ByteOrder::BE);
+				_write_dbf_record(_ls_dbf);
 			}
 			else {
 				int z_min = 0;
@@ -367,6 +398,7 @@ namespace nsShapeFile {
 				_ls_z_shx->write_int(_ls_z_len, FileWriter::ByteOrder::BE);
 				_ls_z_len += 36 + 12 * vtx_count;
 				_ls_z_shx->write_int(32 + 12 * vtx_count, FileWriter::ByteOrder::BE);
+				_write_dbf_record(_ls_z_dbf);
 			}
 			return true;
 		}
@@ -421,6 +453,7 @@ namespace nsShapeFile {
 				_poly_shx->write_int(_poly_len, FileWriter::ByteOrder::BE);
 				_poly_len += 28 + 8 * vtx_count;
 				_poly_shx->write_int(24 + 8 * vtx_count, FileWriter::ByteOrder::BE);
+				_write_dbf_record(_poly_dbf);
 			}
 			else {
 				int z_min = 0;
@@ -461,6 +494,7 @@ namespace nsShapeFile {
 				_poly_z_shx->write_int(_poly_z_len, FileWriter::ByteOrder::BE);
 				_poly_z_len += 36 + 12 * vtx_count;
 				_poly_z_shx->write_int(32 + 12 * vtx_count, FileWriter::ByteOrder::BE);
+				_write_dbf_record(_poly_z_dbf);
 			}
 			return true;
 		}
