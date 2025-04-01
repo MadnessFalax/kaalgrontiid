@@ -17,7 +17,14 @@ namespace nsShapeFile {
 	using Array = nspArray::pArray<T>;
 	using Mapping = nspMap::pMap<size_t, Array<size_t>*>;
 
+
 	class shpExporter : public nspExporter::pExporter {
+		enum class ExportType {
+			POLYGON,
+			LINESTRING,
+			POINT
+		};
+
 		FileWriter* _poly_shx = nullptr;
 		FileWriter* _ls_shx = nullptr;
 		FileWriter* _point_shx = nullptr;
@@ -59,6 +66,8 @@ namespace nsShapeFile {
 		int _poly_z_number = 1;
 		int _ls_z_number = 1;
 		int _point_z_number = 1;
+
+		ExportType _export_type = ExportType{};
 
 		bool _write_file_header(int shape_type, FileWriter* file) {
 			// code
@@ -141,7 +150,8 @@ namespace nsShapeFile {
 		}
 
 	public:
-		shpExporter(String path_to_target_directory) {
+		shpExporter(String path_to_target_directory, ExportType exported_type) {
+			_export_type = exported_type;
 			_target_dir = path_to_target_directory;
 
 			_timestamp = time(nullptr);
