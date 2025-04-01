@@ -1,5 +1,5 @@
 #pragma once
-
+#include <type_traits>
 #include <ctime>
 #include "pExporter.h"
 #include "../container/pString.h"
@@ -17,59 +17,71 @@ namespace nsShapeFile {
 	using Array = nspArray::pArray<T>;
 	using Mapping = nspMap::pMap<size_t, Array<size_t>*>;
 
+	template <typename U>
+	struct get_shape_code;
 
+	template <>
+	struct get_shape_code<cNTuple> {
+		static constexpr int value = 1;
+	};
+
+	template <>
+	struct get_shape_code<cLineString<cNTuple>> {
+		static constexpr int value = 3;
+	};
+
+	template <>
+	struct get_shape_code<cPolygon<cNTuple>> {
+		static constexpr int value = 5;
+	};
+
+	template <>
+	struct get_shape_code<cSphere<cNTuple>> {
+		static constexpr int value = 1;
+	};
+
+	template <typename U>
+	struct get_z_shape_code;
+
+	template <>
+	struct get_z_shape_code<cNTuple> {
+		static constexpr int value = 11;
+	};
+
+	template <>
+	struct get_z_shape_code<cLineString<cNTuple>> {
+		static constexpr int value = 13;
+	};
+
+	template <>
+	struct get_z_shape_code<cPolygon<cNTuple>> {
+		static constexpr int value = 15;
+	};
+
+	template <>
+	struct get_z_shape_code<cSphere<cNTuple>> {
+		static constexpr int value = 11;
+	};
+
+	template <typename T>
 	class shpExporter : public nspExporter::pExporter {
-	public:
-		enum class ExportType {
-			POLYGON,
-			LINESTRING,
-			POINT
-		};
+		FileWriter* _target_shx = nullptr;
+		FileWriter* _target_shp = nullptr;
+		FileWriter* _target_dbf = nullptr;
 
-	private:
-		FileWriter* _poly_shx = nullptr;
-		FileWriter* _ls_shx = nullptr;
-		FileWriter* _point_shx = nullptr;
-
-		FileWriter* _poly_shp = nullptr;
-		FileWriter* _ls_shp = nullptr;
-		FileWriter* _point_shp = nullptr;
-
-		FileWriter* _poly_dbf = nullptr;
-		FileWriter* _ls_dbf = nullptr;
-		FileWriter* _point_dbf = nullptr;
-
-		FileWriter* _poly_z_shx = nullptr;
-		FileWriter* _ls_z_shx = nullptr;
-		FileWriter* _point_z_shx = nullptr;
-
-		FileWriter* _poly_z_shp = nullptr;
-		FileWriter* _ls_z_shp = nullptr;
-		FileWriter* _point_z_shp = nullptr;
-
-		FileWriter* _poly_z_dbf = nullptr;
-		FileWriter* _ls_z_dbf = nullptr;
-		FileWriter* _point_z_dbf = nullptr;
+		FileWriter* _target_z_shx = nullptr;
+		FileWriter* _target_z_shp = nullptr;
+		FileWriter* _target_z_dbf = nullptr;
 
 		String _target_dir = "";
 		time_t _timestamp = 0;
 		String _timestamp_str = "";
 
-		int _poly_len = 50;
-		int _ls_len = 50;
-		int _point_len = 50;
-		int _poly_z_len = 50;
-		int _ls_z_len = 50;
-		int _point_z_len = 50;
+		int _target_len = 50;
+		int _target_z_len = 50;
 
-		int _poly_number = 1;
-		int _ls_number = 1;
-		int _point_number = 1;
-		int _poly_z_number = 1;
-		int _ls_z_number = 1;
-		int _point_z_number = 1;
-
-		ExportType _export_type = ExportType{};
+		int _target_number = 1;
+		int _target_z_number = 1;
 
 		bool _write_file_header(int shape_type, FileWriter* file) {
 			// code
@@ -162,8 +174,18 @@ namespace nsShapeFile {
 		}
 
 	public:
-		shpExporter(String path_to_target_directory, ExportType exported_type) {
-			_export_type = exported_type;
+		shpExporter() = delete;
+
+		template <
+			typename U = T, 
+			typename = std::enable_if_t <
+				std::is_same_v<U, cNTuple> || 
+				std::is_same_v<U, cLineString<cNTuple>> || 
+				std::is_same_v<U, cPolygon<cNTuple>> ||
+				std::is_same_v<U, cSphere<cNTuple>>
+			>
+		>
+		shpExporter(String path_to_target_directory) {
 			_target_dir = path_to_target_directory;
 
 			_timestamp = time(nullptr);
@@ -172,141 +194,86 @@ namespace nsShapeFile {
 			_timestamp_str = buffer;
 			delete[] buffer;
 
-			_poly_shx = new FileWriter(_target_dir + "_polygon_" + _timestamp_str + ".shx", true);
-			_poly_shp = new FileWriter(_target_dir + "_polygon_" + _timestamp_str + ".shp", true);
-			_point_shx = new FileWriter(_target_dir + "_point_" + _timestamp_str + ".shx", true);
-			_point_shp = new FileWriter(_target_dir + "_point_" + _timestamp_str + ".shp", true);
-			_ls_shx = new FileWriter(_target_dir + "_linestring_" + _timestamp_str + ".shx", true);
-			_ls_shp = new FileWriter(_target_dir + "_linestring_" + _timestamp_str + ".shp", true);
-			_poly_z_shx = new FileWriter(_target_dir + "_polygonz_" + _timestamp_str + ".shx", true);
-			_poly_z_shp = new FileWriter(_target_dir + "_polygonz_" + _timestamp_str + ".shp", true);
-			_point_z_shx = new FileWriter(_target_dir + "_pointz_" + _timestamp_str + ".shx", true);
-			_point_z_shp = new FileWriter(_target_dir + "_pointz_" + _timestamp_str + ".shp", true);
-			_ls_z_shx = new FileWriter(_target_dir + "_linestringz_" + _timestamp_str + ".shx", true);
-			_ls_z_shp = new FileWriter(_target_dir + "_linestringz_" + _timestamp_str + ".shp", true);
-
-			_poly_dbf = new FileWriter(_target_dir + "_polygon_" + _timestamp_str + ".dbf", true);
-			_point_dbf = new FileWriter(_target_dir + "_point_" + _timestamp_str + ".dbf", true);
-			_ls_dbf = new FileWriter(_target_dir + "_linestring_" + _timestamp_str + ".dbf", true);
-			_poly_z_dbf = new FileWriter(_target_dir + "_polygonz_" + _timestamp_str + ".dbf", true);
-			_point_z_dbf = new FileWriter(_target_dir + "_pointz_" + _timestamp_str + ".dbf", true);
-			_ls_z_dbf = new FileWriter(_target_dir + "_linestringz_" + _timestamp_str + ".dbf", true);
+			_target_shx = new FileWriter(_target_dir + "_target_" + _timestamp_str + ".shx", true);
+			_target_shp = new FileWriter(_target_dir + "_target_" + _timestamp_str + ".shp", true);
+			_target_dbf = new FileWriter(_target_dir + "_target_" + _timestamp_str + ".dbf", true);
+			
+			_target_z_shx = new FileWriter(_target_dir + "_targetz_" + _timestamp_str + ".shx", true);
+			_target_z_shp = new FileWriter(_target_dir + "_targetz_" + _timestamp_str + ".shp", true);
+			_target_z_dbf = new FileWriter(_target_dir + "_targetz_" + _timestamp_str + ".dbf", true);
 		}
 
 		~shpExporter() {
-			delete _poly_shx;
-			delete _poly_shp;
-			delete _point_shx;
-			delete _point_shp;
-			delete _ls_shx;
-			delete _ls_shp;
-			delete _poly_z_shx;
-			delete _poly_z_shp;
-			delete _point_z_shx;
-			delete _point_z_shp;
-			delete _ls_z_shx;
-			delete _ls_z_shp;
-			delete _poly_dbf;
-			delete _point_dbf;
-			delete _ls_dbf;
-			delete _poly_z_dbf;
-			delete _point_z_dbf;
-			delete _ls_z_dbf;
+			delete _target_shx;
+			delete _target_shp;
+			delete _target_z_shx;
+			delete _target_z_shp;
+			delete _target_dbf;
+			delete _target_z_dbf;
 		};
 		
 		bool begin() override {
-			_write_file_header(5, _poly_shx);
-			_write_file_header(5, _poly_shp);
-			_write_file_header(3, _ls_shx);
-			_write_file_header(3, _ls_shp);
-			_write_file_header(1, _point_shx);
-			_write_file_header(1, _point_shp);
-			_write_file_header(15, _poly_z_shx);
-			_write_file_header(15, _poly_z_shp);
-			_write_file_header(13, _ls_z_shx);
-			_write_file_header(13, _ls_z_shp);
-			_write_file_header(11, _point_z_shx);
-			_write_file_header(11, _point_z_shp);
-			_write_dbf_header(_poly_dbf);
-			_write_dbf_header(_point_dbf);
-			_write_dbf_header(_ls_dbf);
-			_write_dbf_header(_poly_z_dbf);
-			_write_dbf_header(_point_z_dbf);
-			_write_dbf_header(_ls_z_dbf);
+
+			_write_file_header(get_shape_code<T>::value, _target_shx);
+			_write_file_header(get_shape_code<T>::value, _target_shp);
+			_write_dbf_header(_target_dbf);
+
+			_write_file_header(get_z_shape_code<T>::value, _target_z_shx);
+			_write_file_header(get_z_shape_code<T>::value, _target_z_shp);
+			_write_dbf_header(_target_z_dbf);
+			
 			return true;
 		}
 
 		bool end() override {
-			_poly_shx->set_position(24);
-			_poly_shx->write_int(_poly_len, FileWriter::ByteOrder::BE);
-			_poly_shp->set_position(24);
-			_poly_shp->write_int(_poly_len, FileWriter::ByteOrder::BE);
-			
-			_point_shx->set_position(24);
-			_point_shx->write_int(_point_len, FileWriter::ByteOrder::BE);
-			_point_shp->set_position(24);
-			_point_shp->write_int(_point_len, FileWriter::ByteOrder::BE);
-			
-			_ls_shx->set_position(24);
-			_ls_shx->write_int(_ls_len, FileWriter::ByteOrder::BE);
-			_ls_shp->set_position(24);
-			_ls_shp->write_int(_ls_len, FileWriter::ByteOrder::BE);
-			
-			_poly_z_shx->set_position(24);
-			_poly_z_shx->write_int(_poly_z_len, FileWriter::ByteOrder::BE);
-			_poly_z_shp->set_position(24);
-			_poly_z_shp->write_int(_poly_z_len, FileWriter::ByteOrder::BE);
-			
-			_point_z_shx->set_position(24);
-			_point_z_shx->write_int(_point_z_len, FileWriter::ByteOrder::BE);
-			_point_z_shp->set_position(24);
-			_point_z_shp->write_int(_point_z_len, FileWriter::ByteOrder::BE);
-			
-			_ls_z_shx->set_position(24);
-			_ls_z_shx->write_int(_ls_z_len, FileWriter::ByteOrder::BE);
-			_ls_z_shp->set_position(24);
-			_ls_z_shp->write_int(_ls_z_len, FileWriter::ByteOrder::BE);
+			_target_shx->set_position(24);
+			_target_shx->write_int(_target_len, FileWriter::ByteOrder::BE);
+			_target_shp->set_position(24);
+			_target_shp->write_int(_target_len, FileWriter::ByteOrder::BE);
 
-			_write_dbf_size(_poly_dbf, _poly_number - 1);
-			_write_dbf_size(_point_dbf, _point_number - 1);
-			_write_dbf_size(_ls_dbf, _ls_number - 1);
-			_write_dbf_size(_poly_z_dbf, _poly_z_number - 1);
-			_write_dbf_size(_point_z_dbf, _point_z_number - 1);
-			_write_dbf_size(_ls_z_dbf, _ls_z_number - 1);
+			_target_z_shx->set_position(24);
+			_target_z_shx->write_int(_target_z_len, FileWriter::ByteOrder::BE);
+			_target_z_shp->set_position(24);
+			_target_z_shp->write_int(_target_z_len, FileWriter::ByteOrder::BE);
+
+			_write_dbf_size(_target_dbf, _target_number - 1);
+			_write_dbf_size(_target_z_dbf, _target_z_number - 1);
 
 			return true;
 		}
 
+		template <typename U = T, typename = std::enable_if_t<std::is_same_v<U, cNTuple> || std::is_same_v<U, cSphere<cNTuple>>>>
 		bool export_item(cNTuple* point) {
 			auto p_size = point->GetLength();
 			if (p_size == 2) {
-				_point_shp->write_int(_point_number++, FileWriter::ByteOrder::BE);
-				_point_shp->write_int(10, FileWriter::ByteOrder::BE);
-				_point_shp->write_int(1);
-				_point_shp->write_double(point->GetDouble(0, nullptr));
-				_point_shp->write_double(point->GetDouble(1, nullptr));
+				_target_shp->write_int(_target_number++, FileWriter::ByteOrder::BE);
+				_target_shp->write_int(10, FileWriter::ByteOrder::BE);
+				_target_shp->write_int(1);
+				_target_shp->write_double(point->GetDouble(0, nullptr));
+				_target_shp->write_double(point->GetDouble(1, nullptr));
 
-				_point_shx->write_int(_point_len, FileWriter::ByteOrder::BE);
-				_point_len += 14;
-				_point_shx->write_int(10, FileWriter::ByteOrder::BE);
-				_write_dbf_record(_point_dbf);	
+				_target_shx->write_int(_target_len, FileWriter::ByteOrder::BE);
+				_target_len += 14;
+				_target_shx->write_int(10, FileWriter::ByteOrder::BE);
+				_write_dbf_record(_target_dbf);	
 			}
 			else {
-				_point_z_shp->write_int(_point_z_number++, FileWriter::ByteOrder::BE);
-				_point_z_shp->write_int(14, FileWriter::ByteOrder::BE);
-				_point_z_shp->write_int(11);
-				_point_z_shp->write_double(point->GetDouble(0, nullptr));
-				_point_z_shp->write_double(point->GetDouble(1, nullptr));
-				_point_z_shp->write_double(point->GetDouble(2, nullptr));
+				_target_z_shp->write_int(_target_z_number++, FileWriter::ByteOrder::BE);
+				_target_z_shp->write_int(14, FileWriter::ByteOrder::BE);
+				_target_z_shp->write_int(11);
+				_target_z_shp->write_double(point->GetDouble(0, nullptr));
+				_target_z_shp->write_double(point->GetDouble(1, nullptr));
+				_target_z_shp->write_double(point->GetDouble(2, nullptr));
 
-				_point_z_shx->write_int(_point_z_len, FileWriter::ByteOrder::BE);
-				_point_z_len += 18;
-				_point_z_shx->write_int(14, FileWriter::ByteOrder::BE);
-				_write_dbf_record(_point_z_dbf);
+				_target_z_shx->write_int(_target_z_len, FileWriter::ByteOrder::BE);
+				_target_z_len += 18;
+				_target_z_shx->write_int(14, FileWriter::ByteOrder::BE);
+				_write_dbf_record(_target_z_dbf);
 			}
 			return true;
 		}
 
+		template <typename U = T, typename = std::enable_if_t<std::is_same_v<U, cLineString<cNTuple>>>>
 		bool export_item(cLineString<cNTuple>* line) {
 			auto max_dim = 2;
 			auto** vtx_col = line->GetVerticesCollection();
@@ -338,26 +305,26 @@ namespace nsShapeFile {
 				}
 			}
 			if (max_dim == 2) {
-				_ls_shp->write_int(_ls_number++, FileWriter::ByteOrder::BE);
-				_ls_shp->write_int(24 + 8 * vtx_count, FileWriter::ByteOrder::BE);
-				_ls_shp->write_int(3);
-				_ls_shp->write_double(x_min);
-				_ls_shp->write_double(y_min);
-				_ls_shp->write_double(x_max);
-				_ls_shp->write_double(y_max);
-				_ls_shp->write_int(1);
-				_ls_shp->write_int(vtx_count);
-				_ls_shp->write_int(0);
+				_target_shp->write_int(_target_number++, FileWriter::ByteOrder::BE);
+				_target_shp->write_int(24 + 8 * vtx_count, FileWriter::ByteOrder::BE);
+				_target_shp->write_int(3);
+				_target_shp->write_double(x_min);
+				_target_shp->write_double(y_min);
+				_target_shp->write_double(x_max);
+				_target_shp->write_double(y_max);
+				_target_shp->write_int(1);
+				_target_shp->write_int(vtx_count);
+				_target_shp->write_int(0);
 				for (decltype(vtx_count) i = 0; i < vtx_count; i++) {
 					auto* vtx = vtx_col[i];
-					_ls_shp->write_double(vtx->GetDouble(0, nullptr));
-					_ls_shp->write_double(vtx->GetDouble(1, nullptr));
+					_target_shp->write_double(vtx->GetDouble(0, nullptr));
+					_target_shp->write_double(vtx->GetDouble(1, nullptr));
 				}
 
-				_ls_shx->write_int(_ls_len, FileWriter::ByteOrder::BE);
-				_ls_len += 28 + 8 * vtx_count;
-				_ls_shx->write_int(24 + 8 * vtx_count, FileWriter::ByteOrder::BE);
-				_write_dbf_record(_ls_dbf);
+				_target_shx->write_int(_target_len, FileWriter::ByteOrder::BE);
+				_target_len += 28 + 8 * vtx_count;
+				_target_shx->write_int(24 + 8 * vtx_count, FileWriter::ByteOrder::BE);
+				_write_dbf_record(_target_dbf);
 			}
 			else {
 				int z_min = 0;
@@ -373,36 +340,37 @@ namespace nsShapeFile {
 					}
 				}
 
-				_ls_z_shp->write_int(_ls_z_number++, FileWriter::ByteOrder::BE);
-				_ls_z_shp->write_int(32 + 12 * vtx_count, FileWriter::ByteOrder::BE);
-				_ls_z_shp->write_int(13);
-				_ls_z_shp->write_double(x_min);
-				_ls_z_shp->write_double(y_min);
-				_ls_z_shp->write_double(x_max);
-				_ls_z_shp->write_double(y_max);
-				_ls_z_shp->write_int(1);
-				_ls_z_shp->write_int(vtx_count);
-				_ls_z_shp->write_int(0);
+				_target_z_shp->write_int(_target_z_number++, FileWriter::ByteOrder::BE);
+				_target_z_shp->write_int(32 + 12 * vtx_count, FileWriter::ByteOrder::BE);
+				_target_z_shp->write_int(13);
+				_target_z_shp->write_double(x_min);
+				_target_z_shp->write_double(y_min);
+				_target_z_shp->write_double(x_max);
+				_target_z_shp->write_double(y_max);
+				_target_z_shp->write_int(1);
+				_target_z_shp->write_int(vtx_count);
+				_target_z_shp->write_int(0);
 				for (decltype(vtx_count) i = 0; i < vtx_count; i++) {
 					auto* vtx = vtx_col[i];
-					_ls_z_shp->write_double(vtx->GetDouble(0, nullptr));
-					_ls_z_shp->write_double(vtx->GetDouble(1, nullptr));
+					_target_z_shp->write_double(vtx->GetDouble(0, nullptr));
+					_target_z_shp->write_double(vtx->GetDouble(1, nullptr));
 				}
-				_ls_z_shp->write_double(z_min);
-				_ls_z_shp->write_double(z_max);
+				_target_z_shp->write_double(z_min);
+				_target_z_shp->write_double(z_max);
 				for (decltype(vtx_count) i = 0; i < vtx_count; i++) {
 					auto* vtx = vtx_col[i];
-					_ls_z_shp->write_double(vtx->GetLength() == 3 ? vtx->GetDouble(2, nullptr) : 0.0);
+					_target_z_shp->write_double(vtx->GetLength() == 3 ? vtx->GetDouble(2, nullptr) : 0.0);
 				}
 
-				_ls_z_shx->write_int(_ls_z_len, FileWriter::ByteOrder::BE);
-				_ls_z_len += 36 + 12 * vtx_count;
-				_ls_z_shx->write_int(32 + 12 * vtx_count, FileWriter::ByteOrder::BE);
-				_write_dbf_record(_ls_z_dbf);
+				_target_z_shx->write_int(_target_z_len, FileWriter::ByteOrder::BE);
+				_target_z_len += 36 + 12 * vtx_count;
+				_target_z_shx->write_int(32 + 12 * vtx_count, FileWriter::ByteOrder::BE);
+				_write_dbf_record(_target_z_dbf);
 			}
 			return true;
 		}
 
+		template <typename U = T, typename = std::enable_if_t<std::is_same_v<U, cPolygon<cNTuple>>>>
 		bool export_item(cPolygon<cNTuple>* poly) {
 			auto max_dim = 2;
 			auto** vtx_col = poly->GetVerticesCollection();
@@ -434,26 +402,26 @@ namespace nsShapeFile {
 				}
 			}
 			if (max_dim == 2) {
-				_poly_shp->write_int(_poly_number++, FileWriter::ByteOrder::BE);
-				_poly_shp->write_int(24 + 8 * vtx_count, FileWriter::ByteOrder::BE);
-				_poly_shp->write_int(5);
-				_poly_shp->write_double(x_min);
-				_poly_shp->write_double(y_min);
-				_poly_shp->write_double(x_max);
-				_poly_shp->write_double(y_max);
-				_poly_shp->write_int(1);
-				_poly_shp->write_int(vtx_count);
-				_poly_shp->write_int(0);
+				_target_shp->write_int(_target_number++, FileWriter::ByteOrder::BE);
+				_target_shp->write_int(24 + 8 * vtx_count, FileWriter::ByteOrder::BE);
+				_target_shp->write_int(5);
+				_target_shp->write_double(x_min);
+				_target_shp->write_double(y_min);
+				_target_shp->write_double(x_max);
+				_target_shp->write_double(y_max);
+				_target_shp->write_int(1);
+				_target_shp->write_int(vtx_count);
+				_target_shp->write_int(0);
 				for (decltype(vtx_count) i = 0; i < vtx_count; i++) {
 					auto* vtx = vtx_col[i];
-					_poly_shp->write_double(vtx->GetDouble(0, nullptr));
-					_poly_shp->write_double(vtx->GetDouble(1, nullptr));
+					_target_shp->write_double(vtx->GetDouble(0, nullptr));
+					_target_shp->write_double(vtx->GetDouble(1, nullptr));
 				}
 
-				_poly_shx->write_int(_poly_len, FileWriter::ByteOrder::BE);
-				_poly_len += 28 + 8 * vtx_count;
-				_poly_shx->write_int(24 + 8 * vtx_count, FileWriter::ByteOrder::BE);
-				_write_dbf_record(_poly_dbf);
+				_target_shx->write_int(_target_len, FileWriter::ByteOrder::BE);
+				_target_len += 28 + 8 * vtx_count;
+				_target_shx->write_int(24 + 8 * vtx_count, FileWriter::ByteOrder::BE);
+				_write_dbf_record(_target_dbf);
 			}
 			else {
 				int z_min = 0;
@@ -469,36 +437,37 @@ namespace nsShapeFile {
 					}
 				}
 
-				_poly_z_shp->write_int(_poly_z_number++, FileWriter::ByteOrder::BE);
-				_poly_z_shp->write_int(32 + 12 * vtx_count, FileWriter::ByteOrder::BE);
-				_poly_z_shp->write_int(15);
-				_poly_z_shp->write_double(x_min);
-				_poly_z_shp->write_double(y_min);
-				_poly_z_shp->write_double(x_max);
-				_poly_z_shp->write_double(y_max);
-				_poly_z_shp->write_int(1);
-				_poly_z_shp->write_int(vtx_count);
-				_poly_z_shp->write_int(0);
+				_target_z_shp->write_int(_target_z_number++, FileWriter::ByteOrder::BE);
+				_target_z_shp->write_int(32 + 12 * vtx_count, FileWriter::ByteOrder::BE);
+				_target_z_shp->write_int(15);
+				_target_z_shp->write_double(x_min);
+				_target_z_shp->write_double(y_min);
+				_target_z_shp->write_double(x_max);
+				_target_z_shp->write_double(y_max);
+				_target_z_shp->write_int(1);
+				_target_z_shp->write_int(vtx_count);
+				_target_z_shp->write_int(0);
 				for (decltype(vtx_count) i = 0; i < vtx_count; i++) {
 					auto* vtx = vtx_col[i];
-					_poly_z_shp->write_double(vtx->GetDouble(0, nullptr));
-					_poly_z_shp->write_double(vtx->GetDouble(1, nullptr));
+					_target_z_shp->write_double(vtx->GetDouble(0, nullptr));
+					_target_z_shp->write_double(vtx->GetDouble(1, nullptr));
 				}
-				_poly_z_shp->write_double(z_min);
-				_poly_z_shp->write_double(z_max);
+				_target_z_shp->write_double(z_min);
+				_target_z_shp->write_double(z_max);
 				for (decltype(vtx_count) i = 0; i < vtx_count; i++) {
 					auto* vtx = vtx_col[i];
-					_poly_z_shp->write_double(vtx->GetLength() == 3 ? vtx->GetDouble(2, nullptr) : 0.0);
+					_target_z_shp->write_double(vtx->GetLength() == 3 ? vtx->GetDouble(2, nullptr) : 0.0);
 				}
 
-				_poly_z_shx->write_int(_poly_z_len, FileWriter::ByteOrder::BE);
-				_poly_z_len += 36 + 12 * vtx_count;
-				_poly_z_shx->write_int(32 + 12 * vtx_count, FileWriter::ByteOrder::BE);
-				_write_dbf_record(_poly_z_dbf);
+				_target_z_shx->write_int(_target_z_len, FileWriter::ByteOrder::BE);
+				_target_z_len += 36 + 12 * vtx_count;
+				_target_z_shx->write_int(32 + 12 * vtx_count, FileWriter::ByteOrder::BE);
+				_write_dbf_record(_target_z_dbf);
 			}
 			return true;
 		}
 
+		template <typename U = T, typename = std::enable_if_t<std::is_same_v<U, cNTuple> || std::is_same_v<U, cSphere<cNTuple>>>>
 		bool export_item(cSphere<cNTuple>* sphere) {
 			return export_item(sphere->GetVertex(0));
 		}
