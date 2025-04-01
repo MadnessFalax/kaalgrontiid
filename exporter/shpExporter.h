@@ -110,7 +110,7 @@ namespace nsShapeFile {
 			// header length
 			file->write_short(0);
 			// record length
-			file->write_short(4);
+			file->write_short(1);
 			// reserved
 			file->write_int(0);
 			file->write_int(0);
@@ -147,6 +147,16 @@ namespace nsShapeFile {
 			file->write_int(0);
 			// descriptors end
 			file->write_char(0x0d);
+
+			return true;
+		}
+
+		bool _write_dbf_record(FileWriter* file) {
+			// deletion marker
+			file->write_char(' ');
+			// write True
+			file->write_char('T');
+			return true;
 		}
 
 	public:
