@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ctime"
+#include <ctime>
 #include "pExporter.h"
 #include "../container/pString.h"
 #include "../container/pArray.h"
@@ -21,16 +21,26 @@ namespace nsShapeFile {
 		FileWriter* _poly_shx = nullptr;
 		FileWriter* _ls_shx = nullptr;
 		FileWriter* _point_shx = nullptr;
+
 		FileWriter* _poly_shp = nullptr;
 		FileWriter* _ls_shp = nullptr;
 		FileWriter* _point_shp = nullptr;
 
+		FileWriter* _poly_dbf = nullptr;
+		FileWriter* _ls_dbf = nullptr;
+		FileWriter* _point_dbf = nullptr;
+
 		FileWriter* _poly_z_shx = nullptr;
 		FileWriter* _ls_z_shx = nullptr;
 		FileWriter* _point_z_shx = nullptr;
+
 		FileWriter* _poly_z_shp = nullptr;
 		FileWriter* _ls_z_shp = nullptr;
 		FileWriter* _point_z_shp = nullptr;
+
+		FileWriter* _poly_z_dbf = nullptr;
+		FileWriter* _ls_z_dbf = nullptr;
+		FileWriter* _point_z_dbf = nullptr;
 
 		String _target_dir = "";
 		time_t _timestamp = 0;
@@ -75,6 +85,59 @@ namespace nsShapeFile {
 			file->write_double(-9999.0);
 			file->write_double(9999.0);
 			return true;
+		}
+
+		bool _write_dbf_header(FileWriter* file) {
+			// dBASE 3
+			file->write_char(0x03);
+			// last update
+			time_t t = time(nullptr);
+			tm* time = localtime(&t);
+			file->write_char(time->tm_year);
+			file->write_char(time->tm_mon);
+			file->write_char(time->tm_mday);
+			// number of records
+			file->write_int(0);
+			// header length
+			file->write_short(0);
+			// record length
+			file->write_short(4);
+			// reserved
+			file->write_int(0);
+			file->write_int(0);
+			file->write_int(0);
+			file->write_int(0);
+			file->write_int(0);
+
+			// dummy field descriptor - shapefile states that at least one field is required and there should be one entry for each shape
+			file->write_char('d');
+			file->write_char('u');
+			file->write_char('m');
+			file->write_char('m');
+			file->write_char('y');
+			file->write_int(0);
+			file->write_int(0);
+			// type
+			file->write_char('L');
+			// data address
+			file->write_int(0);
+			// length
+			file->write_char(1);
+			// decimal count
+			file->write_char(0);
+			// reserved
+			file->write_short(0);
+			// work area id
+			file->write_char(0);
+			// reserved
+			file->write_char(0);
+			// set fields
+			file->write_char(0);
+			// reserved
+			file->write_int(0);
+			file->write_int(0);
+			// descriptors end
+			file->write_char(0x0d);
 		}
 
 	public:
