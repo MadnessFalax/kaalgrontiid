@@ -110,21 +110,21 @@ static void helper() {
     auto* exporter = new nsOSM::osmExporter(".\\test\\output.osm");
 #endif
 #ifdef TEST_SHP
-	auto* exporter = new nsShapeFile::shpExporter(".\\test\\output", nsShapeFile::shpExporter::ExportType::POINT);
+	auto* exporter = new nsShapeFile::shpExporter<cPolygon<cNTuple>>(".\\test\\output");
 #endif
     exporter->begin();
-	exporter->export_item(point);
-	exporter->export_item(point2);
-	exporter->export_item(point3);
-	exporter->export_item(point4);
-	exporter->export_item(point5);
-	exporter->export_item(point6);
-	exporter->export_item(point7);
-	exporter->export_item(point8);
-	exporter->export_item(point9);
-	exporter->export_item(point10);
+	//exporter->export_item(point);
+	//exporter->export_item(point2);
+	//exporter->export_item(point3);
+	//exporter->export_item(point4);
+	//exporter->export_item(point5);
+	//exporter->export_item(point6);
+	//exporter->export_item(point7);
+	//exporter->export_item(point8);
+	//exporter->export_item(point9);
+	//exporter->export_item(point10);
 	//exporter->export_item(line);
-	//exporter->export_item(poly);
+	exporter->export_item(poly);
 	//exporter->export_item(sphere);
 	exporter->end();
 	delete exporter;
