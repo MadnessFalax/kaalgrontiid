@@ -128,6 +128,37 @@ namespace nspFile {
 			return status;
 		}
 
+		bool write_char(char value) {
+			bool status = false;
+			if (_is_binary) {
+				if (_cur_buffer_len + 1 >= _buffer_size) {
+					_flush();
+				}
+				_binary_buffer[_cur_buffer_len++] = value;
+			}
+			return status;
+		}
+
+		bool write_short(short value, ByteOrder byte_order = ByteOrder::LE) {
+			bool status = false;
+			if (_is_binary) {
+				if (_cur_buffer_len + 2 >= _buffer_size) {
+					_flush();
+				}
+
+				auto* buf = reinterpret_cast<unsigned char*>(&value);
+
+				if (byte_order == ByteOrder::BE) {
+					char tmp = buf[0];
+					buf[0] = buf[1];
+					buf[1] = tmp;
+				}
+				memcpy(&(_binary_buffer[_cur_buffer_len]), buf, 2);
+				_cur_buffer_len += 2;
+			}
+			return status;
+		}
+
 		bool write_int(int value, ByteOrder byte_order = ByteOrder::LE) {
 			bool status = false;
 			if (_is_binary) {
