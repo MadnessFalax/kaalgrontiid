@@ -173,6 +173,23 @@ namespace nsShapeFile {
 			return true;
 		}
 
+		bool _start_new_export() {
+			bool ret_val = true;
+			ret_val &= end();
+			ret_val &= begin();
+			return ret_val;
+		}
+
+		bool _reset_timestamp() {
+			_timestamp = time(nullptr);
+			char* buffer = new char[32];
+			snprintf(buffer, 32, "%llu", _timestamp);
+			_timestamp_str = buffer;
+			delete[] buffer;
+
+			return true;
+		}
+
 	public:
 		shpExporter() = delete;
 
@@ -187,20 +204,6 @@ namespace nsShapeFile {
 		>
 		shpExporter(String path_to_target_directory) {
 			_target_dir = path_to_target_directory;
-
-			_timestamp = time(nullptr);
-			char* buffer = new char[32];
-			snprintf(buffer, 32, "%llu", _timestamp);
-			_timestamp_str = buffer;
-			delete[] buffer;
-
-			_target_shx = new FileWriter(_target_dir + "_target_" + _timestamp_str + ".shx", true);
-			_target_shp = new FileWriter(_target_dir + "_target_" + _timestamp_str + ".shp", true);
-			_target_dbf = new FileWriter(_target_dir + "_target_" + _timestamp_str + ".dbf", true);
-			
-			_target_z_shx = new FileWriter(_target_dir + "_targetz_" + _timestamp_str + ".shx", true);
-			_target_z_shp = new FileWriter(_target_dir + "_targetz_" + _timestamp_str + ".shp", true);
-			_target_z_dbf = new FileWriter(_target_dir + "_targetz_" + _timestamp_str + ".dbf", true);
 		}
 
 		~shpExporter() {
@@ -213,6 +216,20 @@ namespace nsShapeFile {
 		};
 		
 		bool begin() override {
+			_reset_timestamp();
+			_target_len = 50;
+			_target_z_len = 50;
+
+			_target_number = 1;
+			_target_z_number = 1;
+
+			_target_shx = new FileWriter(_target_dir + "_target_" + _timestamp_str + ".shx", true);
+			_target_shp = new FileWriter(_target_dir + "_target_" + _timestamp_str + ".shp", true);
+			_target_dbf = new FileWriter(_target_dir + "_target_" + _timestamp_str + ".dbf", true);
+
+			_target_z_shx = new FileWriter(_target_dir + "_targetz_" + _timestamp_str + ".shx", true);
+			_target_z_shp = new FileWriter(_target_dir + "_targetz_" + _timestamp_str + ".shp", true);
+			_target_z_dbf = new FileWriter(_target_dir + "_targetz_" + _timestamp_str + ".dbf", true);
 
 			_write_file_header(get_shape_code<T>::value, _target_shx);
 			_write_file_header(get_shape_code<T>::value, _target_shp);
@@ -239,6 +256,19 @@ namespace nsShapeFile {
 			_write_dbf_size(_target_dbf, _target_number - 1);
 			_write_dbf_size(_target_z_dbf, _target_z_number - 1);
 
+			delete _target_shx;
+			_target_shx = nullptr;
+			delete _target_shp;
+			_target_shp = nullptr;
+			delete _target_z_shx;
+			_target_z_shx = nullptr;
+			delete _target_z_shp;
+			_target_z_shp = nullptr;
+			delete _target_dbf;
+			_target_dbf = nullptr;
+			delete _target_z_dbf;
+			_target_z_dbf = nullptr;
+
 			return true;
 		}
 
@@ -246,6 +276,10 @@ namespace nsShapeFile {
 		bool export_item(cNTuple* point) {
 			auto p_size = point->GetLength();
 			if (p_size == 2) {
+				auto record_len = 14;
+				if (record_len + _target_len >= 0x7FFFFFFF || record_len + _target_len < 0) {
+					_start_new_export();
+				}
 				_target_shp->write_int(_target_number++, FileWriter::ByteOrder::BE);
 				_target_shp->write_int(10, FileWriter::ByteOrder::BE);
 				_target_shp->write_int(1);
@@ -253,11 +287,15 @@ namespace nsShapeFile {
 				_target_shp->write_double(point->GetDouble(1, nullptr));
 
 				_target_shx->write_int(_target_len, FileWriter::ByteOrder::BE);
-				_target_len += 14;
+				_target_len += record_len;
 				_target_shx->write_int(10, FileWriter::ByteOrder::BE);
 				_write_dbf_record(_target_dbf);	
 			}
 			else {
+				auto record_len = 18;
+				if (record_len + _target_z_len >= 0x7FFFFFFF || record_len + _target_z_len < 0) {
+					_start_new_export();
+				}
 				_target_z_shp->write_int(_target_z_number++, FileWriter::ByteOrder::BE);
 				_target_z_shp->write_int(14, FileWriter::ByteOrder::BE);
 				_target_z_shp->write_int(11);
@@ -266,7 +304,7 @@ namespace nsShapeFile {
 				_target_z_shp->write_double(point->GetDouble(2, nullptr));
 
 				_target_z_shx->write_int(_target_z_len, FileWriter::ByteOrder::BE);
-				_target_z_len += 18;
+				_target_z_len += record_len;
 				_target_z_shx->write_int(14, FileWriter::ByteOrder::BE);
 				_write_dbf_record(_target_z_dbf);
 			}
@@ -305,6 +343,10 @@ namespace nsShapeFile {
 				}
 			}
 			if (max_dim == 2) {
+				auto record_len = 28 + 8 * vtx_count;
+				if (record_len + _target_len >= 0x7FFFFFFF || record_len + _target_len < 0) {
+					_start_new_export();
+				}
 				_target_shp->write_int(_target_number++, FileWriter::ByteOrder::BE);
 				_target_shp->write_int(24 + 8 * vtx_count, FileWriter::ByteOrder::BE);
 				_target_shp->write_int(3);
@@ -322,11 +364,15 @@ namespace nsShapeFile {
 				}
 
 				_target_shx->write_int(_target_len, FileWriter::ByteOrder::BE);
-				_target_len += 28 + 8 * vtx_count;
+				_target_len += record_len;
 				_target_shx->write_int(24 + 8 * vtx_count, FileWriter::ByteOrder::BE);
 				_write_dbf_record(_target_dbf);
 			}
 			else {
+				auto record_len = 36 + 12 * vtx_count;
+				if (record_len + _target_z_len >= 0x7FFFFFFF || record_len + _target_z_len < 0) {
+					_start_new_export();
+				}
 				int z_min = 0;
 				int z_max = 0;
 				for (decltype(vtx_count) i = 0; i < vtx_count; i++) {
@@ -363,7 +409,7 @@ namespace nsShapeFile {
 				}
 
 				_target_z_shx->write_int(_target_z_len, FileWriter::ByteOrder::BE);
-				_target_z_len += 36 + 12 * vtx_count;
+				_target_z_len += record_len;
 				_target_z_shx->write_int(32 + 12 * vtx_count, FileWriter::ByteOrder::BE);
 				_write_dbf_record(_target_z_dbf);
 			}
@@ -402,6 +448,10 @@ namespace nsShapeFile {
 				}
 			}
 			if (max_dim == 2) {
+				auto record_len = 28 + 8 * vtx_count;
+				if (record_len + _target_len >= 0x7FFFFFFF || record_len + _target_len < 0) {
+					_start_new_export();
+				}
 				_target_shp->write_int(_target_number++, FileWriter::ByteOrder::BE);
 				_target_shp->write_int(24 + 8 * vtx_count, FileWriter::ByteOrder::BE);
 				_target_shp->write_int(5);
@@ -419,11 +469,15 @@ namespace nsShapeFile {
 				}
 
 				_target_shx->write_int(_target_len, FileWriter::ByteOrder::BE);
-				_target_len += 28 + 8 * vtx_count;
+				_target_len += record_len;
 				_target_shx->write_int(24 + 8 * vtx_count, FileWriter::ByteOrder::BE);
 				_write_dbf_record(_target_dbf);
 			}
 			else {
+				auto record_len = 36 + 12 * vtx_count;
+				if (record_len + _target_z_len >= 0x7FFFFFFF || record_len + _target_z_len < 0) {
+					_start_new_export();
+				}
 				int z_min = 0;
 				int z_max = 0;
 				for (decltype(vtx_count) i = 0; i < vtx_count; i++) {
@@ -460,7 +514,7 @@ namespace nsShapeFile {
 				}
 
 				_target_z_shx->write_int(_target_z_len, FileWriter::ByteOrder::BE);
-				_target_z_len += 36 + 12 * vtx_count;
+				_target_z_len += record_len;
 				_target_z_shx->write_int(32 + 12 * vtx_count, FileWriter::ByteOrder::BE);
 				_write_dbf_record(_target_z_dbf);
 			}
