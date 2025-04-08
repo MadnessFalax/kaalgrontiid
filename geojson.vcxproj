@@ -583,7 +583,7 @@
     <ClCompile Include="..\..\dstruct\paged\core\cTreeHeader.cpp" />
     <ClCompile Include="parser\regex\AST\pRegexNode.cpp" />
     <ClCompile Include="parser\regex\NFA\pState.cpp" />
-    <ClCompile Include="Source2.cpp" />
+    <ClCompile Include="Source3.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />

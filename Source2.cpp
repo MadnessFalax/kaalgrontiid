@@ -33,14 +33,6 @@ template <class T, class U, class V = unsigned char>
 using Map = nspMap::pMap<T, U, V>;
 using FileWriter = nspFile::pFileWriter;
 
-template <class T>
-using Array = nspArray::pArray<T>;
-using String = nspString::pString;
-template <class T, class U, class V = unsigned char>
-using Map = nspMap::pMap<T, U, V>;
-template<class enum_t>
-using Lexer = nspLexer::pLexer<enum_t>;
-
 using Regex = nspRegex::pRegex;
 template<class enum_t, nspLexer::PrototypeKind t = nspLexer::PrototypeKind::DEFAULT>
 using Token = nspLexer::pTokenPrototype<enum_t, t>;
@@ -233,7 +225,8 @@ static void helper() {
 		if (i != 0) {
 			seq_array->Advance(context);
 		}
-		cNTuple::Print(context->GetItem(), "\n", &cSpaceDescriptor(3, new cNTuple(), new cDouble()));
+		cNTuple point = cNTuple(context->GetItem(), space_desc_3d);
+		print_point_info(&point);
 	}
 
 	seq_array->CloseContext(context);

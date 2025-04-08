@@ -566,7 +566,7 @@
     <ClCompile Include="..\..\dstruct\paged\core\cTreeHeader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source2.cpp">
+    <ClCompile Include="Source3.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
