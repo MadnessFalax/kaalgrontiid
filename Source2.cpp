@@ -222,18 +222,18 @@ static void helper() {
 
 	auto item_count = seq_array->GetHeader()->GetItemCount();
 
-	printf("Inserted %i items.", item_count);
+	printf("Inserted %i items.\n", item_count);
 
 	char* read_item = nullptr;
 
-	seq_array->OpenContext(header->GetFirstNodeIndex(), 0, context);
+	seq_array->OpenContext(seq_array->GetHeader()->GetFirstNodeIndex(), 0, context);
 
 
 	for (decltype(item_count) i = 0; i < item_count; i++) {
 		if (i != 0) {
 			seq_array->Advance(context);
 		}
-		cNTuple::Print(context->GetItem(), "\n", space_desc_3d);
+		cNTuple::Print(context->GetItem(), "\n", &cSpaceDescriptor(3, new cNTuple(), new cDouble()));
 	}
 
 	seq_array->CloseContext(context);

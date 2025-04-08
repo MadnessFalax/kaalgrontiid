@@ -7,7 +7,6 @@ namespace nspFile {
 
 	using String = nspString::pString;
 	using FileStream = common::stream::cFileStream;
-	constexpr size_t BUFFER_SIZE = 1 * 1024 * 1024;
 
 	class pFileWriter {
 		
