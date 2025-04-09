@@ -20,7 +20,7 @@ namespace nsShapeFile {
 			return shpShapeType::NULLSHAPE;
 		}
 
-		cDataType* get_item() override {
+		cDataShape<cNTuple>* get_item() override {
 			return nullptr;
 		}
 

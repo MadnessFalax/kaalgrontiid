@@ -153,7 +153,7 @@ namespace nsShapeFile {
 			return _space_descriptor;
 		}
 
-		cDataType* get_item() override {
+		cDataShape<cNTuple>* get_item() override {
 			if (_record_content) {
 				auto* possible_item = _record_content->get_item();
 				if (possible_item) {

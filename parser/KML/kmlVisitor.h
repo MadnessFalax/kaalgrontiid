@@ -86,10 +86,7 @@ namespace nsKML {
 		void resolve_custom_visit<kmlHandler::CommitShape>(CustomNode& node) {
 			size_t p_size = _points->size();
 
-			cSpaceDescriptor* desc = _space_desc_2d;
-			if (_context.dimension == 3) {
-				desc = _space_desc_3d;
-			}
+			cSpaceDescriptor* desc = _space_desc_3d;
 
 			_context.last_item_sd = desc;
 
@@ -100,9 +97,16 @@ namespace nsKML {
 				for (size_t i = 0; i < _context.dimension; i++) {
 					tuple->SetValue((unsigned int)i, (*(*_points)[0])[i], desc);
 				}
+				if (_context.dimension == 2) {
+					tuple->SetValue((unsigned int)2, 0.0, desc);
+				}
 
-				_context.item = tuple;
+				auto** tuples = new cNTuple * [1];
+				tuples[0] = tuple;
 
+				_context.item = cDataShape<cNTuple>::CreateDataShape(DS_POINT, tuples, 1, desc);
+
+				tuples = nullptr;
 				tuple = nullptr;
 			}
 			else {
@@ -122,6 +126,9 @@ namespace nsKML {
 					tuples[i] = new cNTuple(desc);
 					for (size_t j = 0; j < _context.dimension; j++) {
 						tuples[i]->SetValue((unsigned int)j, (*(*_points)[i])[j], desc);
+					}
+					if (_context.dimension == 2) {
+						tuples[i]->SetValue((unsigned int)2, 0.0, desc);
 					}
 				}
 

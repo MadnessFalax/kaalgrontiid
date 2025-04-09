@@ -68,7 +68,7 @@ namespace nsShapeFile {
 			return shpShapeType::POLYLINEZ;
 		}
 
-		cDataType* get_item() override {
+		cDataShape<cNTuple>* get_item() override {
 			if (index < num_parts) {
 				auto part_start = parts[index++];
 				auto part_end = index < parts.size() ? parts[index] : points.size() / 2;

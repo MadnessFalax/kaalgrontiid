@@ -42,7 +42,7 @@ namespace nsShapeFile {
 		virtual shpShapeType get_shape_type() {
 			return shpShapeType::NULLSHAPE;
 		}
-		virtual cDataType* get_item() = 0;
+		virtual cDataShape<cNTuple>* get_item() = 0;
 		virtual ~shpRecordContent() {};
 	};
 }

@@ -16,6 +16,7 @@
 #include "cPolygon.h"
 #include "cLineString.h"
 #include "cSphere.h"
+#include "cPoint.h"
 
 namespace nspParser {
 	template<typename enum_t, typename enum_r, typename enum_c, typename derived>
@@ -53,7 +54,7 @@ namespace nspParser {
 			
 			bool has_item = false;
 			DataShape item_type = DataShape{};
-			cDataType* item = nullptr;
+			cDataShape<cNTuple>* item = nullptr;
 			size_t dimension = 0;
 			cSpaceDescriptor* last_item_sd = nullptr;
 
@@ -320,7 +321,7 @@ namespace nspParser {
 			return _ending_rule != nullptr;
 		}
 
-		cDataType* get_item() {
+		cDataShape<cNTuple>* get_item() {
 			auto* retval = _context.item;
 			_context.item = nullptr;
 			_context.has_item = false;

@@ -203,17 +203,13 @@ namespace nsOSM {
 				_context.item_type = DataShape::DS_POLYGON;
 			}
 
-			cSpaceDescriptor* sp_desc = nullptr;
+			cSpaceDescriptor* sp_desc = _space_desc_3d;
 
 			cNTuple** tuples = new cNTuple * [p_size];
 			for (size_t i = 0; i < p_size; i++) {
 				auto dim = (*(*_points)[i]).dim;
 				if (dim == 3) {
-					sp_desc = _space_desc_3d;
 					shape_dim = 3;
-				}
-				else {
-					sp_desc = _space_desc_2d;
 				}
 				tuples[i] = new cNTuple(sp_desc);
 				tuples[i]->SetValue((unsigned int)0, (*(*_points)[i]).longitude, nullptr);
@@ -221,9 +217,12 @@ namespace nsOSM {
 				if (dim == 3) {
 					tuples[i]->SetValue((unsigned int)2, (*(*_points)[i]).elevation, nullptr);
 				}
+				else {
+					tuples[i]->SetValue((unsigned int)2, 0.0, nullptr);
+				}
 			}
 
-			auto* shape_desc = (shape_dim == 2 ? _space_desc_2d : _space_desc_3d);
+			auto* shape_desc = _space_desc_3d;
 
 			_context.item = cDataShape<cNTuple>::CreateDataShape(_context.item_type, tuples, p_size, shape_desc);
 			_context.last_item_sd = shape_desc;
@@ -248,7 +247,7 @@ namespace nsOSM {
 
 				_context.dimension = point->dim;
 
-				auto* desc = point->dim == 2 ? _space_desc_2d : _space_desc_3d;
+				auto* desc = _space_desc_3d;
 				_context.last_item_sd = desc;
 
 				_context.item_type = DataShape::DS_POINT;
@@ -259,14 +258,18 @@ namespace nsOSM {
 				if (point->dim == 3) {
 					tuple->SetValue((unsigned int)2, point->elevation, nullptr);
 				}
-			
-				_context.item = tuple;
+				else {
+					tuple->SetValue((unsigned int)2, 0.0, nullptr);
+				}
+
+				auto** pt_arr = new cNTuple*[1];
+				pt_arr[0] = tuple;
+
+				_context.item = cDataShape<cNTuple>::CreateDataShape(DataShape::DS_POINT, pt_arr, 1, desc);
 
 				tuple = nullptr;
-
+				pt_arr = nullptr;
 				point = nullptr;
-
-				_context.last_item_sd = desc;
 
 				_context.has_item = true;
 

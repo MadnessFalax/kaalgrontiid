@@ -6,14 +6,21 @@
 #include "container/pString.h"
 #include "container/pMap.h"
 #include "container/pPair.h"
+
 #include "parser/GeoJSON/gjParser.h"
 #include "parser/KML/kmlParser.h"
 #include "parser/OSM/osmParser.h"
 #include "parser/Shapefile/shpParser.h"
 
+#include "exporter/gjExporter.h"
+#include "exporter/kmlExporter.h"
+#include "exporter/osmExporter.h"
+#include "exporter/shpExporter.h"
+
 #include "cLineString.h"
 #include "cPolygon.h"
 #include "cSphere.h"
+#include "cPoint.h"
 
 #include "dstruct/paged/core/cNodeCache.h"
 #include "dstruct/paged/core/cDStructConst.h"
@@ -34,23 +41,17 @@ using Regex = nspRegex::pRegex;
 template<class enum_t, nspLexer::PrototypeKind t = nspLexer::PrototypeKind::DEFAULT>
 using Token = nspLexer::pTokenPrototype<enum_t, t>;
 
-using Tkey = cNTuple;
+using Tkey = cDataShape<cNTuple>;
 using SeqArray = dstruct::paged::sqarray::cSequentialArray<Tkey>;
 using SeqArrayContext = dstruct::paged::sqarray::cSequentialArrayContext<Tkey>;
 using SeqArrayHeader = dstruct::paged::sqarray::cSequentialArrayHeader<Tkey>;
 
-#ifndef WORK
-constexpr auto PATH = R"(C:\Users\Petr\Downloads\src\test\kaalgrontiid\test\output.osm)";
-#endif
 
-#ifdef WORK
-constexpr auto PATH = R"(C:\Users\uiv56391\source\repos\framework-back-up\test\kaalgrontiid\test\example.kml)";
-#endif
-
-#ifdef TEST_SHP
-constexpr auto shp = R"(C:\Users\Petr\Downloads\src\test\kaalgrontiid\test\output_polygon_1743441761.shp)";
-constexpr auto shx = R"(C:\Users\Petr\Downloads\src\test\kaalgrontiid\test\output_polygon_1743441761.shx)";
-#endif
+constexpr auto OSM_PATH = R"(C:\Users\Petr\Downloads\src\test\kaalgrontiid\test\short.osm)";
+constexpr auto GEOJS_PATH = R"(C:\Users\Petr\Downloads\src\test\kaalgrontiid\test\sample_geo.json)";
+constexpr auto KML_PATH = R"(C:\Users\Petr\Downloads\src\test\kaalgrontiid\test\KML_Samples.kml)";
+constexpr auto SHP = R"(C:\Users\Petr\Downloads\src\test\kaalgrontiid\test\shp\gis_osm_natural_a_07_1.shp)";
+constexpr auto SXP = R"(C:\Users\Petr\Downloads\src\test\kaalgrontiid\test\shp\gis_osm_natural_a_07_1.shx)";
 
 static void print_point_info(cNTuple* point) {
 	printf("Point: ");
@@ -61,18 +62,23 @@ static void print_point_info(cNTuple* point) {
 	printf("\n");
 }
 
-static void print_shape_info(cDataType* shape, DataShape shp_type) {
+static void print_shape_info(cDataShape<cNTuple>* shape) {
+	cNTuple* point = nullptr;
 	cLineString<cNTuple>* ls = nullptr;
 	cPolygon<cNTuple>* poly = nullptr;
 	cSphere<cNTuple>* sphere = nullptr;
-	cNTuple* point = nullptr;
+	cPoint<cNTuple>* pt = nullptr;
 
 	unsigned int vt_count = 0;
+	DataShape shp_type = shape->GetDataShape();
 	printf("------------------\n");
 
 	switch (shp_type) {
 	case DataShape::DS_POINT:
-		point = static_cast<cNTuple*>(shape);
+		pt = static_cast<cPoint<cNTuple>*>(shape);
+		vt_count = pt->GetVerticesCount();
+		printf("Point: %i vertices:\n", vt_count);
+		point = pt->GetVertex(0);
 		print_point_info(point);
 		break;
 	case DataShape::DS_LINESTRING:
@@ -121,108 +127,294 @@ static void helper() {
 	header->SetCodeType(ELIAS_DELTA);
 
 	cQuickDB* db = new cQuickDB();
-	db->Create("test", 500, 10000, 8192);
+	db->Create("test", 1000, 50000, 8192);
 
 	auto* seq_array = new SeqArray();
 	seq_array->Create(header, db);
 
 	unsigned int node_id, position;
 
-	cNTuple** tuple_arr = nullptr;
-	unsigned int tuple_size = 0;
+	auto* osm_parser = nsOSM::setup_parser();
+	auto* geojs_parser = nsGeoJSON::setup_parser();
+	auto* kml_parser = nsKML::setup_parser();
+	auto* shp_parser = new nsShapeFile::shpParser();
 
-	String path = PATH;
+	cDataShape<cNTuple>* item = nullptr;
 
-#ifdef TEST_OSM
-	auto* p = nsOSM::setup_parser();
-	p->open(path);
-#endif
+	// -------------- IMPORT DATA ------------------
+	printf("TEST #1 - Data import:\n");
 
-#ifdef TEST_GEOJS
-	auto* p = nsGeoJSON::setup_parser();
-	p->open(path);
-#endif
+	// IMPORT OSM SAMPLE
+	printf("Importing OSM sample...\n");
+	osm_parser->open(OSM_PATH);
+	while (item = osm_parser->get_item()) {
+		seq_array->AddItem(node_id, position, *item);
+		delete item;
+		item = nullptr;
+	}
+	delete osm_parser;
+	printf("Importing OSM sample done.\n");
 
-#ifdef TEST_KML
-	auto* p = nsKML::setup_parser();
-	p->open(path);
-#endif
+	// IMPORT GEOJSON SAMPLE
+	printf("Importing GeoJSON sample...\n");
+	geojs_parser->open(GEOJS_PATH);
+	while (item = geojs_parser->get_item()) {
+		seq_array->AddItem(node_id, position, *item);
+		delete item;
+		item = nullptr;
+	}
+	delete geojs_parser;
+	printf("Importing GeoJSON sample done.\n");
 
-#ifdef TEST_SHP
-	auto* p = new nsShapeFile::shpParser();
-	p->open(shp, shx);
-#endif
+	// IMPORT KML SAMPLE
+	printf("Importing KML sample...\n");
+	kml_parser->open(KML_PATH);
+	while (item = kml_parser->get_item()) {
+		seq_array->AddItem(node_id, position, *item);
+		delete item;
+		item = nullptr;
+	}
+	delete kml_parser;
+	printf("Importing KML sample done.\n");
 
-	cLineString<cNTuple>* ls = nullptr;
-	cPolygon<cNTuple>* poly = nullptr;
-	cSphere<cNTuple>* sphere = nullptr;
-	cNTuple* point = nullptr;
+	// IMPORT SHAPEFILE SAMPLE
+	printf("Importing SHP sample...\n");
+	shp_parser->open(SHP, SXP);
+	while (item = shp_parser->get_item()) {
+		seq_array->AddItem(node_id, position, *item);
+		delete item;
+		item = nullptr;
+	}
+	delete shp_parser;
+	printf("Importing SHP sample done.\n");
 
-	cDataType* item = nullptr;
-	while (item = p->get_item()) {
-		// do nothing
-		print_shape_info(item, p->get_shape_type());
-		switch (p->get_shape_type()) {
+	auto item_count = seq_array->GetHeader()->GetItemCount();
+	printf("Inserted %i items.\n", item_count);
+
+	// -------------- EXPORT DATA ------------------
+	printf("TEST #2 - Data export:\n");
+
+	// EXPORT ALL IMPORTED DATA INTO KML
+	printf("Exporting to KML...\n");
+	auto* kml_exporter = new nsKML::kmlExporter(".\\test\\output\\output.kml");
+	kml_exporter->begin();
+
+	seq_array->OpenContext(seq_array->GetHeader()->GetFirstNodeIndex(), 0, context);
+
+	for (decltype(item_count) i = 0; i < item_count; i++) {
+		if (i != 0) {
+			seq_array->Advance(context);
+		}
+		Tkey* out_item = Tkey::CreateDataShape(context->GetItem(), space_desc_3d);
+		switch (out_item->GetDataShape()) {
 		case DataShape::DS_POINT:
-			point = static_cast<cNTuple*>(item);
-			seq_array->AddItem(node_id, position, *point);
-
-			delete point;
-			point = nullptr;
-			item = nullptr;
+			kml_exporter->export_item(static_cast<cPoint<cNTuple>*>(out_item));
 			break;
 		case DataShape::DS_LINESTRING:
-			ls = static_cast<cLineString<cNTuple>*>(item);
-			tuple_arr = ls->GetVerticesCollection();
-			tuple_size = ls->GetVerticesCount();
-
-			for (unsigned int i = 0; i < tuple_size; i++) {
-				seq_array->AddItem(node_id, position, *(tuple_arr[i]));
-			}
-
-			delete ls;
-			ls = nullptr;
-			item = nullptr;
+			kml_exporter->export_item(static_cast<cLineString<cNTuple>*>(out_item));
 			break;
 		case DataShape::DS_POLYGON:
-			poly = static_cast<cPolygon<cNTuple>*>(item);
-			tuple_arr = poly->GetVerticesCollection();
-			tuple_size = poly->GetVerticesCount();
-
-			for (unsigned int i = 0; i < tuple_size; i++) {
-				seq_array->AddItem(node_id, position, *(tuple_arr[i]));
-			}
-
-			delete poly;
-			poly = nullptr;
-			item = nullptr;
+			kml_exporter->export_item(static_cast<cPolygon<cNTuple>*>(out_item));
 			break;
 		case DataShape::DS_SPHERE:
-			sphere = static_cast<cSphere<cNTuple>*>(item);
-			tuple_arr = sphere->GetVerticesCollection();
-			tuple_size = sphere->GetVerticesCount();
-
-			for (unsigned int i = 0; i < tuple_size; i++) {
-				seq_array->AddItem(node_id, position, *(tuple_arr[i]));
-			}
-
-			delete sphere;
-			sphere = nullptr;
-			item = nullptr;
+			kml_exporter->export_item(static_cast<cSphere<cNTuple>*>(out_item));
 			break;
 		default:
 			break;
 		}
-
-
-		// impossible to delete through base class, dtor not virtual!!!
-		//delete item;
-		//item = nullptr;
+		delete out_item;
 	}
 
-	delete p;
+	seq_array->CloseContext(context);
 
-	printf("Inserted %i items.", seq_array->GetHeader()->GetItemCount());
+	kml_exporter->end();
+	delete kml_exporter;
+	printf("Exporting to KML done.\n");
+
+	// EXPORT ALL IMPORTED DATA INTO OSM
+	printf("Exporting to OSM...\n");
+	auto* osm_exporter = new nsOSM::osmExporter(".\\test\\output\\output.osm");
+	osm_exporter->begin();
+
+	seq_array->OpenContext(seq_array->GetHeader()->GetFirstNodeIndex(), 0, context);
+
+	for (decltype(item_count) i = 0; i < item_count; i++) {
+		if (i != 0) {
+			seq_array->Advance(context);
+		}
+		Tkey* out_item = Tkey::CreateDataShape(context->GetItem(), space_desc_3d);
+		switch (out_item->GetDataShape()) {
+		case DataShape::DS_POINT:
+			osm_exporter->export_item(static_cast<cPoint<cNTuple>*>(out_item));
+			break;
+		case DataShape::DS_LINESTRING:
+			osm_exporter->export_item(static_cast<cLineString<cNTuple>*>(out_item));
+			break;
+		case DataShape::DS_POLYGON:
+			osm_exporter->export_item(static_cast<cPolygon<cNTuple>*>(out_item));
+			break;
+		case DataShape::DS_SPHERE:
+			osm_exporter->export_item(static_cast<cSphere<cNTuple>*>(out_item));
+			break;
+		default:
+			break;
+		}
+		delete out_item;
+	}
+
+	seq_array->CloseContext(context);
+
+	osm_exporter->end();
+	delete osm_exporter;
+	printf("Exporting to OSM done.\n");
+
+	// EXPORT ALL IMPORTED DATA INTO GEOJSON
+	printf("Exporting to GeoJSON...\n");
+	auto* gj_exporter = new nsGeoJSON::gjExporter(".\\test\\output\\output.json");
+	gj_exporter->begin();
+
+	seq_array->OpenContext(seq_array->GetHeader()->GetFirstNodeIndex(), 0, context);
+
+	for (decltype(item_count) i = 0; i < item_count; i++) {
+		if (i != 0) {
+			seq_array->Advance(context);
+		}
+		Tkey* out_item = Tkey::CreateDataShape(context->GetItem(), space_desc_3d);
+		switch (out_item->GetDataShape()) {
+		case DataShape::DS_POINT:
+			gj_exporter->export_item(static_cast<cPoint<cNTuple>*>(out_item));
+			break;
+		case DataShape::DS_LINESTRING:
+			gj_exporter->export_item(static_cast<cLineString<cNTuple>*>(out_item));
+			break;
+		case DataShape::DS_POLYGON:
+			gj_exporter->export_item(static_cast<cPolygon<cNTuple>*>(out_item));
+			break;
+		case DataShape::DS_SPHERE:
+			gj_exporter->export_item(static_cast<cSphere<cNTuple>*>(out_item));
+			break;
+		default:
+			break;
+		}
+		delete out_item;
+	}
+
+	seq_array->CloseContext(context);
+
+	gj_exporter->end();
+	delete gj_exporter;
+	printf("Exporting to GeoJSON done.\n");
+
+	// EXPORT ALL IMPORTED DATA INTO SHAPEFILE (SHP file only consists of one type, for that reason file for every type is created.)
+	printf("Exporting to SHP...\n");
+	auto* shp_point_exporter = new nsShapeFile::shpExporter<cPoint<cNTuple>>(".\\test\\output\\output_pt");
+	auto* shp_linestring_exporter = new nsShapeFile::shpExporter<cLineString<cNTuple>>(".\\test\\output\\output_ls");
+	auto* shp_polygon_exporter = new nsShapeFile::shpExporter<cPolygon<cNTuple>>(".\\test\\output\\output_poly");
+	shp_point_exporter->begin();
+	shp_linestring_exporter->begin();
+	shp_polygon_exporter->begin();
+
+	seq_array->OpenContext(seq_array->GetHeader()->GetFirstNodeIndex(), 0, context);
+
+	for (decltype(item_count) i = 0; i < item_count; i++) {
+		if (i != 0) {
+			seq_array->Advance(context);
+		}
+		Tkey* out_item = Tkey::CreateDataShape(context->GetItem(), space_desc_3d);
+		switch (out_item->GetDataShape()) {
+		case DataShape::DS_POINT:
+			shp_point_exporter->export_item(static_cast<cPoint<cNTuple>*>(out_item));
+			break;
+		case DataShape::DS_LINESTRING:
+			shp_linestring_exporter->export_item(static_cast<cLineString<cNTuple>*>(out_item));
+			break;
+		case DataShape::DS_POLYGON:
+			shp_polygon_exporter->export_item(static_cast<cPolygon<cNTuple>*>(out_item));
+			break;
+		case DataShape::DS_SPHERE:
+			shp_point_exporter->export_item(static_cast<cSphere<cNTuple>*>(out_item));
+			break;
+		default:
+			break;
+		}
+		delete out_item;
+	}
+
+	seq_array->CloseContext(context);
+
+	shp_point_exporter->end();
+	shp_linestring_exporter->end();
+	shp_polygon_exporter->end();
+	delete shp_point_exporter;
+	delete shp_linestring_exporter;
+	delete shp_polygon_exporter;
+	printf("Exporting to SHP done.\n");
+
+	db->Close();
+
+	delete seq_array;
+	delete db;
+	delete header;
+	delete context;
+	delete space_desc_3d;
+
+	// -------------- EXPORTED DATA IMPORT ------------------
+	printf("TEST #3 - Import of exported data:\n");
+
+	space_desc_3d = new cSpaceDescriptor(DIMENSION_3, new cNTuple(), new cDouble());
+	context = new SeqArrayContext();
+	header = new SeqArrayHeader("seqArray", 8192, space_desc_3d, cDStructConst::DSMODE_DEFAULT);
+	header->SetCodeType(ELIAS_DELTA);
+
+	db = new cQuickDB();
+	db->Create("test", 1000, 50000, 8192);
+
+	seq_array = new SeqArray();
+	seq_array->Create(header, db);
+
+	node_id = position = 0;
+
+	osm_parser = nsOSM::setup_parser();
+	geojs_parser = nsGeoJSON::setup_parser();
+	kml_parser = nsKML::setup_parser();
+
+	item = nullptr;
+
+	// IMPORT OSM SAMPLE
+	printf("Importing OSM sample...\n");
+	osm_parser->open(".\\test\\output\\output.osm");
+	while (item = osm_parser->get_item()) {
+		seq_array->AddItem(node_id, position, *item);
+		delete item;
+		item = nullptr;
+	}
+	delete osm_parser;
+	printf("Importing OSM sample done.\n");
+
+	// IMPORT GEOJSON SAMPLE
+	printf("Importing GeoJSON sample...\n");
+	geojs_parser->open(".\\test\\output\\output.json");
+	while (item = geojs_parser->get_item()) {
+		seq_array->AddItem(node_id, position, *item);
+		delete item;
+		item = nullptr;
+	}
+	delete geojs_parser;
+	printf("Importing GeoJSON sample done.\n");
+
+	// IMPORT KML SAMPLE
+	printf("Importing KML sample...\n");
+	kml_parser->open(".\\test\\output\\output.kml");
+	while (item = kml_parser->get_item()) {
+		seq_array->AddItem(node_id, position, *item);
+		delete item;
+		item = nullptr;
+	}
+	delete kml_parser;
+	printf("Importing KML sample done.\n");
+
+	item_count = seq_array->GetHeader()->GetItemCount();
+	printf("Inserted %i items. Which should be three times as much as in TEST #1.\n", item_count);
 
 	db->Close();
 

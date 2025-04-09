@@ -81,14 +81,13 @@ namespace nsGeoJSON {
 			_context.last_status = Context::LastStatus::OK;
 		}
 
+
+		// Shapes have to be normalized to 3D because cSpaceDescriptor is just badly implemented. Sooner or later someone will find out the hard way. :(
 		template<>
 		void resolve_custom_visit<gjHandler::CommitShape>(CustomNode& node) {
 			size_t p_size = _points->size();
 
-			cSpaceDescriptor* desc = _space_desc_2d;
-			if (_context.dimension == 3) {
-				desc = _space_desc_3d;
-			}
+			cSpaceDescriptor* desc = _space_desc_3d;
 
 			_context.last_item_sd = desc;
 
@@ -99,9 +98,15 @@ namespace nsGeoJSON {
 				for (size_t i = 0; i < _context.dimension; i++) {
 					tuple->SetValue((unsigned int)i, (*(*_points)[0])[i], desc);
 				}
+				if (_context.dimension == 2) {
+					tuple->SetValue((unsigned int)2, 0.0, desc);
+				}
 
-				_context.item = tuple;
+				auto** tuples = new cNTuple * [1];
+				tuples[0] = tuple;
+				_context.item = cDataShape<cNTuple>::CreateDataShape(DataShape::DS_POINT, tuples, 1, desc);
 
+				tuples = nullptr;
 				tuple = nullptr;
 
 				for (size_t i = 0; i < p_size; i++) {
@@ -131,6 +136,9 @@ namespace nsGeoJSON {
 					tuples[i] = new cNTuple(desc);
 					for (size_t j = 0; j < _context.dimension; j++) {
 						tuples[i]->SetValue((unsigned int)j, (*(*_points)[i])[j], desc);
+					}
+					if (_context.dimension == 2) {
+						tuples[i]->SetValue((unsigned int)2, 0.0, desc);
 					}
 				}
 

@@ -26,6 +26,11 @@ namespace nsShapeFile {
 	};
 
 	template <>
+	struct get_shape_code<cPoint<cNTuple>> {
+		static constexpr int value = 1;
+	};
+
+	template <>
 	struct get_shape_code<cLineString<cNTuple>> {
 		static constexpr int value = 3;
 	};
@@ -45,6 +50,11 @@ namespace nsShapeFile {
 
 	template <>
 	struct get_z_shape_code<cNTuple> {
+		static constexpr int value = 11;
+	};
+
+	template <>
+	struct get_z_shape_code<cPoint<cNTuple>> {
 		static constexpr int value = 11;
 	};
 
@@ -199,7 +209,8 @@ namespace nsShapeFile {
 				std::is_same_v<U, cNTuple> || 
 				std::is_same_v<U, cLineString<cNTuple>> || 
 				std::is_same_v<U, cPolygon<cNTuple>> ||
-				std::is_same_v<U, cSphere<cNTuple>>
+				std::is_same_v<U, cSphere<cNTuple>> || 
+				std::is_same_v<U, cPoint<cNTuple>>
 			>
 		>
 		shpExporter(String path_to_target_directory) {
@@ -272,7 +283,7 @@ namespace nsShapeFile {
 			return true;
 		}
 
-		template <typename U = T, typename = std::enable_if_t<std::is_same_v<U, cNTuple> || std::is_same_v<U, cSphere<cNTuple>>>>
+		template <typename U = T, typename = std::enable_if_t<std::is_same_v<U, cNTuple> || std::is_same_v<U, cSphere<cNTuple>> || std::is_same_v<U, cPoint<cNTuple>>>>
 		bool export_item(cNTuple* point) {
 			auto p_size = point->GetLength();
 			if (p_size == 2) {
@@ -309,6 +320,11 @@ namespace nsShapeFile {
 				_write_dbf_record(_target_z_dbf);
 			}
 			return true;
+		}
+
+		template <typename U = T, typename = std::enable_if_t<std::is_same_v<U, cNTuple> || std::is_same_v<U, cSphere<cNTuple>> || std::is_same_v<U, cPoint<cNTuple>>>>
+		bool export_item(cPoint<cNTuple>* point) {
+			return export_item(point->GetVertex(0));
 		}
 
 		template <typename U = T, typename = std::enable_if_t<std::is_same_v<U, cLineString<cNTuple>>>>
@@ -521,7 +537,7 @@ namespace nsShapeFile {
 			return true;
 		}
 
-		template <typename U = T, typename = std::enable_if_t<std::is_same_v<U, cNTuple> || std::is_same_v<U, cSphere<cNTuple>>>>
+		template <typename U = T, typename = std::enable_if_t<std::is_same_v<U, cSphere<cNTuple>> || std::is_same_v<U, cNTuple> || std::is_same_v<U, cPoint<cNTuple>>>>
 		bool export_item(cSphere<cNTuple>* sphere) {
 			return export_item(sphere->GetVertex(0));
 		}

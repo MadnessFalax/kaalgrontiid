@@ -101,7 +101,7 @@ namespace nsShapeFile {
 			return shpShapeType::MULTIPATCH;
 		}
 
-		cDataType* get_item() override {
+		cDataShape<cNTuple>* get_item() override {
 			if (index < num_parts) {
 				size_t V1 = 0;
 				size_t Vn = 0;

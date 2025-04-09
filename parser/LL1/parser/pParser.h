@@ -128,7 +128,7 @@ namespace nspParser {
 			return _context->last_item_sd;
 		}
 
-		cDataType* get_item() override {
+		cDataShape<cNTuple>* get_item() override {
 			while (!_context->has_item) {
 				if (!_resolve_current_node()) {
 					break;

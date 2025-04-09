@@ -121,6 +121,42 @@ namespace nsOSM {
 			return status;
 		}
 
+		bool export_item(cPoint<cNTuple>* point) {
+			auto status = false;
+			String output = "";
+
+			char* num_buf = new char[32];
+
+			auto* pt = point->GetVertex(0);
+
+			auto dim = pt->GetLength();
+
+			output += "<node id=\"";
+			snprintf(num_buf, 32, "%llu", _cur_id++);
+			output += num_buf;
+			output += "\" lat=\"";
+			snprintf(num_buf, 32, "%.7f", pt->GetDouble(1, nullptr));
+			output += num_buf;
+			output += "\" lon=\"";
+			snprintf(num_buf, 32, "%.7f", pt->GetDouble(0, nullptr));
+			output += num_buf;
+			output += "\">\n";
+
+			if (dim > 2) {
+				output += "<tag k=\"ele\" v=\"";
+				snprintf(num_buf, 32, "%.7f", pt->GetDouble(2, nullptr));
+				output += num_buf;
+				output += "\"/>\n";
+			}
+			output += "</node>\n";
+
+
+			delete[] num_buf;
+
+			status &= _file->write(output);
+			return status;
+		}
+
 		bool export_item(cLineString<cNTuple>* line) {
 			auto status = false;
 

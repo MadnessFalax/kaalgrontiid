@@ -56,16 +56,24 @@ namespace nsShapeFile {
 			return shpShapeType::MULTIPOINTM;
 		}
 
-		cDataType* get_item() override {
+		cDataShape<cNTuple>* get_item() override {
 			if (index < num_points) {
 
-				cNTuple* tuple = new cNTuple(&sd_2d);
+				cNTuple* tuple = new cNTuple(&sd_3d);
 				tuple->SetValue(0, points[index * 2], nullptr);
 				tuple->SetValue(1, points[index * 2 + 1], nullptr);
+				tuple->SetValue(2, 0, nullptr);
 
 				index++;
 
-				return tuple;
+				auto** tuples = new cNTuple * [1];
+				tuples[0] = tuple;
+				auto* shape = cDataShape<cNTuple>::CreateDataShape(DataShape::DS_POINT, tuples, 1, &sd_2d);
+
+				tuple = nullptr;	
+				tuples = nullptr;
+
+				return shape;
 			}
 
 			return nullptr;

@@ -1,5 +1,5 @@
 #define _CRTDBG_MAP_ALLOC
-#define POLYGON
+#define DATASHAPE_POINT
 #include <stdlib.h>
 #include <crtdbg.h>
 
@@ -11,6 +11,7 @@
 #include "cLineString.h"
 #include "cPolygon.h"
 #include "cSphere.h"
+#include "cPoint.h"
 
 #include "dstruct/paged/core/cNodeCache.h"
 #include "dstruct/paged/core/cDStructConst.h"
@@ -40,17 +41,21 @@ static void print_point_info(cNTuple* point) {
 }
 
 static void print_shape_info(cDataType* shape, DataShape shp_type) {
+    cNTuple* point = nullptr;
     cLineString<cNTuple>* ls = nullptr;
     cPolygon<cNTuple>* poly = nullptr;
     cSphere<cNTuple>* sphere = nullptr;
-    cNTuple* point = nullptr;
+    cPoint<cNTuple>* pt = nullptr;
 
     unsigned int vt_count = 0;
     printf("------------------\n");
 
     switch (shp_type) {
     case DataShape::DS_POINT:
-        point = static_cast<cNTuple*>(shape);
+        pt = static_cast<cPoint<cNTuple>*>(shape);
+		vt_count = pt->GetVerticesCount();
+		printf("Point: %i vertices:\n", vt_count);
+		point = pt->GetVertex(0);
         print_point_info(point);
         break;
     case DataShape::DS_LINESTRING:
@@ -159,6 +164,48 @@ static void helper() {
     point10_2->SetValue(2, (double)29.0f, nullptr);
 #endif
 
+#ifdef DATASHAPE_POINT
+	cNTuple** pt1_arr = new cNTuple * [1];
+	pt1_arr[0] = point;
+    cPoint<cNTuple>* pt1 = new cPoint<cNTuple>(pt1_arr, 1, space);
+
+    cNTuple** pt2_arr = new cNTuple * [1];
+    pt2_arr[0] = point2;
+	cPoint<cNTuple>* pt2 = new cPoint<cNTuple>(pt2_arr, 1, space);
+
+    cNTuple** pt3_arr = new cNTuple * [1];
+    pt3_arr[0] = point3;
+	cPoint<cNTuple>* pt3 = new cPoint<cNTuple>(pt3_arr, 1, space);
+
+    cNTuple** pt4_arr = new cNTuple * [1];
+    pt4_arr[0] = point4;
+	cPoint<cNTuple>* pt4 = new cPoint<cNTuple>(pt4_arr, 1, space);
+
+    cNTuple** pt5_arr = new cNTuple * [1];
+    pt5_arr[0] = point5;
+	cPoint<cNTuple>* pt5 = new cPoint<cNTuple>(pt5_arr, 1, space);
+
+    cNTuple** pt6_arr = new cNTuple * [1];
+    pt6_arr[0] = point6;
+	cPoint<cNTuple>* pt6 = new cPoint<cNTuple>(pt6_arr, 1, space);
+
+    cNTuple** pt7_arr = new cNTuple * [1];
+    pt7_arr[0] = point7;
+	cPoint<cNTuple>* pt7 = new cPoint<cNTuple>(pt7_arr, 1, space);
+
+    cNTuple** pt8_arr = new cNTuple * [1];
+    pt8_arr[0] = point8;
+	cPoint<cNTuple>* pt8 = new cPoint<cNTuple>(pt8_arr, 1, space);
+
+    cNTuple** pt9_arr = new cNTuple * [1];
+    pt9_arr[0] = point9;
+	cPoint<cNTuple>* pt9 = new cPoint<cNTuple>(pt9_arr, 1, space);
+
+    cNTuple** pt10_arr = new cNTuple * [1];
+    pt10_arr[0] = point10;
+	cPoint<cNTuple>* pt10 = new cPoint<cNTuple>(pt10_arr, 1, space);
+#endif
+
 #ifdef LINESTRING
     cNTuple** ls_points = new cNTuple * [4];
     ls_points[0] = point;
@@ -260,20 +307,19 @@ static void helper() {
 	seq_array->AddItem(node_id, position, *sphere5);
 #endif
 
-#ifdef POINT
-	seq_array->AddItem(node_id, position, *point);
-	seq_array->AddItem(node_id, position, *point2);
-	seq_array->AddItem(node_id, position, *point3);
-	seq_array->AddItem(node_id, position, *point4);
-	seq_array->AddItem(node_id, position, *point5);
-	seq_array->AddItem(node_id, position, *point6);
-	seq_array->AddItem(node_id, position, *point7);
-	seq_array->AddItem(node_id, position, *point8);
-	seq_array->AddItem(node_id, position, *point9);
-	seq_array->AddItem(node_id, position, *point10);
+#ifdef DATASHAPE_POINT
+	seq_array->AddItem(node_id, position, *pt1);
+	seq_array->AddItem(node_id, position, *pt2);
+	seq_array->AddItem(node_id, position, *pt3);
+	seq_array->AddItem(node_id, position, *pt4);
+	seq_array->AddItem(node_id, position, *pt5);
+	seq_array->AddItem(node_id, position, *pt6);
+	seq_array->AddItem(node_id, position, *pt7);
+	seq_array->AddItem(node_id, position, *pt8);
+	seq_array->AddItem(node_id, position, *pt9);
+	seq_array->AddItem(node_id, position, *pt10);
 #endif
 
-#ifdef POLYGON
 	auto item_count = seq_array->GetHeader()->GetItemCount();
     seq_array->OpenContext(seq_array->GetHeader()->GetFirstNodeIndex(), 0, context);
 
@@ -287,7 +333,6 @@ static void helper() {
 	}
 
 	seq_array->CloseContext(context);
-#endif
 
 #ifdef LINESTRING
     delete line1;
@@ -308,17 +353,17 @@ static void helper() {
     delete sphere5;
 #endif
 
-#ifdef POINT
-	delete point;
-	delete point2;
-	delete point3;
-	delete point4;
-	delete point5;
-	delete point6;
-	delete point7;
-	delete point8;
-	delete point9;
-	delete point10;
+#ifdef DATASHAPE_POINT
+	delete pt1;
+	delete pt2;
+	delete pt3;
+	delete pt4;
+	delete pt5;
+	delete pt6;
+	delete pt7;
+	delete pt8;
+	delete pt9;
+	delete pt10;
 #endif
 
     db->Close();

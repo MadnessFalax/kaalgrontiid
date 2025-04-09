@@ -81,6 +81,38 @@ namespace nsGeoJSON {
 			return status;
 		}
 
+		bool export_item(cPoint<cNTuple>* point) {
+			auto status = false;
+			if (point != nullptr) {
+				auto* pt = point->GetVertex(0);
+
+				String output = "";
+				if (!_first) {
+					output += ",";
+				}
+				output += "{";
+				output += "\"type\": \"Point\",";
+				output += "\"coordinates\": [";
+				auto pt_size = pt->GetLength();
+				for (unsigned char i = 0; i < pt_size; i++) {
+					char* num = new char[32];
+					if (i > 0) {
+						output += ",";
+					}
+					snprintf(num, 32, "%f", pt->GetDouble(i, nullptr));
+					output += num;
+					delete[] num;
+				}
+				output += "]";
+				output += "}";
+
+				status &= _file->write(output);
+			}
+
+			_first = false;
+			return status;
+		}
+
 		bool export_item(cLineString<cNTuple>* line) {
 			auto status = false;
 			if (line != nullptr) {

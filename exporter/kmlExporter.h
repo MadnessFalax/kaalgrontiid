@@ -86,6 +86,34 @@ namespace nsKML {
 			return status;
 		}
 
+		bool export_item(cPoint<cNTuple>* point) {
+			auto status = false;
+			String output = "";
+			output += "<Placemark>\n";
+			output += "<Point>\n";
+			output += "<coordinates>";
+
+			auto pt = point->GetVertex(0);
+
+			auto pt_size = pt->GetLength();
+			for (unsigned char i = 0; i < pt_size; i++) {
+				char* num = new char[32];
+				if (i > 0) {
+					output += ",";
+				}
+				snprintf(num, 32, "%f", pt->GetDouble(i, nullptr));
+				output += num;
+				delete[] num;
+			}
+
+			output += "</coordinates>\n";
+			output += "</Point>\n";
+			output += "</Placemark>\n";
+
+			status &= _file->write(output);
+			return status;
+		}
+
 		bool export_item(cLineString<cNTuple>* line) {
 			auto status = false;
 			String output = "";

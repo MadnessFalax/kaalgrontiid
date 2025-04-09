@@ -25,16 +25,24 @@ namespace nsShapeFile {
 			return shpShapeType::POINT;
 		}
 
-		cDataType* get_item() override {
+		cDataShape<cNTuple>* get_item() override {
 			if (index == 0 && is_loaded) {
 
-				cNTuple* tuple = new cNTuple(&sd_2d);
+				cNTuple* tuple = new cNTuple(&sd_3d);
 				tuple->SetValue(0, X, nullptr);
 				tuple->SetValue(1, Y, nullptr);
+				tuple->SetValue(2, 0, nullptr);
 
 				index++;
 
-				return tuple;
+				auto** tuples = new cNTuple * [1];
+				tuples[0] = tuple;
+				auto* shape = cDataShape<cNTuple>::CreateDataShape(DataShape::DS_POINT, tuples, 1, &sd_2d);
+
+				tuple = nullptr;
+				tuples = nullptr;
+
+				return shape;
 			}
 
 			return nullptr;
