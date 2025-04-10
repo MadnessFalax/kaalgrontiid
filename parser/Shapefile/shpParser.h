@@ -56,11 +56,11 @@ namespace nsShapeFile {
 			_record_content = nullptr;
 		}
 
-		void open(String shp, String shx) {
+		void open(String path_without_extension) {
 			delete _shx;
-			_shx = new FileHandler(shx, true);
+			_shx = new FileHandler(path_without_extension + ".shx", true);
 			delete _shp;
-			_shp = new FileHandler(shp, true);
+			_shp = new FileHandler(path_without_extension + ".shp", true);
 			delete _space_descriptor;
 			_space_descriptor = nullptr;
 			delete _item;

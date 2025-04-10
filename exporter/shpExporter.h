@@ -86,6 +86,8 @@ namespace nsShapeFile {
 		String _target_dir = "";
 		time_t _timestamp = 0;
 		String _timestamp_str = "";
+		String _last_target_path = "";
+		String _last_z_target_path = "";
 
 		int _target_len = 50;
 		int _target_z_len = 50;
@@ -225,6 +227,14 @@ namespace nsShapeFile {
 			delete _target_dbf;
 			delete _target_z_dbf;
 		};
+
+		String get_last_target_path() {
+			return _last_target_path;
+		}
+
+		String get_last_z_target_path() {
+			return _last_z_target_path;
+		}
 		
 		bool begin() override {
 			_reset_timestamp();
@@ -234,13 +244,16 @@ namespace nsShapeFile {
 			_target_number = 1;
 			_target_z_number = 1;
 
-			_target_shx = new FileWriter(_target_dir + "_target_" + _timestamp_str + ".shx", true);
-			_target_shp = new FileWriter(_target_dir + "_target_" + _timestamp_str + ".shp", true);
-			_target_dbf = new FileWriter(_target_dir + "_target_" + _timestamp_str + ".dbf", true);
+			_last_target_path = _target_dir + "_target_" + _timestamp_str;
+			_last_z_target_path = _target_dir + "_z_target_" + _timestamp_str;
 
-			_target_z_shx = new FileWriter(_target_dir + "_targetz_" + _timestamp_str + ".shx", true);
-			_target_z_shp = new FileWriter(_target_dir + "_targetz_" + _timestamp_str + ".shp", true);
-			_target_z_dbf = new FileWriter(_target_dir + "_targetz_" + _timestamp_str + ".dbf", true);
+			_target_shx = new FileWriter(_last_target_path + ".shx", true);
+			_target_shp = new FileWriter(_last_target_path + ".shp", true);
+			_target_dbf = new FileWriter(_last_target_path + ".dbf", true);
+
+			_target_z_shx = new FileWriter(_last_z_target_path + ".shx", true);
+			_target_z_shp = new FileWriter(_last_z_target_path + ".shp", true);
+			_target_z_dbf = new FileWriter(_last_z_target_path + ".dbf", true);
 
 			_write_file_header(get_shape_code<T>::value, _target_shx);
 			_write_file_header(get_shape_code<T>::value, _target_shp);

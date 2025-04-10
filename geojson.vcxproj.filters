@@ -569,18 +569,18 @@
     <ClCompile Include="..\..\dstruct\paged\core\cTreeHeader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source.cpp">
+    <ClCompile Include="Source1.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="test\utf8_test.json" />
+    <None Include="test\other\utf8_test.json" />
     <None Include=".gitignore" />
-    <None Include="test\sample_geo.json" />
+    <None Include="test\input\sample_geo.json" />
     <None Include="parser\LL1\grammar\regex.grammar" />
     <None Include="parser\LL1\grammar\kml.grammar" />
     <None Include="parser\LL1\grammar\osm.grammar" />
-    <None Include="test\short.osm" />
+    <None Include="test\input\short.osm" />
     <None Include="..\..\..\Czech_Republic_KMZ\Czech Republic.kmz" />
   </ItemGroup>
   <ItemGroup>

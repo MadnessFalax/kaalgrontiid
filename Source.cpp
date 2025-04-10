@@ -47,11 +47,10 @@ using SeqArrayContext = dstruct::paged::sqarray::cSequentialArrayContext<Tkey>;
 using SeqArrayHeader = dstruct::paged::sqarray::cSequentialArrayHeader<Tkey>;
 
 
-constexpr auto OSM_PATH = R"(.\test\short.osm)";
-constexpr auto GEOJS_PATH = R"(.\test\sample_geo.json)";
-constexpr auto KML_PATH = R"(.\test\KML_Samples.kml)";
-constexpr auto SHP = R"(.\test\shp\gis_osm_natural_a_07_1.shp)";
-constexpr auto SXP = R"(.\test\shp\gis_osm_natural_a_07_1.shx)";
+constexpr auto OSM_PATH = R"(.\test\input\short.osm)";
+constexpr auto GEOJS_PATH = R"(.\test\input\sample_geo.json)";
+constexpr auto KML_PATH = R"(.\test\input\KML_Samples.kml)";
+constexpr auto SHP = R"(.\test\input\gis_osm_natural_a_07_1)";
 
 static void print_point_info(cNTuple* point) {
 	printf("Point: ");
@@ -179,7 +178,7 @@ static void helper() {
 
 	// IMPORT SHAPEFILE SAMPLE
 	printf("Importing SHP sample...\n");
-	shp_parser->open(SHP, SXP);
+	shp_parser->open(SHP);
 	while (item = shp_parser->get_item()) {
 		seq_array->AddItem(node_id, position, *item);
 		delete item;
