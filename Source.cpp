@@ -47,11 +47,11 @@ using SeqArrayContext = dstruct::paged::sqarray::cSequentialArrayContext<Tkey>;
 using SeqArrayHeader = dstruct::paged::sqarray::cSequentialArrayHeader<Tkey>;
 
 
-constexpr auto OSM_PATH = R"(C:\Users\Petr\Downloads\src\test\kaalgrontiid\test\short.osm)";
-constexpr auto GEOJS_PATH = R"(C:\Users\Petr\Downloads\src\test\kaalgrontiid\test\sample_geo.json)";
-constexpr auto KML_PATH = R"(C:\Users\Petr\Downloads\src\test\kaalgrontiid\test\KML_Samples.kml)";
-constexpr auto SHP = R"(C:\Users\Petr\Downloads\src\test\kaalgrontiid\test\shp\gis_osm_natural_a_07_1.shp)";
-constexpr auto SXP = R"(C:\Users\Petr\Downloads\src\test\kaalgrontiid\test\shp\gis_osm_natural_a_07_1.shx)";
+constexpr auto OSM_PATH = R"(.\test\short.osm)";
+constexpr auto GEOJS_PATH = R"(.\test\sample_geo.json)";
+constexpr auto KML_PATH = R"(.\test\KML_Samples.kml)";
+constexpr auto SHP = R"(.\test\shp\gis_osm_natural_a_07_1.shp)";
+constexpr auto SXP = R"(.\test\shp\gis_osm_natural_a_07_1.shx)";
 
 static void print_point_info(cNTuple* point) {
 	printf("Point: ");

@@ -444,6 +444,9 @@
     <ClInclude Include="exporter\shpExporter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\common\datatype\geo\cPoint.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="parser\regex\NFA\pState.cpp">
@@ -566,7 +569,7 @@
     <ClCompile Include="..\..\dstruct\paged\core\cTreeHeader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source3.cpp">
+    <ClCompile Include="Source.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -578,6 +581,7 @@
     <None Include="parser\LL1\grammar\kml.grammar" />
     <None Include="parser\LL1\grammar\osm.grammar" />
     <None Include="test\short.osm" />
+    <None Include="..\..\..\Czech_Republic_KMZ\Czech Republic.kmz" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="parser\LL1\grammar\geojson.grammar" />

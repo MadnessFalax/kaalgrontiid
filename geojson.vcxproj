@@ -300,12 +300,14 @@
       <SDLCheck>false</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>false</ConformanceMode>
-      <AdditionalIncludeDirectories>..\..;..\..\common\datatype\geo;..\..\common\datatype\tuple;..\..\dstruct\paged\b+tree;..\..\dstruct\paged\core;..\..\dstruct\paged;..\..\dstruct\mmemory;..\..\common\datatype;..\..\common\random;..\..\common;..\..\common\stream;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\3rd_party\minizip-ng;..\..;..\..\common\datatype\geo;..\..\common\datatype\tuple;..\..\dstruct\paged\b+tree;..\..\dstruct\paged\core;..\..\dstruct\paged;..\..\dstruct\mmemory;..\..\common\datatype;..\..\common\random;..\..\common;..\..\common\stream;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp14</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>.\3rd_party\minizip-ng\build\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>minizip.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Shapefile|x64'">
@@ -356,12 +358,14 @@
       <SDLCheck>false</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;TEST_GEOJS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>false</ConformanceMode>
-      <AdditionalIncludeDirectories>..\..;..\..\common\datatype\geo;..\..\common\datatype\tuple;..\..\dstruct\paged\b+tree;..\..\dstruct\paged\core;..\..\dstruct\paged;..\..\dstruct\mmemory;..\..\common\datatype;..\..\common\random;..\..\common;..\..\common\stream;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\3rd_party\include;..\..;..\..\common\datatype\geo;..\..\common\datatype\tuple;..\..\dstruct\paged\b+tree;..\..\dstruct\paged\core;..\..\dstruct\paged;..\..\dstruct\mmemory;..\..\common\datatype;..\..\common\random;..\..\common;..\..\common\stream;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp14</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>.\3rd_party\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>minizip.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugWork|x64'">
@@ -587,6 +591,7 @@
     <ClCompile Include="Source.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\..\Czech_Republic_KMZ\Czech Republic.kmz" />
     <None Include=".gitignore" />
     <None Include="parser\LL1\grammar\kml.grammar" />
     <None Include="parser\LL1\grammar\osm.grammar" />
