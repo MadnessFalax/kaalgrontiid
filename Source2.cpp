@@ -28,6 +28,7 @@
 #include "dstruct/paged/sequentialarray/cSequentialArrayContext.h"
 #include "dstruct/paged/sequentialarray/cSequentialArrayHeader.h"
 #include "dstruct/paged/sequentialarray/cSequentialArrayNodeHeader.h"
+#include "common/utils/cTimer.h"
 
 template <class T>
 using Array = nspArray::pArray<T>;
@@ -131,6 +132,7 @@ static void print_shape_info(cDataShape<cNTuple>* shape) {
 
 // used for out of scope stack disposal check so that _CrtDumpMemoryLeaks doesnt show false positive leaks on stack allocated memory
 static void helper() {
+	cTimer timer = cTimer();
 
 	auto* space_desc_3d = new cSpaceDescriptor(DIMENSION_3, new cNTuple(), new cDouble());
 	auto* context = new SeqArrayContext();
@@ -164,10 +166,13 @@ static void helper() {
 	cDataShape<cNTuple>* item = nullptr;
 
 	// -------------- IMPORT DATA ------------------
-	printf("TEST #1 - Data import:\n");
+	printf("\n\nTEST #1 - Data import:\n");
 
 	// IMPORT SAMPLE
+	
 	printf("Importing sample...\n");
+	
+	timer.Start();
 	parser->open(INPUT_PATH);
 	while (item = parser->get_item()) {
 		seq_array->AddItem(node_id, position, *item);
@@ -175,13 +180,18 @@ static void helper() {
 		item = nullptr;
 	}
 	delete parser;
+
+	timer.Stop();	
 	printf("Importing sample done.\n");
 
 	auto item_count = seq_array->GetHeader()->GetItemCount();
 	printf("Inserted %i items.\n", item_count);
 
+	timer.Print(" - Import time\n");
+	printf("Took %.3f seconds per imported item.\n", timer.GetRealTime() / item_count);
+	
 	// -------------- EXPORT DATA ------------------
-	printf("TEST #2 - Data export:\n");
+	printf("\n\nTEST #2 - Data export:\n");
 
 	// EXPORT ALL IMPORTED DATA
 
@@ -199,6 +209,10 @@ static void helper() {
 
 #ifndef TEST_SHP
 	printf("Exporting...\n");
+
+	timer.Reset();
+	timer.Start();
+
 	exporter->begin();
 
 	seq_array->OpenContext(seq_array->GetHeader()->GetFirstNodeIndex(), 0, context);
@@ -231,12 +245,21 @@ static void helper() {
 
 	exporter->end();
 	delete exporter;
+
+	timer.Stop();
+	timer.Print(" - Export time\n");
+	printf("Took %.3f seconds per exported item.\n", timer.GetRealTime() / item_count);
+
 	printf("Exporting done.\n");
 #endif
 
 #ifdef TEST_SHP
 	// EXPORT ALL IMPORTED DATA INTO SHAPEFILE (SHP file only consists of one type, for that reason file for every type is created.)
 	printf("Exporting to SHP...\n");
+
+	timer.Reset();
+	timer.Start();
+
 	auto* shp_point_exporter = new nsShapeFile::shpExporter<cPoint<cNTuple>>(".\\test\\output\\output_pt");
 	auto* shp_linestring_exporter = new nsShapeFile::shpExporter<cLineString<cNTuple>>(".\\test\\output\\output_ls");
 	auto* shp_polygon_exporter = new nsShapeFile::shpExporter<cPolygon<cNTuple>>(".\\test\\output\\output_poly");
@@ -278,6 +301,11 @@ static void helper() {
 	delete shp_point_exporter;
 	delete shp_linestring_exporter;
 	delete shp_polygon_exporter;
+
+	timer.Stop();
+	timer.Print(" - Export time\n");
+	printf("Took %.3f seconds per exported item.\n", timer.GetRealTime() / item_count);
+
 	printf("Exporting to SHP done.\n");
 #endif
 
