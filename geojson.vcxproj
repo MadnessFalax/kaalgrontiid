@@ -840,7 +840,7 @@
     <ClCompile Include="..\..\dstruct\paged\core\cTreeHeader.cpp" />
     <ClCompile Include="parser\regex\AST\pRegexNode.cpp" />
     <ClCompile Include="parser\regex\NFA\pState.cpp" />
-    <ClCompile Include="Source2.cpp" />
+    <ClCompile Include="Example3.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Czech_Republic_KMZ\Czech Republic.kmz" />
@@ -848,6 +848,7 @@
     <None Include="parser\LL1\grammar\kml.grammar" />
     <None Include="parser\LL1\grammar\osm.grammar" />
     <None Include="parser\LL1\grammar\regex.grammar" />
+    <None Include="README.md" />
     <None Include="test\input\sample_geo.json">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Shapefile|x64'">false</ExcludedFromBuild>

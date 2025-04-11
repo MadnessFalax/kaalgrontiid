@@ -47,18 +47,24 @@ using SeqArray = dstruct::paged::sqarray::cSequentialArray<Tkey>;
 using SeqArrayContext = dstruct::paged::sqarray::cSequentialArrayContext<Tkey>;
 using SeqArrayHeader = dstruct::paged::sqarray::cSequentialArrayHeader<Tkey>;
 
+// -------------- CHANGE THESE BASED ON PREFERENCES ------------------
+// I suggest using output files from Example1 as the input data are identical. 
+// This should allow the best possible performance comparison for both parser and exporter for each formate.
+// Also use Release_XXX configurations as there is no debug info being printed. 
+// (We know that printing to console takes more time than communicating with PCs on the other side of the world. *sigh*)
+
 #ifdef TEST_OSM
-constexpr auto INPUT_PATH = R"(.\test\input\short.osm)";
+constexpr auto INPUT_PATH = R"(.\test\output\output.osm)";
 constexpr auto OUTPUT_PATH = R"(.\test\output\output.osm)";
 #endif
 
 #ifdef TEST_GEOJS
-constexpr auto INPUT_PATH = R"(.\test\input\sample_geo.json)";
+constexpr auto INPUT_PATH = R"(.\test\output\output.json)";
 constexpr auto OUTPUT_PATH = R"(.\test\output\output.json)";
 #endif
 
 #ifdef TEST_KML
-constexpr auto INPUT_PATH = R"(.\test\input\KML_Samples.kml)";
+constexpr auto INPUT_PATH = R"(.\test\output\output.kml)";
 constexpr auto OUTPUT_PATH = R"(.\test\output\output.kml)";
 #endif
 
