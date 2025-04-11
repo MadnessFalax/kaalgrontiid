@@ -6,10 +6,6 @@
 #include "../container/pArray.h"
 #include "../container/pMap.h"
 
-#include "cPolygon.h"
-#include "cLineString.h"
-#include "cSphere.h"
-
 namespace nsShapeFile {
 	using String = nspString::pString;
 	using FileWriter = nspFile::pFileWriter;

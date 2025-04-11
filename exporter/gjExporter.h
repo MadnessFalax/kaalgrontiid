@@ -5,10 +5,6 @@
 #include "../container/pString.h"
 #include "../container/pArray.h"
 
-#include "cPolygon.h"
-#include "cLineString.h"
-#include "cSphere.h"
-
 namespace nsGeoJSON {
 	using String = nspString::pString;
 	using FileWriter = nspFile::pFileWriter;
