@@ -1,5 +1,5 @@
-# Thesis
-#### Geospatial data import/export tool for RadegastDB framework
+﻿# Thesis
+## Geospatial data import/export tool for RadegastDB framework
 
 The goal of this thesis is to implement a tool that would allow import/export of geospatial data into RadegastDB framework's sequential array memory container. 
 
@@ -58,20 +58,20 @@ The three example files are included in the repository:
 
 The fastest way to switch between the active examples is to include the desired one in project and exclude the others.
 
-#### Example #1
+### Example #1
 In this example the data are imported from one file of each formate. 
 These are all loaded into single sequential array. 
 The resulting data are then exported into each of the formates.
 The exported data are then imported back into the sequential array to show that the data validity doesn't change through the process. 
 Only non-spatial data are scrapped. I suggest running build with Release configuration.
 
-#### Example #2
+### Example #2
 In this example you should choose the formate you want to import/export.
 In order to do so you need to choose the right configuration.
 I suggest using Release_xxx configurations as these do not print any other debug information into console.
 The data are imported and printed before insert into sequential array. They are then again printed before export.
 
-#### Example #3
+### Example #3
 In this example you should choose the formate you want to import/export.
 In order to do so you need to choose the right configuration.
 I suggest using Release_xxx configurations as these do not print any other debug information into console.
@@ -85,3 +85,5 @@ These are:
 - [geojson.io](https://geojson.io/) (GeoJSON)
 - [kmzview.com](https://kmzview.com/) (KML)
 - [mapshaper.org](https://mapshaper.org/) (Shapefile)
+
+🐱‍👤👳🏾‍♂️🧙‍♂️ 🔥🐲 💎
