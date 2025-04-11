@@ -1,6 +1,5 @@
 #pragma once
 #include <cstdio>
-#include "../utils/is_pointer.h"
 #include <type_traits>
 #include "../utils/exception/pOutOfRangeException.h"
 

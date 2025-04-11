@@ -1,50 +1,65 @@
-﻿GeoJSON				-> FeatureCollection
-					| Feature
-					| Geometry
+GeoJSON               -> { GJProperties }
+GJProperties          -> GJProperty GJPropertiesTail
+GJPropertiesTail      -> , GJProperty GJPropertiesTail | null
+GJProperty            -> "type" : TypeVal 
+                      | "features" : [ FeatureValues ] 
+                      | "geometry" : OptionalGeometryValue
+                      | "properties" : { GenericProperties }
+                      | "coordinates" : [ CoordinatesRoot ]
+                      | "geometries" : [ GeometryValues ]
+                      | GenericProperty
 
-FeatureCollection	-> { FCMembers }
-FCMembers			-> FCMember FCMembersTail
-FCMembersTail		-> , FCMember FCMembersTail | null
-FCMember			-> "type" : "FeatureCollection" | "features" : [ Features ] | Property
+GeometryType          -> "Point" 
+                      | "LineString" 
+                      | "Polygon" 
+                      | "MultiPoint" 
+                      | "MultiLineString" 
+                      | "MultiPolygon" 
+                      | "GeometryCollection"
 
-Features			-> Feature FeaturesTail
-FeaturesTail		-> , Feature FeaturesTail | null
+TypeVal               -> "FeatureCollection" 
+                      | "Feature" 
+                      | GeometryType
 
-Feature				-> { FMembers }
-FMembers			-> FMember FMembersTail
-FMembersTail		-> , FMember FMembersTail | null
-FMember				-> "type" : "Feature" | "geometry" : Geometry | "properties" : Properties | Property
+OptionalGeometryValue -> null
+                      | { GProperties } 
 
-Geometry			-> { GMembers }
-GMembers			-> GMember GMembersTail
-GMembersTail		-> , GMember GMembersTail | null
-GMember				-> "type" : GeometryType | "coordinates" : Coordinates | Property
+GenericProperties     -> GenericProperty GenericPropertiesTail
+GenericPropertiesTail -> , GenericProperty GenericPropertiesTail | null
+GenericProperty       -> STRING : Value
 
-GeometryType		-> "Point" | "LineString" | "Polygon" | "MultiPoint" | "MultiLineString" | "MultiPolygon" | "GeometryCollection"
+FeatureValues         -> { FProperties } FeatureValuesTail | null
+FeatureValuesTail     -> , { FProperties } FeatureValuesTail | null
 
-Properties			-> { Property PropertiesTail }
-PropertiesTail		-> , Property PropertiesTail | null
-Property			-> STRING : Value
+GeometryValues        -> { GProperties } GeometryValuesTail | null
+GeometryValuesTail    -> , { GProperties } GeometryValuesTail | null
 
-Coordinates			-> [ CoordinateBody ]
-CoordinatesBody		-> Coordinate, Coordinate, CoordinateTail | null
-CoordinateTail		-> , Coordinate CoordinateTail, null
-Coordinate			-> Number
+FProperties           -> FProperty FPropertiesTail
+FPropertiesTail       -> , FProperty FPropertiesTail | null
+FProperty             -> "type" : "Feature" 
+                      | "geometry" : OptionalGeometryValue 
+                      | "properties" : { GenericProperties } 
+                      | GenericProperty
 
-Array				-> [ Elements ]
-Elements			-> Element ElementsTail
-ElementsTail		-> , Element ElementsTail | null
-Element				-> Value
+GProperties           -> GProperty GPropertiesTail
+GPropertiesTail       -> , GProperty GPropertiesTail | null
+GProperty             -> "type" : GeometryType 
+                      | "coordinates" : [ CoordinatesRoot ]
+                      | "geometries" : [ GeometryValues ]
+                      | GenericProperty
 
-Value				-> STRING
-					| NUMBER
-					| Object
-					| Array
-					| true
-					| false
-					| null
+CoordinatesRoot       -> [ CoordinatesRoot ] CoordinatesRootTail | Coordinates
+CoordinatesRootTail   -> , [ CoordinatesRoot ] CoordinatesRootTail | null
+Coordinates           -> NUMBER CoordinatesTail | null
+CoordinatesTail       -> , NUMBER CoordinatesTail | null
 
-Object				-> { OMembers }
-OMembers			-> OMember OMembersTail
-OMembersTail		-> , OMember OMembersTail | null
-OMember				-> STRING : Value
+Value                 -> "true" 
+                      | "false" 
+                      | "null" 
+                      | { GenericProperties } 
+                      | [ GenericArrayValues ] 
+                      | STRING 
+                      | NUMBER 
+
+GenericArrayValues    -> Value GenericArrayValuesTail
+GenericArrayValuesTail-> , Value GenericArrayValuesTail | null

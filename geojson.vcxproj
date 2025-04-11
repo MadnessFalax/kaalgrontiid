@@ -701,12 +701,9 @@
     <ClInclude Include="parser\regex\AST\node\pWildcardNode.h" />
     <ClInclude Include="parser\regex\AST\node\pAlternationNode.h" />
     <ClInclude Include="parser\regex\AST\node\pDigitNode.h" />
-    <ClInclude Include="parser\regex\AST\node\pEndNode.h" />
     <ClInclude Include="parser\regex\AST\node\pLiteralNode.h" />
     <ClInclude Include="parser\regex\AST\node\pPlusNode.h" />
-    <ClInclude Include="parser\regex\AST\node\pStartNode.h" />
     <ClInclude Include="parser\regex\AST\node\pWhiteSpaceNode.h" />
-    <ClInclude Include="parser\regex\AST\pRegexContext.h" />
     <ClInclude Include="parser\regex\AST\pRegexNode.h" />
     <ClInclude Include="parser\regex\AST\pRegexVisitor.h" />
     <ClInclude Include="parser\regex\NFA\exception\pNFAUndefinedException.h" />
@@ -738,7 +735,6 @@
     <ClInclude Include="parser\Shapefile\shpRecordHeader.h" />
     <ClInclude Include="parser\Shapefile\shpRecordIndex.h" />
     <ClInclude Include="utils\exception\pOutOfRangeException.h" />
-    <ClInclude Include="utils\is_pointer.h" />
     <ClInclude Include="container\pArray.h" />
     <ClInclude Include="container\pString.h" />
     <ClInclude Include="utils\match.h" />
@@ -838,17 +834,20 @@
     <ClCompile Include="..\..\dstruct\paged\core\cQueryStatistics.cpp" />
     <ClCompile Include="..\..\dstruct\paged\core\cQuickDB.cpp" />
     <ClCompile Include="..\..\dstruct\paged\core\cTreeHeader.cpp" />
-    <ClCompile Include="parser\regex\AST\pRegexNode.cpp" />
     <ClCompile Include="parser\regex\NFA\pState.cpp" />
     <ClCompile Include="Example3.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Czech_Republic_KMZ\Czech Republic.kmz" />
     <None Include=".gitignore" />
+    <None Include="output_cleaner.ps1" />
     <None Include="parser\LL1\grammar\kml.grammar" />
     <None Include="parser\LL1\grammar\osm.grammar" />
     <None Include="parser\LL1\grammar\regex.grammar" />
     <None Include="README.md" />
+    <None Include="test\input\gis_osm_natural_a_07_1.shp" />
+    <None Include="test\input\gis_osm_natural_a_07_1.shx" />
+    <None Include="test\input\KML_Samples.kml" />
     <None Include="test\input\sample_geo.json">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Shapefile|x64'">false</ExcludedFromBuild>
@@ -859,11 +858,11 @@
       <FileType>Document</FileType>
     </None>
     <None Include="test\input\short.osm" />
+    <None Include="test\other\Sample-KML-File-3.kml" />
     <None Include="test\other\utf8_test.json" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="parser\LL1\grammar\geojson.grammar" />
-    <Text Include="parser\LL1\grammar\geojson_new.grammar" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

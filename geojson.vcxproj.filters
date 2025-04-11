@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="utils\is_pointer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="abstract\pHashable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -72,12 +69,6 @@
     <ClInclude Include="parser\regex\AST\node\abstract\pLiteralListNode.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="parser\regex\AST\node\pStartNode.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="parser\regex\AST\node\pEndNode.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="parser\regex\AST\node\pDigitNode.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -97,9 +88,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="parser\regex\AST\node\pConcatNode.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="parser\regex\AST\pRegexContext.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="parser\regex\pBadPatternException.h">
@@ -452,9 +440,6 @@
     <ClCompile Include="parser\regex\NFA\pState.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="parser\regex\AST\pRegexNode.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\common\cCommon.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -583,9 +568,13 @@
     <None Include="test\input\short.osm" />
     <None Include="..\..\..\Czech_Republic_KMZ\Czech Republic.kmz" />
     <None Include="README.md" />
+    <None Include="test\input\KML_Samples.kml" />
+    <None Include="test\input\gis_osm_natural_a_07_1.shx" />
+    <None Include="test\input\gis_osm_natural_a_07_1.shp" />
+    <None Include="test\other\Sample-KML-File-3.kml" />
+    <None Include="output_cleaner.ps1" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="parser\LL1\grammar\geojson.grammar" />
-    <Text Include="parser\LL1\grammar\geojson_new.grammar" />
   </ItemGroup>
 </Project>

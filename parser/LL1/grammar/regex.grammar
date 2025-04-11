@@ -1,20 +1,46 @@
-regex	= conc regex_post
+regex			-> conc regex_post
 
-regex_post = '|' regex | null
+regex_post		-> '|' regex 
+				| null
 
-conc	= qual_quant conc_post
-conc_post = conc | null
+conc			-> qual_quant conc_post
 
-qual_quant	= qual quant
+conc_post		-> conc 
+				| null
 
-quant	= '+' | '*' | '?' | '{' quant_core '}' | null
-quant_core = num ',' quant_core_post | ',' num
-quant_core_post = num | null
+qual_quant		-> qual quant
 
-qual = '.' | char | '\' char | '(' regex ')' | '[' qual_range ']'
-qual_range = char qual_range_post | '\' char qual_range_post | '^' char qual_range_post | '^' '\' char qual_range_post
-qual_range_post = '-' char qual_range | '-' '\' char qual_range | qual_range | null
+quant			-> '+' 
+				| '*' 
+				| '?' 
+				| '{' quant_core '}' 
+				| null
 
-char = RANGE(char(32) - char(126))
-num = RANGE('1' - '9') num_tail 
-num_tail = RANGE('0' - '9') num_tail | null
+quant_core		-> num ',' quant_core_post 
+				| ',' num
+
+quant_core_post -> num 
+				| null
+
+qual			-> '.' 
+				| char 
+				| '\' char 
+				| '(' regex ')' 
+				| '[' qual_range ']'
+
+qual_range		-> char qual_range_post 
+				| '\' char qual_range_post 
+				| '^' char qual_range_post 
+				| '^' '\' char qual_range_post
+
+qual_range_post -> '-' char qual_range 
+				| '-' '\' char qual_range 
+				| qual_range 
+				| null
+
+char			-> RANGE(char(32) - char(126))		// was increased for UTF8!
+
+num				-> RANGE('1' - '9') num_tail 
+
+num_tail		-> RANGE('0' - '9') num_tail 
+				| null
